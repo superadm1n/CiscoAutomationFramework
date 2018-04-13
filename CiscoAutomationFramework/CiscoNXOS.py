@@ -15,6 +15,9 @@ limitations under the License.
 '''
 
 import time
+from . import CustomExceptions
+
+not_implemented_text = 'This method has not been implemented in the CiscoNXOS module'
 
 class TerminalCommands:
 
@@ -57,6 +60,9 @@ class TerminalCommands:
         self.ssh.terminal_width_value = str(number)
 
         return self.ssh.send_command_expect_same_prompt('terminal width {}'.format(number))
+
+    def priv_exec(self):
+        raise CustomExceptions.MethodNotSupported
 
 
 class NXOS(TerminalCommands):
@@ -143,6 +149,9 @@ class NXOS(TerminalCommands):
 
         return output
 
+    def show_run_interface(self, interface):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def get_local_users(self):
         users = []
 
@@ -153,6 +162,33 @@ class NXOS(TerminalCommands):
                 users.append(line.split()[1])
 
         return users
+
+    def delete_local_user(self, username):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_description(self, interface, description):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_access_vlan(self, interface, vlan):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def power_cycle_port(self, interface, delay):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_router_lan_subinterface(
+            self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def physical_port_inventory(self):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def physical_port_inventory_longname(self):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def list_ospf_configuration(self):
 

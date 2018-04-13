@@ -25,7 +25,7 @@ import time
 import serial
 import paramiko
 
-from .CustomExceptions import *
+from . import CustomExceptions
 from .CiscoIOSXE import IOSXE
 from .CiscoIOS import IOS
 from .CiscoNXOS import NXOS
@@ -132,11 +132,11 @@ class SSHEngine(BaseClass):
                                 password=password, look_for_keys=False, allow_agent=False)  # Makes connection to server
 
         except paramiko.ssh_exception.AuthenticationException:
-            raise LoginFailed('Unable to login to device with supplied username and password')
+            raise CustomExceptions.LoginFailed('Unable to login to device with supplied username and password')
 
 
         except paramiko.ssh_exception.NoValidConnectionsError:
-            raise ConnectionError('Unable to connect to server {} on port {}!'.format(ip, self.sshPort))
+            raise CustomExceptions.ConnectionError('Unable to connect to server {} on port {}!'.format(ip, self.sshPort))
 
         else:
             time.sleep(.1)
@@ -154,7 +154,7 @@ class SSHEngine(BaseClass):
         try:
             self.shell = self.client.invoke_shell()
         except paramiko.ssh_exception.SSHException:
-            raise InvokeShellError('Unable to Invoke Shell in SSHEngine Class')
+            raise CustomExceptions.InvokeShellError('Unable to Invoke Shell in SSHEngine Class')
 
         # I think to stop the second exception I should add a longer wait time here
         return self.get_initial_prompt()
@@ -371,7 +371,7 @@ class SerialEngine(BaseClass, serial.Serial):
     def _login_to_device(self, username, password):
 
         if username is None or password is None:
-            raise UsernameOrPasswordNotSupplied('You have not supplied a Username or Password to login to the '
+            raise CustomExceptions.UsernameOrPasswordNotSupplied('You have not supplied a Username or Password to login to the '
                                                 'device with')
 
         output = []
@@ -399,7 +399,7 @@ class SerialEngine(BaseClass, serial.Serial):
             line = line.lower()
 
             if 'fail' in line:
-                raise LoginFailed('Unable to Login to device with supplied username and password')
+                raise CustomExceptions.LoginFailed('Unable to Login to device with supplied username and password')
 
         return True
 
@@ -420,7 +420,7 @@ class SerialEngine(BaseClass, serial.Serial):
                 return 'SHELL'
 
             else:
-                raise UnableToDetermineLocation('Serial Engine is unable to determine if the shell is requiring '
+                raise CustomExceptions.UnableToDetermineLocation('Serial Engine is unable to determine if the shell is requiring '
                                                 'login or already logged in ')
 
     def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
@@ -613,7 +613,7 @@ class TransportInterface(SSHEngine, SerialEngine):
         elif self.engine == 'ssh':
             return SSHEngine
         else:
-            raise EngineNotSelected('Valid Transport Engine not Specified!')
+            raise CustomExceptions.EngineNotSelected('Valid Transport Engine not Specified!')
 
     def __enter__(self):
 
@@ -709,7 +709,7 @@ class CAF(TransportInterface):
             return ASA(self)
 
         else:
-            raise OsDetectionFailure('Unable to detect OS for device')
+            raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
 
     def detect_firmware(self):
 
@@ -796,17 +796,7 @@ class CAF(TransportInterface):
         :return: Running Configuration of specified interface
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).show_run_interface(interface)
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).show_run_interface(interface)
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).show_run_interface(interface)
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        return self.ssh.show_run_interface(interface)
 
     def get_local_users(self):
         '''
@@ -824,18 +814,12 @@ class CAF(TransportInterface):
         :param username: Username to delete
         :return:
         '''
+        try:
+            output = self.ssh.delete_local_user(username)
+            return output
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).delete_local_user(username)
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).delete_local_user(username)
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).delete_local_user(username)
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def configure_description(self, interface, description):
 
@@ -846,17 +830,10 @@ class CAF(TransportInterface):
         :return:
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).configure_description(interface, description)
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).configure_description(interface, description)
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).configure_description(interface, description)
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.configure_description(interface,description)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def configure_access_vlan(self, interface, vlan):
         '''
@@ -867,42 +844,25 @@ class CAF(TransportInterface):
         :return: commands sent to server and their output
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).configure_access_vlan(interface, vlan)
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).configure_access_vlan(interface, vlan)
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).configure_access_vlan(interface, vlan)
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.configure_access_vlan(interface, vlan)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def power_cycle_port(self, interface, delay=5):
 
-        return self.ssh.power_cycle_port(interface, delay)
+        try:
+            return self.ssh.power_cycle_port(interface, delay)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def configure_router_lan_subinterface(
             self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).configure_router_lan_subinterface(
-                physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses
-            )
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).configure_router_lan_subinterface(
-                physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses
-            )
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).configure_router_lan_subinterface(
-                physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses
-            )
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.configure_router_lan_subinterface(physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def physical_port_inventory(self):
         '''
@@ -911,17 +871,10 @@ class CAF(TransportInterface):
         :return: List of physical interfaces on device
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).physical_port_inventory()
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).physical_port_inventory()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).physical_port_inventory()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.physical_port_inventory()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def physical_port_inventory_longname(self):
 
@@ -932,17 +885,10 @@ class CAF(TransportInterface):
         :return: list of ports
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).physical_port_inventory_longname()
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).physical_port_inventory_longname()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).physical_port_inventory_longname()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.physical_port_inventory_longname()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def port_status(self):
 

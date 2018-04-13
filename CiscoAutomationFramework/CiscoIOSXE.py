@@ -16,6 +16,7 @@ limitations under the License.
 
 
 import time
+from . import CustomExceptions
 from .CiscoIOS import IOS, TerminalCommands
 
 
@@ -44,6 +45,12 @@ class IOSXE(TerminalCommands):
         '''
         return self.ios.show_run()
 
+    def show_run_interface(self, interface):
+        # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
+        # issuing the 'show running-config' command
+
+        return self.ios.show_run_interface(interface)
+
     def get_local_users(self):
         '''
         Method to extract the local users configured on the system out of the running config
@@ -54,7 +61,7 @@ class IOSXE(TerminalCommands):
 
     def delete_local_user(self, username):
 
-        return 'Command not configured for IOSXE at this point, skel code is staged'
+        raise CustomExceptions.MethodNotImplemented()
         output = ''
 
         output += self.ssh.config_t()
@@ -65,14 +72,8 @@ class IOSXE(TerminalCommands):
 
         return output
 
-    def show_run_interface(self, interface):
-        # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
-        # issuing the 'show running-config' command
-
-        return self.ios.show_run_interface(interface)
-
     def configure_description(self, interface, description):
-        return 'Method not configured for IOSXE, skel code is staged from IOS'
+        raise CustomExceptions.MethodNotImplemented
 
         output = ''
 
@@ -209,7 +210,6 @@ class IOSXE(TerminalCommands):
                         else:
                             general_data.append(line)
             return general_data
-
 
     def list_ospf_configuration(self):
 
