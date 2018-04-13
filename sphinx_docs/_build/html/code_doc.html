@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CiscoAutomationFramework Code Documentation &#8212; Cisco Automation Framework 0.57 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.57',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="ciscoautomationframework-code-documentation">
+<h1>CiscoAutomationFramework Code Documentation<a class="headerlink" href="#ciscoautomationframework-code-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-Framework">
+<span id="framework"></span><h2>Framework<a class="headerlink" href="#module-Framework" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="Framework.CAF">
+<em class="property">class </em><code class="descclassname">Framework.</code><code class="descname">CAF</code><a class="headerlink" href="#Framework.CAF" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="Framework.CAF.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>self</em>, <em>ip</em>, <em>username</em>, <em>password</em>, <em>enable_password=False</em><span class="sig-paren">)</span><a class="headerlink" href="#Framework.CAF.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects to the remote device, detects the firmware version, and sets up the framework to issue
+commands based on the firmware detected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ip</strong> (<em>str</em>) – IP address of remote device</li>
+<li><strong>username</strong> (<em>str</em>) – Username to login to remote device</li>
+<li><strong>password</strong> (<em>str</em>) – Password to login to remote device</li>
+<li><strong>enable_password</strong> (<em>str</em>) – Password to enter privilege exec mode, not required to establish a connection
+because not all commands need to have that privilege level, but if you have the password it is a good idea
+to pass it in</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Framework.SSHEngine">
+<em class="property">class </em><code class="descclassname">Framework.</code><code class="descname">SSHEngine</code><a class="headerlink" href="#Framework.SSHEngine" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="Framework.SSHEngine.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#Framework.SSHEngine.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="Framework.SSHEngine.connect_to_server">
+<code class="descname">connect_to_server</code><span class="sig-paren">(</span><em>self</em>, <em>ip</em>, <em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="headerlink" href="#Framework.SSHEngine.connect_to_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects to Server</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ip</strong> (<em>str</em>) – IP address of the remote Server</li>
+<li><strong>username</strong> (<em>str</em>) – Username of the user logging in</li>
+<li><strong>password</strong> (<em>str</em>) – Password for the user logging in</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CiscoAutomationFramework Code Documentation</a><ul>
+<li><a class="reference internal" href="#module-Framework">Framework</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/code_doc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Kyle Kowalczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/code_doc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

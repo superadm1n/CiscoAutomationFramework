@@ -1,0 +1,38 @@
+CiscoAutomationFramework Code Documentation
+===========================================
+
+Framework
+---------
+
+
+.. py:module:: Framework
+
+.. py:currentmodule:: Framework
+
+.. py:class:: CAF
+
+    .. py:method:: __init__(self, ip, username, password, enable_password=False)
+
+        Connects to the remote device, detects the firmware version, and sets up the framework to issue
+        commands based on the firmware detected.
+
+        :param str ip: IP address of remote device
+        :param str username: Username to login to remote device
+        :param str password: Password to login to remote device
+        :param str enable_password: Password to enter privilege exec mode, not required to establish a connection
+            because not all commands need to have that privilege level, but if you have the password it is a good idea
+            to pass it in
+
+
+.. py:class:: SSHEngine
+
+    .. py:method:: __init__(self)
+
+    .. py:method:: connect_to_server(self, ip, username, password)
+
+        Connects to Server
+
+        :param str ip: IP address of the remote Server
+        :param str username: Username of the user logging in
+        :param str password: Password for the user logging in
+
