@@ -71,11 +71,11 @@ class TerminalCommands:
         to elevate into enable mode it will raise this exception
         '''
 
-        if self.enable_password is None:
-            raise NoEnablePassword('There was no enable password supplied to the server')
-
         if '#' not in self.ssh.prompt:
-            #enpassword = str(bz2.decompress(self.enable).decode('utf-8'))
+
+            if self.enable_password is None:
+                raise NoEnablePassword('There was no enable password supplied to the server')
+
             self.ssh.send_command('enable')
             time.sleep(.5)
             return self.ssh.send_command_expect_different_prompt(self.enable_password)
@@ -341,7 +341,7 @@ class IOS(TerminalCommands):
         self.terminal_length()
         return self.ssh.send_command_expect_same_prompt('show interfaces status')[3:][:-1]
 
-    def power_inline(self, summary=False):
+    def power_inline(self, summary):
         self.terminal_length()
 
         data_from_device = self.ssh.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]

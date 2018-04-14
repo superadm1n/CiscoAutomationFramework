@@ -164,7 +164,8 @@ class CredCheck(PingTest):
         :rtype: bool
         '''
         try:
-            with CAF(self.transport, self.destination, username, password) as ssh:
+            with CAF(self.transport) as ssh:
+                ssh.connect(self.destination, username, password)
                 pass
             return True
 
@@ -186,7 +187,8 @@ class CredCheck(PingTest):
         :return: True/False depending on if the enable password is accepted or not
         :rtype: bool
         '''
-        with CAF(self.transport, self.destination, username, password, enable_password=enable_password) as ssh:
+        with CAF(self.transport) as ssh:
+            ssh.connect(self.destination, username, password, enable_password=enable_password)
             output = ssh.priv_exec().lower()
 
         for line in output.splitlines():

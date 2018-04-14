@@ -22,670 +22,371 @@ the transport engines and the engine interfaces.
 '''
 
 import time
-import serial
-import paramiko
+
 
 from . import CustomExceptions
 from .CiscoIOSXE import IOSXE
 from .CiscoIOS import IOS
 from .CiscoNXOS import NXOS
 from .CiscoASA import ASA
+from .TransportEngines import TransportInterface
 
 
-class BaseClass:
+class CommandInterface:
 
-    def __init__(self):
-        self.prompt = ''
-        self.hostname = ''
-        self.shell = None
-        self.total_discarded_buffer_bytes = 0
+    '''
+    This class is the interface between the firmware specific logic and the CAF class
+    that the user interfaces with. It will call the proper module based on the previously
+    detected firmware and issue commands from that module.
+    '''
 
+    def priv_exec(self):
 
-class SSHEngine(BaseClass):
-
-    def __init__(self):
-        BaseClass.__init__(self)
-        self.client = paramiko.SSHClient()
-        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-        self.sshPort = 22
-
-    def __enter__(self):
         '''
-        Required to allow the class to be used inside a 'with' statement (with Ciscossh() as ssh:)
+        Enters privilege exec mode, will exit config T if you are in config t, and elevate from standard user mode
+        if you are in standard user mode
 
-        :return: self object
-        '''
-
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        '''
-        Required to allow the class to be used inside a 'with' statement (with Ciscossh() as ssh:) THis function is
-        called when the 'with' statement is exited.
-
-        :param exc_type:
-        :param exc_val:
-        :param exc_tb:
-        :return: Nothing
-        '''
-
-        self.close_connection()
-
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
-        '''
-        High level method for sending a command when expecting the prompt to return differently. This uses the
-        SSHEngine methods of send_command and get_output_different_prompt
-
-        :param command: command to issue on the server as typed directly from command line
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: output from command in either string or list format
-
-        Note: The Purpose of this method is to provide an interface to type commands that are
-        not otherwise satisfied in another method. Make all attempts to not use this method if possible
-        as you will have to integrate more error checking and contingency planning in the main body of
-        the code when it should be handled in the class
-        '''
-
-        self.send_command(command)
-
-        return self.get_output_different_prompt(
-            return_as_list=return_as_list,
-            buffer_size=buffer_size
-        )
-
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        '''
-        Sends commands and gathers the output in a way that expects the same prompt to be returned
-        DO NOT use this method if you are not SURE that the prompt returned will be the same
-
-        :param command: Command to issue to device
-        :param detecting_firmware: set to true if you want to throw away buffer data for detecting firmware
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: Output from command in either string or list format
-        '''
-
-        self.send_command(command)
-
-        return self.get_output(
-            detecting_firmware=detecting_firmware,
-            return_as_list=return_as_list,
-            buffer_size=buffer_size
-        )
-
-    def connect_to_server(self, ip, username, password):
-        '''
-        Makes initial connection to server and calls method to invoke shell
-
-        :param ip: IP of server
-        :type ip: str
-        :param username: username for the server
-        :type username: str
-        :param password: password for the server
-        :type password: str
-        :raises AuthenticationError: raised if the method cant authenticate the user
-        :raises ConnectionError: Raised if this method can't connect to the IP address on specified port
-        :return: string "Connection Succesful"
+        :return: Output from command
         '''
         try:
-            self.client.connect(ip, port=self.sshPort, username=username,
-                                password=password, look_for_keys=False, allow_agent=False)  # Makes connection to server
+            return self.ssh.priv_exec()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        except paramiko.ssh_exception.AuthenticationException:
-            raise CustomExceptions.LoginFailed('Unable to login to device with supplied username and password')
+    def get_uptime(self):
 
-
-        except paramiko.ssh_exception.NoValidConnectionsError:
-            raise CustomExceptions.ConnectionError('Unable to connect to server {} on port {}!'.format(ip, self.sshPort))
-
-        else:
-            time.sleep(.1)
-            self.invoke_shell()
-            return 'Connection Successful'
-
-    def invoke_shell(self):
         '''
-        Invokes shell with remote server
+        Gets the uptime of the remote device
 
-        :return: Prompt supplied from server
-        :raises InvokeShellError: Raised if the the server is unable to invoke a shell
+        :return: str System uptime
         '''
-
         try:
-            self.shell = self.client.invoke_shell()
-        except paramiko.ssh_exception.SSHException:
-            raise CustomExceptions.InvokeShellError('Unable to Invoke Shell in SSHEngine Class')
+            return self.ssh.get_uptime()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        # I think to stop the second exception I should add a longer wait time here
-        return self.get_initial_prompt()
-
-    def get_initial_prompt(self):
+    def show_run(self):
         '''
-        Gathers the initial prompt from the remote device
+        Issues 'show running-config' command to to the remote router/switch
 
-        :return: Output from device
+        :return: output from command
         '''
-
-        output = self.get_output_different_prompt(.5)
-
-        # At times the server will return the data in the 1st line, and others the second line, this try except block handles that
+        # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
+        # issuing the 'show running-config' command
         try:
-            # Sends return key and grabs the prompt that is returned, subtracting 1 character to give the hostname
-            self.send_command('')
-            output = self.get_output_different_prompt(return_as_list=True)
-            for line in output:
-                if line is not '' and line is not ' ':
-                    self.hostname = line[:-1]
-                    break
+            return self.ssh.show_run()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        except IndexError:
-
-            try:
-                self.hostname = output[0][:-1]
-            except IndexError:
-                print('This is the second exception\nBegin Output\n{}\nEnd Output'.format(output))
-
-        return output
-
-    def send_command(self, command):
-
-        '''
-        Method for sending a command to the remote device
-
-        :param command: Command to issue as it is typed on the command line
-        :return: Nothing
-        '''
-
-        self.shell.send('{}\n'.format(command))
-
-    def throw_away_buffer_data(self):
-        '''
-        Will capture any data waiting in the incoming buffer and discard it
-
-        :return: int: total bytes discarded from the buffer
-        :rtype: int
-        '''
-
-        bytes_discarded = 0
-
-        while True:
-            if self.shell.recv_ready():
-                bytes.decode(self.shell.recv(1))
-                bytes_discarded += 1
-                time.sleep(.01)
-            else:
-                break
-
-        return bytes_discarded
-
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1):
-        '''
-        This method will use a pre determined time to capture output, if the server doesnt begin to return output
-        within that predetermined amount of time it will be missed, also if the server hangs for more than 1 second
-        while returning the output, the rest will be missed. This method should only be used when issuing a command
-        to the server that will return a different prompt, if it will return the same prompt use the 'get_output'
-        method.
-
-        :param wait_time: The time to wait before gathering buffer data (used to give the device time to fill the buffer
-        :type wait_time: float
-        :param return_as_list: default set to False will return as a string, set to True it will output as a list \
-        split by lines
-        :type return_as_list: bool
-        :param buffer_size: Number of bytes to gather at a time when retrieving data from buffer
-        :type buffer_size: int
-
-        :return: Output from server in string or list format
+    def show_run_interface(self, interface):
 
         '''
 
-        time.sleep(wait_time)
+        :param interface: Interface to capture the running config of
+        :return: Running Configuration of specified interface
+        '''
+        try:
+            return self.ssh.show_run_interface(interface)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        output = '\n\n'
+    def get_local_users(self):
+        '''
+        Method to extract the local users configured on the system out of the running config
 
-        # This will loop until a > or # is in the output
-        while True:
+        :return: List of the users configured locally on the system
+        '''
+        try:
+            return self.ssh.get_local_users()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-            if self.shell.recv_ready():
-                output += bytes.decode(self.shell.recv(buffer_size))
-
-            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1]:
-                break
-
-        output = output.splitlines()[2:]
-
-        self.prompt = output[-1]
-
-        if return_as_list is False:
-            # formats output as a string for return to user
-            cleanoutput = ''
-
-            for line in output:
-                cleanoutput += '{}\n'.format(line)
-
-            return cleanoutput
-
-        return output
-
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def delete_local_user(self, username):
 
         '''
-        .. warning:: Only use this method if you are sure the last line of output of the server will be the
-            prompt that was previously returned and stored in self.prompt
 
-        Method to capture output from the server, should be run whenever issuing a command
-        This method will loop until the last line of output from the server matches self.prompt
-        so there is a possibility of an infinate loop if the server does not return the same prompt
-        in the last line of output.
+        :param username: Username to delete
+        :return:
+        '''
+        try:
+            return self.ssh.delete_local_user(username)
 
-        :param wait_time: The time to wait before gathering buffer data (used to give the device time to fill the buffer
-        :type wait_time: float
-        :param detecting_firmware: Default set to false, if set to true it triggers to disgard buffer data after \
-        the prompt is encountered, this is useful if you need to issue multiple enter keystrokes after a command.
-        :type detecting_firmware: bool
-        :param return_as_list: default set to False will return as a string, set to True it will output as a list \
-        split by lines
-        :type return_as_list: bool
-        :param buffer_size: Number of bytes to gather at a time when retrieving data from buffer
-        :type buffer_size: int
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        :return: Output from server in string or list format
+    def configure_description(self, interface, description):
+
         '''
 
-        time.sleep(wait_time)
-        output = '\n\n'
-
-        while output.splitlines()[-1] != self.prompt:
-            output += bytes.decode(self.shell.recv(buffer_size))
-            if not self.shell.recv_ready():
-                time.sleep(.5)
-
-        output = output.splitlines()[2:]
-
-        if detecting_firmware is True:
-            # This is needed because of the way CAF detects firmware, it will leave extra lines of the prompt in the buffer
-            # and methods grabbing data downstream will cause issues on other commands. This will take those lines from the buffer
-            # and throw them away this  will only run if this method is run with the 'detecting_firmware' flag set to 'True'
-            # to prevent necessary data from being thrown away.
-            self.total_discarded_buffer_bytes += self.throw_away_buffer_data()
-
-        self.prompt = output[-1]
-
-        if return_as_list is False:
-            # Formats the output as a string and returns it
-            cleanoutput = ''
-
-            for line in output:
-                cleanoutput += '{}\n'.format(line)
-
-            return cleanoutput
-
-        return output
-
-    def close_connection(self):
-        '''
-        Closes the connection with the remote device
-
-        :return: str: Confirmation that connection is closed
-        :rtype: str
-        '''
-        self.client.close()
-
-        if self.shell is not None:
-            if self.shell._closed is True:
-                return 'Connection to {} is Closed'.format(self.hostname)
-            else:
-                return 'Connection to {} is NOT Closed'.format(self.hostname)
-
-        return 'Connection to {} attempted to close, unknown if succeeded'.format(self.hostname)
-
-
-class SerialEngine(BaseClass, serial.Serial):
-
-    def __init__(self):
-        BaseClass.__init__(self)
-        serial.Serial.__init__(self)
-        self.baud = 9600
-        self.timeout = 1
-        self.ser = None
-        self.location = None
-
-    def __enter__(self):
-
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-
-        self.close_connection()
-
-    def connect_to_server(self, serial_interface, username=None, password=None):
-
-        self.ser = serial.Serial(serial_interface, baudrate=self.baud, timeout=self.timeout)
-        self.location = self._determine_location()
-
-        if self.location == 'LOGIN':
-            login_output = self._login_to_device(username, password)
-            self._validate_login(login_output)
-
-        self.get_initial_prompt()
-
-    def _login_to_device(self, username, password):
-
-        if username is None or password is None:
-            raise CustomExceptions.UsernameOrPasswordNotSupplied('You have not supplied a Username or Password to login to the '
-                                                'device with')
-
-        output = []
-        self.send_command(username)
-        time.sleep(1)
-        for line in self.ser.readlines():
-            output.append(line.decode().strip('\r\n'))
-
-        self.send_command(password)
-        time.sleep(1)
-
-        while True:
-            time.sleep(.2)
-            for line in self.ser.readlines():
-                output.append(line.decode().strip('\r\n'))
-
-            for line in output:
-                line = line.lower()
-                if 'fail' in line or '>' in line or '#' in line:
-                    return output
-
-    def _validate_login(self, output_from_login):
-
-        for line in output_from_login:
-            line = line.lower()
-
-            if 'fail' in line:
-                raise CustomExceptions.LoginFailed('Unable to Login to device with supplied username and password')
-
-        return True
-
-    def _determine_location(self):
-
-        self.send_command('\r')
-        time.sleep(1)
-
-        output = ['']
-        while True:
-
-            for line in self.ser.readlines():
-                output.append(line.decode().strip('\r'))
-
-            if 'username' in output[-1].lower():
-                return 'LOGIN'
-            elif '#' in output[-1] or '>' in output[-1]:
-                return 'SHELL'
-
-            else:
-                raise CustomExceptions.UnableToDetermineLocation('Serial Engine is unable to determine if the shell is requiring '
-                                                'login or already logged in ')
-
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
-        '''
-        High level method for sending a command when expecting the prompt to return differently. This uses the
-        SSHEngine methods of send_command and get_output_different_prompt
-
-        :param command: command to issue on the server as typed directly from command line
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: output from command in either string or list format
-
-        Note: The Purpose of this method is to provide an interface to type commands that are
-        not otherwise satisfied in another method. Make all attempts to not use this method if possible
-        as you will have to integrate more error checking and contingency planning in the main body of
-        the code when it should be handled in the class
-        '''
-
-        self.send_command(command)
-
-        return self.get_output_different_prompt(
-            return_as_list=return_as_list,
-            buffer_size=buffer_size
-        )
-
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        '''
-        Sends commands and gathers the output in a way that expects the same prompt to be returned
-        DO NOT use this method if you are not SURE that the prompt returned will be the same
-
-        :param command: Command to issue to device
-        :param detecting_firmware: set to true if you want to throw away buffer data for detecting firmware
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: Output from command in either string or list format
-        '''
-
-        self.send_command(command)
-
-        return self.get_output(
-            detecting_firmware=detecting_firmware,
-            return_as_list=return_as_list,
-            buffer_size=buffer_size
-        )
-
-    def get_initial_prompt(self):
-        '''
-        Gets the initial prompt and hostname of the device and sets the corresponding class variables
-
-        :return: Nothing
-        '''
-
-
-        self.send_command_expect_different_prompt(command=' ', return_as_list=True)[-1].strip()
-
-        self.hostname = self.prompt[:-1]
-
-    def send_command(self, command):
-        '''
-        Method to send a command out the serial interface to the server
-
-        :param command: Command to send to the device
-        :type command: str
-        :return: Nothing
-        '''
-
-        self.ser.write('{}\n'.format(command).encode())
-
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
-
-        '''
-        Gets output when the same prompt is expected to be returned
-
-        :param wait_time: Time to wait before retrieving output from buffer
-        :type wait_time: float
-        :param return_as_list: When set to True will return output as list, when set to False will return output as string
-        :type return_as_list: bool
-        :param buffer_size: Not used but kept for compatibility
-        :type buffer_size: int
+        :param interface: Interface to configure discription on
+        :param description: str description to configure the interface with
         :return:
         '''
 
-        time.sleep(wait_time)
+        try:
+            return self.ssh.configure_description(interface, description)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        output = ['\n', '\n']
+    def configure_access_vlan(self, interface, vlan):
+        '''
+        this method should be used when the user needs to configure an interface as an access port on a specific vlan
 
-        while output[-1] != self.prompt:
-            for line in self.ser.readlines():
-                output.append(line.decode().strip('\r\n'))
+        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
+        :param vlan: Vlan number to configure
+        :return: commands sent to server and their output
+        '''
 
-            if self.ser.in_waiting == 0:
-                time.sleep(.5)
+        try:
+            return self.ssh.configure_access_vlan(interface, vlan)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        output = output[2:]  # removes first 2 entries in list
+    def power_cycle_port(self, interface, delay=5):
 
-        if detecting_firmware is True:
-            # :TODO: Add logic here
-            pass
+        try:
+            return self.ssh.power_cycle_port(interface, delay)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        self.prompt = output[-1].strip()
+    def configure_router_lan_subinterface(
+            self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
 
-        if return_as_list is False:
-            return '\n'.join(output)
-        else:
-            return output
+        try:
+            return self.ssh.configure_router_lan_subinterface(physical_interface, vlan_number, ip_address, subnet_mask,
+                                                              dhcp_servers_ip_addresses)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1):
+    def physical_port_inventory(self):
+        '''
+        Gathers an inventory of physical ports on the remote device
+
+        :return: List of physical interfaces on device
+        '''
+
+        try:
+            return self.ssh.physical_port_inventory()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def physical_port_inventory_longname(self):
 
         '''
-        Gets outut when a different prompt is expected to be returned
+        Gathers an inventory of physical ports on the remote device with their full name ex. GigabitEthernet1/0/1
+        vs their abbreviated name ex. Gi1/0/1
 
-        :param wait_time: Time to wait before retrieving output from buffer
-        :type wait_time: float
-        :param return_as_list: When set to True will return output as list, when set to False will return output as string
-        :type return_as_list: bool
-        :param buffer_size: Not used but kept for compatibility
-        :type buffer_size: int
+        :return: list of ports
+        '''
+
+        try:
+            return self.ssh.physical_port_inventory_longname()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def port_status(self):
+
+        '''
+
+
         :return:
         '''
 
+        try:
+            return self.ssh.port_status()
+        except CustomExceptions.MethodNotImplemented as E:
+            return E
 
-        time.sleep(wait_time)
-
-        output = ['\n', '\n']
-
-        while True:
-            time.sleep(1)
-
-            if self.ser.in_waiting:
-                for line in self.ser.readlines():
-                    output.append(line.decode().strip('\r\n'))
-
-            if '>' in output[-1] or '#' in output[-1]:
-                break
-
-        self.prompt = output[-1].strip()
-
-        if return_as_list is False:
-            return '\n'.join(output)
-        else:
-            return output
-
-    def close_connection(self):
-        '''
-        Closes Serial connection
-
-        :return: Nothing
-        '''
-
-        if '(conf' in self.prompt:
-            self.send_command('end')
-
-        self.send_command('exit')
-        self.ser.close()
-
-
-class TransportInterface(SSHEngine, SerialEngine):
-
-    '''
-    This class is a polymorphic interface that allows CAF and firmware specific code downstream to
-    seamlessly interface with the ssh and serial engines. It is responsible for handling calls from CAF
-    and sending them to either the SSH or Serial engine depending on what the user has specified
-    '''
-
-    def __init__(self, engine):
-        '''
-        Initializes a TransportInterface object and gets it ready to interface calls
-
-        :param engine: serial or ssh depending on which engine the user wants to use
-        :type engine: str
-        '''
-        self.engine = engine
-
-        # calls factor function to initiate a transport object that will hold the calls for the corresponding engine
-        transport = self.transport_factory()
-        transport.__init__(self)  # initializes the transport object
-
-        self.transport = transport  # makes transport object an instance variable
-
-    def transport_factory(self):
+    def power_inline(self, summary=False):
 
         '''
-        Factory function that will return an object that points to the proper engine the user has specified to use
+        Method to get the power inline statics for remote POE device
 
-        :return: Engine object
-        :raises EngineNotSelected: Error raised if the user did not pass the proper string for which engine they \
-        wished to use
+        :param summary: bool if set to true it will get the overview information and not the individual port information
+        :return: list of lists containing the power inline details
         '''
 
-        if self.engine == 'serial':
-            return SerialEngine
-        elif self.engine == 'ssh':
-            return SSHEngine
-        else:
-            raise CustomExceptions.EngineNotSelected('Valid Transport Engine not Specified!')
+        try:
 
-    def __enter__(self):
+            return self.ssh.power_inline(summary)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-        return self.transport.__enter__(self)
+    def list_ospf_configuration(self):
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+        '''
 
-        return self.transport.__exit__(self, exc_type, exc_val, exc_tb)
+        :return: OSPF Configuration
+        '''
 
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
+        try:
 
-        return self.transport.send_command_expect_different_prompt(self, command=command, return_as_list=return_as_list,
-                                                                   buffer_size=buffer_size)
+            return self.ssh.list_ospf_configuration()
 
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        return self.transport.send_command_expect_same_prompt(self, command=command, detecting_firmware=detecting_firmware,
-                                                              return_as_list=return_as_list, buffer_size=buffer_size)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-    def connect_to_server(self, ip, username, password):
-        return self.transport.connect_to_server(self, ip, username, password)
+    def list_eigrp_configuration(self):
+        '''
 
-    def invoke_shell(self):
-        return self.transport.invoke_shell(self)
+        :return: EIGRP Configuration
+        '''
 
-    def get_initial_prompt(self):
-        return self.transport.get_initial_prompt(self)
+        try:
 
-    def send_command(self, command):
-        return self.transport.send_command(self, command=command)
+            return self.ssh.list_eigrp_configuration()
 
-    def throw_away_buffer_data(self):
-        return self.transport.throw_away_buffer_data(self)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1):
-        return self.transport.get_output_different_prompt(self, wait_time=wait_time, return_as_list=return_as_list,
-                                                          buffer_size=buffer_size)
+    def list_down_ports(self):
+        '''
+        Issues show interface description command, skips any vlan or port channel interfaces, also skips any interfaces that are not 'down'
+        all others are considered physical interfaces in an 'up' status and will add those interface names to a list to return that list
+        to the user
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        return self.transport.get_output(self, wait_time=wait_time, detecting_firmware=detecting_firmware,
-                                         return_as_list=return_as_list, buffer_size=buffer_size)
+        :return: List of physical interfaces in an 'up' status
+        '''
 
-    def close_connection(self):
-        return self.transport.close_connection(self)
+        try:
+            return self.ssh.list_down_ports()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
-    '''
-    
-    def determine_location(self):
+    def last_input_and_output(self, interface):
+        '''
 
-        return self.determine_location()
-    '''
+        :param interface: Interface you wish to check the last input & output on
+        :return: a list [Interface, Last Input, Last Output]
+        '''
+
+        try:
+            return self.ssh.last_input_and_output(interface)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def global_last_input_and_output(self):
+
+        try:
+            return self.ssh.global_last_input_and_output()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def find_mac_address(self, mac_address):
+        '''
+        Searches the MAC address table for a MAC address entry
+
+        :param mac_address: MAC address or partial MAC address to search for
+        :return: List [Mac Address, Interface ]
+        '''
+
+        # TODO: Add in this method for Cisco ASA and NXOS
+        # TODO: Test against IOSXE
+        try:
+            return self.ssh.find_mac_address(mac_address)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def mac_address_table(self):
+        '''
+
+        :return: List of lists containing the MAC address table and its contents
+        '''
+        try:
+            return self.ssh.mac_address_table()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def cdp_neighbor_table(self):
+
+        # TODO: Add support for ASA, and NXOS and test IOSXE
+        try:
+            return self.ssh.cdp_neighbor_table()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def arp_table(self):
+
+        # TODO: Test against IOSXE, add support for NXOS and ASA
+
+        try:
+            return self.ssh.arp_table()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def show_interface_status(self):
+
+        '''
+
+        :return:
+        '''
+
+        try:
+            return self.ssh.show_interface_status()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def show_interface_description(self):
+        '''
+        Sets terminal length to infinite, issues show interface description command, gathers output from remote device,
+        split in a list by line
+
+        :return: List of output, split by line in output
+        '''
+
+        try:
+            return self.ssh.show_interface_description()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def show_routes(self):
+        ''''
+        Returns list of lists containing the routing table.
+        '''
+
+        # TODO: add support for NXOS & ASA and test IOSXE
+        try:
+            return self.ssh.show_routes()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
+    def write_mem(self):
+
+        '''
+        Saves the running configuration to startup configuration
+
+        :return:
+        '''
+        try:
+            return self.ssh.write_mem()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
 
-class CAF(TransportInterface):
+class CAF(TransportInterface, CommandInterface):
 
     '''
     This is the class that the user will interface with, this class is responsible for detecting
     the firmware of the device and then issuing commands based on that firmware version.
     '''
 
-    def __init__(self, engine, destination, username, password, enable_password=None):
+    def __init__(self, engine):
+
+        '''
+
+        :param engine: Transport Engine to use (ssh or serial)
+
+        '''
 
         TransportInterface.__init__(self, engine)
+        CommandInterface.__init__(self)
 
-        self.connect_to_server(destination, username, password)
-
-        self.enable_password = enable_password
+        self.engine = engine
+        self.enable_password = None
         self.terminal_length_value = None
         self.terminal_width_value = None
-
-        # These 2 lines call the required methods for OS detection
-        self.firmware_version = self.detect_firmware()
-        self.ssh = self.instantiate_object()
+        self.firmware_version = None
+        self.ssh = None
 
     def instantiate_object(self):
 
@@ -757,316 +458,13 @@ class CAF(TransportInterface):
         # returns variable (Firmware version) from the function
         return firmware_version
 
-    def priv_exec(self):
+    def connect(self, destination, username, password, enable_password=None):
 
-        '''
-        Enters privilege exec mode, will exit config T if you are in config t, and elevate from standard user mode
-        if you are in standard user mode
+        # This needs to be called before instansiating an SSH object because
+        # the enable password will not properly get passed to those objects if it is not
+        self.enable_password = enable_password
 
-        :return: Output from command
-        '''
+        self.connect_to_server(destination, username, password)  # makes connection
+        self.firmware_version = self.detect_firmware()  # detects firmware
+        self.ssh = self.instantiate_object()  # instantiates object to send commands with
 
-        return self.ssh.priv_exec()
-
-    def get_uptime(self):
-
-        '''
-        Gets the uptime of the remote device
-
-        :return: str System uptime
-        '''
-
-        return self.ssh.get_uptime()
-
-    def show_run(self):
-        '''
-        Issues 'show running-config' command to to the remote router/switch
-
-        :return: output from command
-        '''
-        # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
-        # issuing the 'show running-config' command
-        return self.ssh.show_run()
-
-    def show_run_interface(self, interface):
-
-        '''
-
-        :param interface: Interface to capture the running config of
-        :return: Running Configuration of specified interface
-        '''
-
-        return self.ssh.show_run_interface(interface)
-
-    def get_local_users(self):
-        '''
-        Method to extract the local users configured on the system out of the running config
-
-        :return: List of the users configured locally on the system
-        '''
-
-        return self.ssh.get_local_users()
-
-    def delete_local_user(self, username):
-
-        '''
-
-        :param username: Username to delete
-        :return:
-        '''
-        try:
-            output = self.ssh.delete_local_user(username)
-            return output
-
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def configure_description(self, interface, description):
-
-        '''
-
-        :param interface: Interface to configure discription on
-        :param description: str description to configure the interface with
-        :return:
-        '''
-
-        try:
-            return self.ssh.configure_description(interface,description)
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def configure_access_vlan(self, interface, vlan):
-        '''
-        this method should be used when the user needs to configure an interface as an access port on a specific vlan
-
-        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
-        :param vlan: Vlan number to configure
-        :return: commands sent to server and their output
-        '''
-
-        try:
-            return self.ssh.configure_access_vlan(interface, vlan)
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def power_cycle_port(self, interface, delay=5):
-
-        try:
-            return self.ssh.power_cycle_port(interface, delay)
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def configure_router_lan_subinterface(
-            self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
-
-        try:
-            return self.ssh.configure_router_lan_subinterface(physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses)
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def physical_port_inventory(self):
-        '''
-        Gathers an inventory of physical ports on the remote device
-
-        :return: List of physical interfaces on device
-        '''
-
-        try:
-            return self.ssh.physical_port_inventory()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def physical_port_inventory_longname(self):
-
-        '''
-        Gathers an inventory of physical ports on the remote device with their full name ex. GigabitEthernet1/0/1
-        vs their abbreviated name ex. Gi1/0/1
-
-        :return: list of ports
-        '''
-
-        try:
-            return self.ssh.physical_port_inventory_longname()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def port_status(self):
-
-        '''
-
-
-        :return:
-        '''
-
-        try:
-            return self.ssh.port_status()
-        except CustomExceptions.MethodNotImplemented as E:
-            return E
-
-    def power_inline(self, summary=False):
-
-        '''
-        Method to get the power inline statics for remote POE device
-
-        :param summary: bool if set to true it will get the overview information and not the individual port information
-        :return: list of lists containing the power inline details
-        '''
-
-        try:
-
-            return self.ssh.power_inline(summary)
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def list_ospf_configuration(self):
-
-        '''
-
-        :return: OSPF Configuration
-        '''
-
-
-        try:
-
-            return self.ssh.list_ospf_configuration()
-
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def list_eigrp_configuration(self):
-        '''
-
-        :return: EIGRP Configuration
-        '''
-
-        try:
-
-            return self.ssh.list_eigrp_configuration()
-
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def list_down_ports(self):
-        '''
-        Issues show interface description command, skips any vlan or port channel interfaces, also skips any interfaces that are not 'down'
-        all others are considered physical interfaces in an 'up' status and will add those interface names to a list to return that list
-        to the user
-
-        :return: List of physical interfaces in an 'up' status
-        '''
-
-        try:
-            self.ssh.list_down_ports()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def last_input_and_output(self, interface):
-        '''
-
-        :param interface: Interface you wish to check the last input & output on
-        :return: a list [Interface, Last Input, Last Output]
-        '''
-
-        try:
-            return self.ssh.last_input_and_output(interface)
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def global_last_input_and_output(self):
-
-        try:
-            return self.ssh.global_last_input_and_output()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def find_mac_address(self, mac_address):
-        '''
-        Searches the MAC address table for a MAC address entry
-
-        :param mac_address: MAC address or partial MAC address to search for
-        :return: List [Mac Address, Interface ]
-        '''
-
-        # TODO: Add in this method for Cisco ASA and NXOS
-        # TODO: Test against IOSXE
-
-        return self.ssh.find_mac_address(mac_address)
-
-    def mac_address_table(self):
-        '''
-
-        :return: List of lists containing the MAC address table and its contents
-        '''
-        try:
-            return self.ssh.mac_address_table()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def cdp_neighbor_table(self):
-
-        # TODO: Add support for ASA, and NXOS and test IOSXE
-        try:
-            return self.ssh.cdp_neighbor_table()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def arp_table(self):
-
-        # TODO: Test against IOSXE, add support for NXOS and ASA
-
-        try:
-            return self.ssh.arp_table()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def show_interface_status(self):
-
-        '''
-
-        :return:
-        '''
-
-        try:
-            return self.ssh.show_interface_status()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def show_interface_description(self):
-        '''
-        Sets terminal length to infinite, issues show interface description command, gathers output from remote device,
-        split in a list by line
-
-        :return: List of output, split by line in output
-        '''
-
-        try:
-           return self.ssh.show_interface_description()
-        except CustomExceptions.MethodNotImplemented as E:
-           raise E
-
-    def show_routes(self):
-        ''''
-        Returns list of lists containing the routing table.
-        '''
-
-        # TODO: add support for NXOS & ASA and test IOSXE
-        try:
-            return self.ssh.show_routes()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-    def write_mem(self):
-
-        '''
-        Saves the running configuration to startup configuration
-
-        :return:
-        '''
-        try:
-            return self.ssh.write_mem()
-        except CustomExceptions.MethodNotImplemented as E:
-            raise E
-
-
-
-        # END Functions used primarily by the User
