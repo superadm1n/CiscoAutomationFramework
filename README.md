@@ -82,7 +82,6 @@ We use [SemVer](http://semver.org/) for versioning.
 
 * **Kyle Kowalczyk** - *Initial work* - Github: [superadm1n](https://github.com/superadm1n) Personal Website: [SmallGuysIT](https://smallguysit.com)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
