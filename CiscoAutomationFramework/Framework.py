@@ -898,17 +898,10 @@ class CAF(TransportInterface):
         :return:
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).port_status()
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).port_status()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).port_status()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.port_status()
+        except CustomExceptions.MethodNotImplemented as E:
+            return E
 
     def power_inline(self, summary=False):
 
@@ -919,7 +912,11 @@ class CAF(TransportInterface):
         :return: list of lists containing the power inline details
         '''
 
-        return self.ssh.power_inline(summary)
+        try:
+
+            return self.ssh.power_inline(summary)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def list_ospf_configuration(self):
 
@@ -928,7 +925,13 @@ class CAF(TransportInterface):
         :return: OSPF Configuration
         '''
 
-        return self.ssh.list_ospf_configuration()
+
+        try:
+
+            return self.ssh.list_ospf_configuration()
+
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def list_eigrp_configuration(self):
         '''
@@ -936,19 +939,12 @@ class CAF(TransportInterface):
         :return: EIGRP Configuration
         '''
 
-        # return self.ssh.list_eigrp_configuration()
+        try:
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).list_eigrp_configuration()
+            return self.ssh.list_eigrp_configuration()
 
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).list_eigrp_configuration()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).list_eigrp_configuration()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def list_down_ports(self):
         '''
@@ -959,17 +955,10 @@ class CAF(TransportInterface):
         :return: List of physical interfaces in an 'up' status
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).list_down_ports()
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).list_down_ports()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).list_down_ports()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            self.ssh.list_down_ports()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def last_input_and_output(self, interface):
         '''
@@ -978,21 +967,17 @@ class CAF(TransportInterface):
         :return: a list [Interface, Last Input, Last Output]
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).last_input_and_output(interface)
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).last_input_and_output(interface)
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).last_input_and_output(interface)
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.last_input_and_output(interface)
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def global_last_input_and_output(self):
 
-        return self.ssh.global_last_input_and_output()
+        try:
+            return self.ssh.global_last_input_and_output()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def find_mac_address(self, mac_address):
         '''
@@ -1012,29 +997,27 @@ class CAF(TransportInterface):
 
         :return: List of lists containing the MAC address table and its contents
         '''
-        if self.firmware_version == 'IOS':
-            return IOS(self).mac_address_table()
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).mac_address_table()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).mac_address_table()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.mac_address_table()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def cdp_neighbor_table(self):
 
         # TODO: Add support for ASA, and NXOS and test IOSXE
-
-        return self.ssh.cdp_neighbor_table()
+        try:
+            return self.ssh.cdp_neighbor_table()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def arp_table(self):
 
         # TODO: Test against IOSXE, add support for NXOS and ASA
 
-        return self.ssh.arp_table()
+        try:
+            return self.ssh.arp_table()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def show_interface_status(self):
 
@@ -1043,17 +1026,10 @@ class CAF(TransportInterface):
         :return:
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).show_interface_status()
-
-        elif self.firmware_version == 'IOSXE':
-            return IOSXE(self).show_interface_status()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).show_interface_status()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+            return self.ssh.show_interface_status()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def show_interface_description(self):
         '''
@@ -1063,17 +1039,10 @@ class CAF(TransportInterface):
         :return: List of output, split by line in output
         '''
 
-        if self.firmware_version == 'IOS':
-            return IOS(self).show_interface_description()
-
-        if self.firmware_version == 'IOSXE':
-            return IOSXE(self).show_interface_description()
-
-        elif self.firmware_version == 'ASA':
-            return ASA(self).show_interface_description()
-
-        else:
-            return 'Commands not configured for firmware version {}'.format(self.firmware_version)
+        try:
+           return self.ssh.show_interface_description()
+        except CustomExceptions.MethodNotImplemented as E:
+           raise E
 
     def show_routes(self):
         ''''
@@ -1081,7 +1050,10 @@ class CAF(TransportInterface):
         '''
 
         # TODO: add support for NXOS & ASA and test IOSXE
-        return IOS(self).show_routes()
+        try:
+            return self.ssh.show_routes()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
     def write_mem(self):
 
@@ -1090,10 +1062,11 @@ class CAF(TransportInterface):
 
         :return:
         '''
-
-        return self.ssh.write_mem()
+        try:
+            return self.ssh.write_mem()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
 
 
 
         # END Functions used primarily by the User
-

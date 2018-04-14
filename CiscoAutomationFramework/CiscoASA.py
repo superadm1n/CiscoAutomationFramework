@@ -67,9 +67,62 @@ class ASA(ASATerminalCommands):
 
         return output
 
+    def show_run(self):
+
+        return self.ios.show_run()
+
+    def show_run_interface(self, interface):
+
+        return self.ios.show_run_interface(interface)
+
+    def get_local_users(self):
+
+        return self.ios.get_local_users()
+
+    def delete_local_user(self, username):
+
+        return self.ios.delete_local_user(username)
+
+    def configure_description(self, interface, description):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_access_vlan(self, interface, vlan):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def power_cycle_port(self, interface, delay):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def configure_router_lan_subinterface(
             self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
-        return 'Command not configured'
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def physical_port_inventory(self):
+        return self.physical_port_inventory_longname()
+
+    def physical_port_inventory_longname(self):
+
+        port_list = []
+        self.terminal_length()
+
+        # issues 'show interfaces' command on device
+        for line in self.ssh.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
+            # Only uses lines that begin with an f, g, t, or e for ten gig, gig, fast and eth interfaces and appends
+            # the first column to a list
+            if len(line) >= 1:
+
+                if line[0].lower() == 'i':
+                    line = line.split()[1]
+
+                    if line[:2].lower() == 'vl' or line[:2].lower() == 'po':
+                        pass
+                    else:
+                        port_list.append(line)
+
+                    #if line[0].lower() == 'f' or line[0].lower() == 'g' or line[0].lower() == 't' or line[0].lower() == 'e':
+                    #    port_list.append(line)
+
+        return port_list
 
     def port_status(self):
         port_list = []
@@ -92,6 +145,18 @@ class ASA(ASATerminalCommands):
                     output += '{}\n'.format(line)
         return output
 
+    def power_inline(self, summary):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_ospf_configuration(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_eigrp_configuration(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def list_down_ports(self):
 
         # This method gets placed into the proper CLI prompt by the self.port_status() method so no manual
@@ -111,6 +176,13 @@ class ASA(ASATerminalCommands):
     def last_input_and_output(self, interface):
 
         return [interface, 'stats unavailable on ASA', 'stats unavailable on ASA']
+
+    def global_last_input_and_output(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def find_mac_address(self, mac_address):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def mac_address_table(self):
 
@@ -140,6 +212,10 @@ class ASA(ASATerminalCommands):
         :return: Soft Error message in the format the Programmer is expecting
         '''
         raise CustomExceptions.MethodNotSupported('This method is not supported on ASA')
+
+    def arp_table(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def show_interface_status(self):
         # TODO: Generate Psudo command for this method as its not contained within the firmware directly
@@ -218,60 +294,11 @@ class ASA(ASATerminalCommands):
 
         return master_list
 
-    def show_run(self):
-
-        return self.ios.show_run()
-
-    def show_run_interface(self, interface):
-
-        return self.ios.show_run_interface(interface)
-
-    def get_local_users(self):
-
-        return self.ios.get_local_users()
-
-    def delete_local_user(self, username):
-
-        return self.ios.delete_local_user(username)
-
-    def configure_description(self, interface, description):
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
-
-    def configure_access_vlan(self, interface, vlan):
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
-
-    def power_cycle_port(self, interface, delay):
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
-
-    def configure_router_lan_subinterface(
-            self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
+    def show_routes(self):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
-    def physical_port_inventory(self):
-        return self.physical_port_inventory_longname()
+    def write_mem(self):
 
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
-    def physical_port_inventory_longname(self):
-
-        port_list = []
-        self.terminal_length()
-
-        # issues 'show interfaces' command on device
-        for line in self.ssh.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
-            # Only uses lines that begin with an f, g, t, or e for ten gig, gig, fast and eth interfaces and appends
-            # the first column to a list
-            if len(line) >= 1:
-
-                if line[0].lower() == 'i':
-                    line = line.split()[1]
-
-                    if line[:2].lower() == 'vl' or line[:2].lower() == 'po':
-                        pass
-                    else:
-                        port_list.append(line)
-
-                    #if line[0].lower() == 'f' or line[0].lower() == 'g' or line[0].lower() == 't' or line[0].lower() == 'e':
-                    #    port_list.append(line)
-
-        return port_list

@@ -238,9 +238,25 @@ class IOSXE(TerminalCommands):
 
         return self.ios.last_input_and_output(interface)
 
+    def global_last_input_and_output(self):
+
+        return self.ios.global_last_input_and_output()
+
+    def find_mac_address(self, mac_address):
+
+        return self.ios.find_mac_address(mac_address)
+
     def mac_address_table(self):
 
         return self.ios.mac_address_table()
+
+    def cdp_neighbor_table(self):
+
+        return self.ios.cdp_neighbor_table()
+
+    def arp_table(self):
+
+        return self.ios.arp_table()
 
     def show_interface_status(self):
 
@@ -249,6 +265,10 @@ class IOSXE(TerminalCommands):
     def show_interface_description(self):
 
         return self.ios.show_interface_description()
+
+    def show_routes(self):
+
+        return self.ios.show_routes()
 
     def write_mem(self):
         if '#' not in self.ssh.prompt:

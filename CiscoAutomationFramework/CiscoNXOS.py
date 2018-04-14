@@ -190,6 +190,14 @@ class NXOS(TerminalCommands):
     def physical_port_inventory_longname(self):
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
+    def port_status(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def power_inline(self, summary):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def list_ospf_configuration(self):
 
         ospf_config = ''
@@ -219,6 +227,50 @@ class NXOS(TerminalCommands):
             return 'No OSPF process configured'
 
         return ospf_config
+
+    def list_eigrp_configuration(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_down_ports(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def last_input_and_output(self, interface):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def global_last_input_and_output(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def find_mac_address(self, mac_address):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def mac_address_table(self, mac_address):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def cdp_neighbor_table(self, mac_address):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def arp_table(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_interface_status(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_interface_description(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_routes(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def write_mem(self):
 
