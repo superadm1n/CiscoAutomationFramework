@@ -370,7 +370,7 @@ class CAF(TransportInterface, CommandInterface):
     the firmware of the device and then issuing commands based on that firmware version.
     '''
 
-    def __init__(self, engine):
+    def __init__(self, engine='ssh'):
 
         '''
 
