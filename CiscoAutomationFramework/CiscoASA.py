@@ -173,6 +173,10 @@ class ASA(ASATerminalCommands):
 
         return output
 
+    def list_configured_vlans(self):
+
+        raise CustomExceptions.MethodNotImplemented('Method not configured yet!')
+
     def last_input_and_output(self, interface):
 
         return [interface, 'stats unavailable on ASA', 'stats unavailable on ASA']

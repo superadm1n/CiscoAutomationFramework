@@ -236,6 +236,9 @@ class NXOS(TerminalCommands):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
+    def list_configured_vlans(self):
+        raise CustomExceptions.MethodNotImplemented('Method not configured yet!')
+
     def last_input_and_output(self, interface):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)

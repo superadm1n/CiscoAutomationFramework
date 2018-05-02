@@ -487,6 +487,9 @@ class IOS(TerminalCommands):
 
         return output
 
+    def list_configured_vlans(self):
+        pass
+
     def global_last_input_and_output(self):
 
         self.terminal_length()

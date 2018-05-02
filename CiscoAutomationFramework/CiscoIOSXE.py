@@ -238,6 +238,9 @@ class IOSXE(TerminalCommands):
 
         return self.ios.last_input_and_output(interface)
 
+    def list_configured_vlans(self):
+        raise CustomExceptions.MethodNotImplemented('Method not configued must be tested to use the IOS method')
+
     def global_last_input_and_output(self):
 
         return self.ios.global_last_input_and_output()
