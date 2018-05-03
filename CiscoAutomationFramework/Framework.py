@@ -361,6 +361,10 @@ class CommandInterface:
             return self.ssh.write_mem()
         except CustomExceptions.MethodNotImplemented as E:
             raise E
+    '''
+    def test(self):
+        return self.ssh.test()      
+    '''
 
 
 class CAF(TransportInterface, CommandInterface):
@@ -426,7 +430,8 @@ class CAF(TransportInterface, CommandInterface):
         for n in range(1, 4):
             self.transport.send_command(self, ' ')
 
-        output = self.transport.send_command_expect_same_prompt(self, ' ', detecting_firmware=True, return_as_list=True)
+        output = self.transport.send_command_expect_same_prompt(self, ' ', detecting_firmware=True, return_as_list=True,
+                                                                timeout=10)
 
         # defines counter variable to keep track of the number of times a string is found
         iosxe = 0

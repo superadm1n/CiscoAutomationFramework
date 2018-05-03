@@ -26,7 +26,64 @@ on what parameter is passed the interface will chose the correct engine to use t
 import serial
 import paramiko
 import time
+import threading
 from . import CustomExceptions
+
+
+class OutputThread(threading.Thread):
+
+    '''
+    This class is responsible for handling the returning of data from the remote device.
+    It runs as a thread so we can have a timeout feature
+    '''
+
+    def __init__(self, output, shell, buffersize, prompt, expectsamePrompt=True):
+        threading.Thread.__init__(self)
+        self.shell = shell
+        self.output = output
+        self.expectsamePrompt = expectsamePrompt
+        self.buffersize = buffersize
+        self.prompt = prompt
+
+    def run(self):
+
+        '''This method determins if we are expecting the same prompt back or not and handles accordingly
+
+        :return:
+        '''
+
+        if self.expectsamePrompt is True:
+            output = self._get_output_same_prompt_loop()
+            self.output += output
+        else:
+            output = self._get_output_different_prompt_loop()
+            self.output += output
+
+    def _get_output_same_prompt_loop(self):
+
+        output = '\n\n'
+
+        while output.splitlines()[-1] != self.prompt:
+            output += bytes.decode(self.shell.recv(self.buffersize))
+            if not self.shell.recv_ready():
+                time.sleep(.5)
+
+        return output[2:]
+
+    def _get_output_different_prompt_loop(self):
+
+        output = '\n\n'
+
+        # This will loop until a > or # is in the output
+        while True:
+
+            if self.shell.recv_ready():
+                output += bytes.decode(self.shell.recv(self.buffersize))
+
+            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1]:
+                break
+
+        return output[2:]
 
 
 class BaseClass:
@@ -67,7 +124,7 @@ class SSHEngine(BaseClass):
 
         self.close_connection()
 
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
+    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
         '''
         High level method for sending a command when expecting the prompt to return differently. This uses the
         SSHEngine methods of send_command and get_output_different_prompt
@@ -86,10 +143,11 @@ class SSHEngine(BaseClass):
 
         return self.get_output_different_prompt(
             return_as_list=return_as_list,
-            buffer_size=buffer_size
+            buffer_size=buffer_size,
+            timeout=timeout
         )
 
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
         '''
         Sends commands and gathers the output in a way that expects the same prompt to be returned
         DO NOT use this method if you are not SURE that the prompt returned will be the same
@@ -105,7 +163,8 @@ class SSHEngine(BaseClass):
         return self.get_output(
             detecting_firmware=detecting_firmware,
             return_as_list=return_as_list,
-            buffer_size=buffer_size
+            buffer_size=buffer_size,
+            timeout=timeout
         )
 
     def connect_to_server(self, ip, username, password):
@@ -214,7 +273,7 @@ class SSHEngine(BaseClass):
 
         return bytes_discarded
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1):
+    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
         '''
         This method will use a pre determined time to capture output, if the server doesnt begin to return output
         within that predetermined amount of time it will be missed, also if the server hangs for more than 1 second
@@ -234,18 +293,16 @@ class SSHEngine(BaseClass):
 
         '''
 
+
         time.sleep(wait_time)
 
         output = '\n\n'
 
-        # This will loop until a > or # is in the output
-        while True:
+        # starts the data collection thread to gather data from the server
+        dataThread = OutputThread(output, self.shell, expectsamePrompt=False, buffersize=buffer_size, prompt=self.prompt)
+        dataThread.start()
 
-            if self.shell.recv_ready():
-                output += bytes.decode(self.shell.recv(buffer_size))
-
-            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1]:
-                break
+        output += self._thread_handler(dataThread, timeout)
 
         output = output.splitlines()[2:]
 
@@ -262,7 +319,7 @@ class SSHEngine(BaseClass):
 
         return output
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
 
         '''
         .. warning:: Only use this method if you are sure the last line of output of the server will be the
@@ -290,10 +347,12 @@ class SSHEngine(BaseClass):
         time.sleep(wait_time)
         output = '\n\n'
 
-        while output.splitlines()[-1] != self.prompt:
-            output += bytes.decode(self.shell.recv(buffer_size))
-            if not self.shell.recv_ready():
-                time.sleep(.5)
+        # starts the data collection thread to gather data from the server
+        dataThread = OutputThread(output, self.shell,  buffersize=buffer_size, prompt=self.prompt)
+        dataThread.start()
+
+        # handles thread and grabs the output from it and appends it to our local output variable
+        output += self._thread_handler(dataThread, timeout)
 
         output = output.splitlines()[2:]
 
@@ -315,6 +374,25 @@ class SSHEngine(BaseClass):
 
             return cleanoutput
 
+        return output
+
+    def _thread_handler(self, thread, timeout):
+
+
+        for x in range(timeout):
+            if thread.is_alive():
+                pass
+            else:
+                output = thread.output
+                break
+
+            time.sleep(1)
+
+            if x == timeout - 1:
+                # if the code reaches here and breaks out we timed out of our data collection
+                # so I need to decide what to do in the event that happens. I think i might
+                # throw an exception but I would need to build in a handler for that exception.
+                raise IOError('Server did not return all expected data within the timeout of {}'.format(timeout))
         return output
 
     def close_connection(self):
@@ -420,7 +498,7 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
+    def send_command_expect_different_prompt(self, command, timeout, return_as_list=False, buffer_size=1):
         '''
         High level method for sending a command when expecting the prompt to return differently. This uses the
         SSHEngine methods of send_command and get_output_different_prompt
@@ -439,10 +517,11 @@ class SerialEngine(BaseClass, serial.Serial):
 
         return self.get_output_different_prompt(
             return_as_list=return_as_list,
-            buffer_size=buffer_size
+            buffer_size=buffer_size,
+            timeout=timeout
         )
 
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def send_command_expect_same_prompt(self, command, timeout, detecting_firmware=False, return_as_list=False, buffer_size=1):
         '''
         Sends commands and gathers the output in a way that expects the same prompt to be returned
         DO NOT use this method if you are not SURE that the prompt returned will be the same
@@ -458,7 +537,8 @@ class SerialEngine(BaseClass, serial.Serial):
         return self.get_output(
             detecting_firmware=detecting_firmware,
             return_as_list=return_as_list,
-            buffer_size=buffer_size
+            buffer_size=buffer_size,
+            timeout=timeout
         )
 
     def get_initial_prompt(self):
@@ -483,7 +563,7 @@ class SerialEngine(BaseClass, serial.Serial):
 
         self.ser.write('{}\n'.format(command).encode())
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def get_output(self, timeout, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
 
         '''
         Gets output when the same prompt is expected to be returned
@@ -496,6 +576,8 @@ class SerialEngine(BaseClass, serial.Serial):
         :type buffer_size: int
         :return:
         '''
+
+        # TODO: convert this method to have a timeout and use a thread
 
         time.sleep(wait_time)
 
@@ -521,7 +603,7 @@ class SerialEngine(BaseClass, serial.Serial):
         else:
             return output
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1):
+    def get_output_different_prompt(self, timeout, wait_time=.2, return_as_list=False, buffer_size=1):
 
         '''
         Gets outut when a different prompt is expected to be returned
@@ -534,6 +616,8 @@ class SerialEngine(BaseClass, serial.Serial):
         :type buffer_size: int
         :return:
         '''
+        #TODO: convert this method to have a timeout and use a thread
+
 
         time.sleep(wait_time)
 
@@ -555,6 +639,9 @@ class SerialEngine(BaseClass, serial.Serial):
             return '\n'.join(output)
         else:
             return output
+
+    def _thread_handler(self, thread, timeout):
+        pass
 
     def close_connection(self):
         '''
@@ -617,15 +704,16 @@ class TransportInterface(SSHEngine, SerialEngine):
 
         return self.transport.__exit__(self, exc_type, exc_val, exc_tb)
 
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1):
+    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
 
         return self.transport.send_command_expect_different_prompt(self, command=command, return_as_list=return_as_list,
-                                                                   buffer_size=buffer_size)
+                                                                   buffer_size=buffer_size, timeout=timeout)
 
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
         return self.transport.send_command_expect_same_prompt(self, command=command,
                                                               detecting_firmware=detecting_firmware,
-                                                              return_as_list=return_as_list, buffer_size=buffer_size)
+                                                              return_as_list=return_as_list, buffer_size=buffer_size,
+                                                              timeout=timeout)
 
     def connect_to_server(self, ip, username, password):
         return self.transport.connect_to_server(self, ip, username, password)
@@ -642,13 +730,13 @@ class TransportInterface(SSHEngine, SerialEngine):
     def throw_away_buffer_data(self):
         return self.transport.throw_away_buffer_data(self)
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1):
+    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
         return self.transport.get_output_different_prompt(self, wait_time=wait_time, return_as_list=return_as_list,
-                                                          buffer_size=buffer_size)
+                                                          buffer_size=buffer_size, timeout=timeout)
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
         return self.transport.get_output(self, wait_time=wait_time, detecting_firmware=detecting_firmware,
-                                         return_as_list=return_as_list, buffer_size=buffer_size)
+                                         return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
 
     def close_connection(self):
         return self.transport.close_connection(self)

@@ -739,3 +739,27 @@ class IOS(TerminalCommands):
         return self.ssh.get_output()
 
     # END Functions used primarily by the User
+    '''
+    def test(self):
+
+        self.priv_exec()
+
+        self.terminal_length()
+
+        try:
+            output = self.ssh.send_command_expect_same_prompt('show run', timeout=1)
+        except Exception as E:
+            print(E)
+
+        for x in range(10):
+            self.ssh.send_command_expect_same_prompt(' ')
+            time.sleep(.5)
+
+        self.terminal_length()
+
+        output = self.ssh.send_command_expect_same_prompt('show run')
+
+        #output = self.ssh.send_command_expect_same_prompt('show run')
+
+        return output
+    '''
