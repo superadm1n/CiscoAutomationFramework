@@ -19,7 +19,19 @@ This Module contains all the logic that pertains to issuing commands to a device
 '''
 
 import time
+import logging
 from .CustomExceptions import *
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+
+debug_handler = logging.FileHandler('debug.log')
+debug_handler.setFormatter(logFormatter)
+debug_handler.setLevel(logging.DEBUG)
+
+logger.addHandler(debug_handler)
 
 
 
@@ -74,8 +86,10 @@ class TerminalCommands:
         if '#' not in self.ssh.prompt:
 
             if self.enable_password is None:
+                logger.debug('No enable password supplied, exception raised')
                 raise NoEnablePassword('There was no enable password supplied to the server')
 
+            logger.debug('sending enable command')
             self.ssh.send_command('enable')
             time.sleep(.5)
             return self.ssh.send_command_expect_different_prompt(self.enable_password)
@@ -100,16 +114,19 @@ class TerminalCommands:
             self.priv_exec()
 
         if '(config' not in self.ssh.prompt:
+            logger.debug('sending configure terminal command')
             output += self.ssh.send_command_expect_different_prompt('configure terminal')
 
             return output
         else:
+            logger.debug('already in config t mode')
             return 'Already in config mode'
 
     def check_and_exit_config_t(self):
 
         output = ''
         if '(config' in self.ssh.prompt:
+            logger.debug('in config T, backing out')
             output += self.send_end()
 
         return output
@@ -153,13 +170,18 @@ class IOS(TerminalCommands):
         '''
         # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
         # issuing the 'show running-config' command
+        logger.debug('Issuing show run commands')
         self.priv_exec()
         self.check_and_exit_config_t()
 
         # sets terminal length to infinite so all the output is captured
         self.terminal_length()
 
-        return self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50)
+        logger.debug('Sending show run command, expecting same prompt')
+        output = self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50)
+        logger.debug('Output function returned.')
+
+        return output
     
     def get_local_users(self):
         '''

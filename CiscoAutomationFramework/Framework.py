@@ -429,6 +429,8 @@ class CAF(TransportInterface, CommandInterface):
         time.sleep(.2)
         for n in range(1, 4):
             self.transport.send_command(self, ' ')
+            time.sleep(.1)
+
 
         output = self.transport.send_command_expect_same_prompt(self, ' ', detecting_firmware=True, return_as_list=True,
                                                                 timeout=10)

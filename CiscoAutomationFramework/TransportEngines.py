@@ -27,23 +27,41 @@ import serial
 import paramiko
 import time
 import threading
+import logging
 from . import CustomExceptions
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+
+debug_handler = logging.FileHandler('debug.log')
+debug_handler.setFormatter(logFormatter)
+debug_handler.setLevel(logging.DEBUG)
+
+logger.addHandler(debug_handler)
 
 
 class OutputThread(threading.Thread):
 
     '''
     This class is responsible for handling the returning of data from the remote device.
-    It runs as a thread so we can have a timeout feature
+    It runs as a thread so we can have a timeout feature. When the thread completes succesfully
+    the output from the remote device will be stored in the instance variable self.output.
     '''
 
-    def __init__(self, output, shell, buffersize, prompt, expectsamePrompt=True):
+    def __init__(self, output, shell, buffersize, prompt, engine, expectsamePrompt=True):
         threading.Thread.__init__(self)
+
+        self.recievedData = False
+
+        self.engine = engine
         self.shell = shell
         self.output = output
         self.expectsamePrompt = expectsamePrompt
         self.buffersize = buffersize
         self.prompt = prompt
+        self.killflag = False
 
     def run(self):
 
@@ -52,25 +70,38 @@ class OutputThread(threading.Thread):
         :return:
         '''
 
-        if self.expectsamePrompt is True:
-            output = self._get_output_same_prompt_loop()
-            self.output += output
-        else:
-            output = self._get_output_different_prompt_loop()
-            self.output += output
+        if self.engine == 'ssh':
 
-    def _get_output_same_prompt_loop(self):
+            if self.expectsamePrompt is True:
+                output = self._ssh_get_output_same_prompt_loop()
+                self.output += output
+            else:
+                output = self._ssh_get_output_different_prompt_loop()
+                self.output += output
+
+        elif self.engine == 'serial':
+
+            if self.expectsamePrompt is True:
+                output = self._serial_get_output_same_prompt_loop()
+                self.output = output
+            else:
+                output = self._serial_get_output_different_prompt_loop()
+                self.output = output
+
+
+    def _ssh_get_output_same_prompt_loop(self):
 
         output = '\n\n'
 
         while output.splitlines()[-1] != self.prompt:
             output += bytes.decode(self.shell.recv(self.buffersize))
+            self.recievedData = True
             if not self.shell.recv_ready():
                 time.sleep(.5)
 
         return output[2:]
 
-    def _get_output_different_prompt_loop(self):
+    def _ssh_get_output_different_prompt_loop(self):
 
         output = '\n\n'
 
@@ -79,11 +110,80 @@ class OutputThread(threading.Thread):
 
             if self.shell.recv_ready():
                 output += bytes.decode(self.shell.recv(self.buffersize))
+                self.recievedData = True
 
             if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1]:
                 break
 
         return output[2:]
+
+    def _serial_get_output_same_prompt_loop(self):
+
+
+        output = ['\n', '\n']
+
+
+        bitsRcvd = 0
+
+        while output[-1] != self.prompt:
+            if self._check_for_kill() is True:
+                logger.debug('Thread got signal to die')
+                break
+            for line in self.shell.readlines():
+                fromDevice = line.decode().strip('\r\n')
+                output.append(fromDevice)
+                bitsRcvd += len(fromDevice)
+                if len(fromDevice) > 0:
+                    logger.debug('Recieved {} bits from device'.format(len(fromDevice)))
+
+
+            if bitsRcvd > 0:
+                self.recievedData = True
+
+
+            if bitsRcvd == 0:
+                pass
+
+            bitsRcvd = 0
+
+        logger.debug('Returning data from serial get output same prompt thread, total of {} bytes'.format(len(output)))
+        return output[2:]
+
+    def _serial_get_output_different_prompt_loop(self):
+
+        output = ['\n', '\n']
+
+        while True:
+            if self._check_for_kill() is False:
+                break
+            time.sleep(1)
+
+            bitsRcvd = 0
+
+            if self.shell.in_waiting:
+                logging.debug('data waiting on serial')
+                for line in self.shell.readlines():
+                    fromDevice = line.decode().strip('\r\n')
+                    output.append(fromDevice)
+                    bitsRcvd += len(fromDevice)
+
+                if bitsRcvd > 0:
+                    self.recievedData = True
+
+            if '>' in output[-1] or '#' in output[-1]:
+                logging.debug('End of output from device')
+                break
+
+            bitsRcvd = 0
+
+        return output[2:]
+
+    def _check_for_kill(self):
+
+        if self.killflag == False:
+            return False
+        else:
+            return True
 
 
 class BaseClass:
@@ -298,10 +398,16 @@ class SSHEngine(BaseClass):
 
         output = '\n\n'
 
-        # starts the data collection thread to gather data from the server
-        dataThread = OutputThread(output, self.shell, expectsamePrompt=False, buffersize=buffer_size, prompt=self.prompt)
+        # starts the data collection thread to gather data from the remote device
+        dataThread = OutputThread(output, self.shell,
+                                  expectsamePrompt=False,
+                                  buffersize=buffer_size,
+                                  prompt=self.prompt,
+                                  engine='ssh')
+
         dataThread.start()
 
+        # watches thread for the time specified in the timeout NOTE this throws IOError exception if it times out
         output += self._thread_handler(dataThread, timeout)
 
         output = output.splitlines()[2:]
@@ -348,10 +454,12 @@ class SSHEngine(BaseClass):
         output = '\n\n'
 
         # starts the data collection thread to gather data from the server
-        dataThread = OutputThread(output, self.shell,  buffersize=buffer_size, prompt=self.prompt)
+        dataThread = OutputThread(output, self.shell,  buffersize=buffer_size, prompt=self.prompt, engine='ssh')
         dataThread.start()
+        logger.debug('Started output thread')
 
         # handles thread and grabs the output from it and appends it to our local output variable
+        # NOTE this throws an IO error if it times out
         output += self._thread_handler(dataThread, timeout)
 
         output = output.splitlines()[2:]
@@ -378,20 +486,37 @@ class SSHEngine(BaseClass):
 
     def _thread_handler(self, thread, timeout):
 
+        '''
 
-        for x in range(timeout):
+        :param thread: Thread that is going to be watched
+        :param timeout: the time we are going to watch the thread before we throw and IOError
+        :return: data that was collected from the server
+        '''
+
+        counter = 0
+        while True:
+
             if thread.is_alive():
-                pass
+                logger.debug('Thread is alive')
+
+                if thread.recievedData is True:
+                    thread.recievedData = False
+                    counter = 0
+
             else:
+                logger.debug('Thread has returned data')
                 output = thread.output
                 break
 
             time.sleep(1)
 
-            if x == timeout - 1:
+            counter += 1
+
+            if counter == timeout:
                 # if the code reaches here and breaks out we timed out of our data collection
                 # so I need to decide what to do in the event that happens. I think i might
                 # throw an exception but I would need to build in a handler for that exception.
+                logger.debug('Timeout has been reached')
                 raise IOError('Server did not return all expected data within the timeout of {}'.format(timeout))
         return output
 
@@ -433,13 +558,16 @@ class SerialEngine(BaseClass, serial.Serial):
     def connect_to_server(self, serial_interface, username=None, password=None):
 
         self.ser = serial.Serial(serial_interface, baudrate=self.baud, timeout=self.timeout)
+
         self.location = self._determine_location()
 
         if self.location == 'LOGIN':
             login_output = self._login_to_device(username, password)
             self._validate_login(login_output)
 
-        self.get_initial_prompt()
+        else:
+            self.get_initial_prompt()
+
 
     def _login_to_device(self, username, password):
 
@@ -465,6 +593,9 @@ class SerialEngine(BaseClass, serial.Serial):
             for line in output:
                 line = line.lower()
                 if 'fail' in line or '>' in line or '#' in line:
+                    if '>' in line or '#' in line:
+                        self.prompt = line
+                        self.hostname = line[:-1]
                     return output
 
     def _validate_login(self, output_from_login):
@@ -498,7 +629,7 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
-    def send_command_expect_different_prompt(self, command, timeout, return_as_list=False, buffer_size=1):
+    def send_command_expect_different_prompt(self, command, timeout, return_as_list=False, buffer_size=1, pause=1):
         '''
         High level method for sending a command when expecting the prompt to return differently. This uses the
         SSHEngine methods of send_command and get_output_different_prompt
@@ -541,16 +672,24 @@ class SerialEngine(BaseClass, serial.Serial):
             timeout=timeout
         )
 
-    def get_initial_prompt(self):
+    def get_initial_prompt(self, login_output=None):
         '''
         Gets the initial prompt and hostname of the device and sets the corresponding class variables
 
         :return: Nothing
         '''
 
-        self.send_command_expect_different_prompt(command=' ', return_as_list=True)[-1].strip()
-
         self.hostname = self.prompt[:-1]
+
+        self.send_command(' ')
+
+        time.sleep(1)
+
+        output = self.get_output_different_prompt(10, return_as_list=True)
+
+        #output = self.send_command_expect_different_prompt(command=' ', return_as_list=True, timeout=10)
+
+
 
     def send_command(self, command):
         '''
@@ -562,6 +701,34 @@ class SerialEngine(BaseClass, serial.Serial):
         '''
 
         self.ser.write('{}\n'.format(command).encode())
+
+    def throw_away_buffer_data(self):
+        '''
+        Will capture any data waiting in the incoming buffer and discard it
+
+        :return: int: total bytes discarded from the buffer
+        :rtype: int
+        '''
+
+        total_bytes_discarded = 0
+
+        time.sleep(.1)
+        while True:
+            bytes_discarded = 0
+            for line in self.ser.readlines():
+                fromDevice = line.decode().strip('\r\n')
+                bytes_discarded += len(fromDevice)
+                # output.append(fromDevice
+
+            if bytes_discarded == 0:
+                break
+            else:
+                total_bytes_discarded += bytes_discarded
+
+
+        logger.debug('Discarded a total of {} bytes'.format(total_bytes_discarded))
+
+        return total_bytes_discarded
 
     def get_output(self, timeout, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
 
@@ -579,28 +746,40 @@ class SerialEngine(BaseClass, serial.Serial):
 
         # TODO: convert this method to have a timeout and use a thread
 
+        logging.debug('Serial engine starting to get output from device')
+
         time.sleep(wait_time)
+        time.sleep(2)
 
         output = ['\n', '\n']
 
-        while output[-1] != self.prompt:
-            for line in self.ser.readlines():
-                output.append(line.decode().strip('\r\n'))
+        dataThread = OutputThread(output, self.ser, buffersize=buffer_size, prompt=self.prompt, engine='serial')
+        dataThread.start()
+        logger.debug('Started serial output thread')
 
-            if self.ser.in_waiting == 0:
-                time.sleep(.5)
+        time.sleep(5)
 
-        output = output[2:]  # removes first 2 entries in list
+        output = self._serthread_handler(dataThread, timeout)
+
+        bytes_discarded = 0
 
         if detecting_firmware is True:
             # :TODO: Add logic here
+            self.throw_away_buffer_data()
+
             pass
 
-        self.prompt = output[-1].strip()
+        try:
+
+            self.prompt = output[-1].strip()
+        except:
+            raise IOError
 
         if return_as_list is False:
+            logging.debug('Serial engine completed getting output from device')
             return '\n'.join(output)
         else:
+            logging.debug('Serial engine completed getting output from device')
             return output
 
     def get_output_different_prompt(self, timeout, wait_time=.2, return_as_list=False, buffer_size=1):
@@ -618,30 +797,73 @@ class SerialEngine(BaseClass, serial.Serial):
         '''
         #TODO: convert this method to have a timeout and use a thread
 
+        logging.debug('Serial engine starting to get output different prompt from device')
+
 
         time.sleep(wait_time)
 
         output = ['\n', '\n']
 
-        while True:
-            time.sleep(1)
+        # starts the data collection thread to gather data from the remote device
+        dataThread = OutputThread(output, self.ser,
+                                  expectsamePrompt=False,
+                                  buffersize=buffer_size,
+                                  prompt=self.prompt,
+                                  engine='serial')
 
-            if self.ser.in_waiting:
-                for line in self.ser.readlines():
-                    output.append(line.decode().strip('\r\n'))
+        dataThread.start()
+        logger.debug('Started serial thread to get output')
 
-            if '>' in output[-1] or '#' in output[-1]:
-                break
+        output = self._serthread_handler(dataThread, timeout)
 
-        self.prompt = output[-1].strip()
+        if len(output) > 0:
+            self.prompt = output[-1].strip()
 
         if return_as_list is False:
+            logging.debug('Serial engine completed getting output different prompt from device')
             return '\n'.join(output)
         else:
+            logging.debug('Serial engine completed getting output different prompt from device')
             return output
 
-    def _thread_handler(self, thread, timeout):
-        pass
+    def _serthread_handler(self, thread, timeout):
+
+        '''
+
+        :param thread: Thread that is going to be watched
+        :param timeout: the time we are going to watch the thread before we throw and IOError
+        :return: data that was collected from the server
+        '''
+
+
+        counter = 0
+        while True:
+
+            if thread.is_alive():
+                logger.debug('Serial thread is alive')
+
+                if thread.recievedData is True:
+                    thread.recievedData = False
+                    counter = 0
+
+            else:
+                logger.debug('Thread is dead returning data')
+                output = thread.output
+                break
+
+            time.sleep(1)
+            counter += 1
+
+
+            if counter == timeout:
+                logger.debug('Serial thread handler killing thread')
+                thread.killflag = True
+                return thread.output
+                # if the code reaches here and breaks out we timed out of our data collection
+                # so I need to decide what to do in the event that happens. I think i might
+                # throw an exception but I would need to build in a handler for that exception.
+                #raise IOError('Server did not return all expected data within the timeout of {}'.format(timeout))
+        return output
 
     def close_connection(self):
         '''
