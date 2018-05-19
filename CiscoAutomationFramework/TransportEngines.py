@@ -32,6 +32,7 @@ from . import CustomExceptions
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+logger.propagate = False
 
 logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
 
@@ -154,7 +155,7 @@ class OutputThread(threading.Thread):
         output = ['\n', '\n']
 
         while True:
-            if self._check_for_kill() is False:
+            if self._check_for_kill() is True:
                 break
             time.sleep(1)
 
@@ -749,7 +750,6 @@ class SerialEngine(BaseClass, serial.Serial):
         logging.debug('Serial engine starting to get output from device')
 
         time.sleep(wait_time)
-        time.sleep(2)
 
         output = ['\n', '\n']
 
@@ -757,9 +757,8 @@ class SerialEngine(BaseClass, serial.Serial):
         dataThread.start()
         logger.debug('Started serial output thread')
 
-        time.sleep(5)
-
         output = self._serthread_handler(dataThread, timeout)
+        logger.debug('Output from serial thread captured')
 
         bytes_discarded = 0
 
@@ -815,6 +814,7 @@ class SerialEngine(BaseClass, serial.Serial):
         logger.debug('Started serial thread to get output')
 
         output = self._serthread_handler(dataThread, timeout)
+        logger.debug('Output from serial thread captured')
 
         if len(output) > 0:
             self.prompt = output[-1].strip()

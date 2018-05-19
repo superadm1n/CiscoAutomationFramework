@@ -22,7 +22,7 @@ the transport engines and the engine interfaces.
 '''
 
 import time
-
+import logging
 
 from . import CustomExceptions
 from .CiscoIOSXE import IOSXE
@@ -31,6 +31,18 @@ from .CiscoNXOS import NXOS
 from .CiscoASA import ASA
 from .TransportEngines import TransportInterface
 
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+
+logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+
+debug_handler = logging.FileHandler('debug.log')
+debug_handler.setFormatter(logFormatter)
+debug_handler.setLevel(logging.DEBUG)
+
+logger.addHandler(debug_handler)
 
 class CommandInterface:
 
@@ -73,6 +85,9 @@ class CommandInterface:
         '''
         # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
         # issuing the 'show running-config' command
+
+        logger.debug('Command interface grabbing show run command')
+
         try:
             return self.ssh.show_run()
         except CustomExceptions.MethodNotImplemented as E:

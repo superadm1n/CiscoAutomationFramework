@@ -24,6 +24,7 @@ from .CustomExceptions import *
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+logger.propagate = False
 
 logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
 
@@ -163,7 +164,7 @@ class IOS(TerminalCommands):
 
         return output
 
-    def show_run(self):
+    def show_run(self, timeout=15):
         '''
         Issues 'show running-config' command to to the remote router/switch
         :return: output from command
@@ -178,7 +179,7 @@ class IOS(TerminalCommands):
         self.terminal_length()
 
         logger.debug('Sending show run command, expecting same prompt')
-        output = self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50)
+        output = self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50, timeout=timeout)
         logger.debug('Output function returned.')
 
         return output
