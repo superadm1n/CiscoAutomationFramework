@@ -506,6 +506,9 @@ class SSHEngine(BaseClass):
 
             else:
                 logger.debug('Thread has returned data')
+                while thread.is_alive():
+                    # loops until the thread is confirmed dead
+                    pass
                 output = thread.output
                 break
 
@@ -858,6 +861,11 @@ class SerialEngine(BaseClass, serial.Serial):
             if counter == timeout:
                 logger.debug('Serial thread handler killing thread')
                 thread.killflag = True
+
+                while thread.is_alive():
+                    # loops until the thread is confirmed dead
+                    pass
+
                 return thread.output
                 # if the code reaches here and breaks out we timed out of our data collection
                 # so I need to decide what to do in the event that happens. I think i might
