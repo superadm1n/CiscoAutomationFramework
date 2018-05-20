@@ -238,6 +238,11 @@ class IOSXE(TerminalCommands):
 
         return self.ios.last_input_and_output(interface)
 
+    def list_configured_vlans(self):
+
+        return self.ios.list_configured_vlans()
+
+
     def global_last_input_and_output(self):
 
         return self.ios.global_last_input_and_output()

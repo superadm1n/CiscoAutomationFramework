@@ -236,6 +236,31 @@ class NXOS(TerminalCommands):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
+    def list_configured_vlans(self):
+
+
+        self.terminal_length()
+
+        output = []
+        startflag = False
+        for line in self.ssh.send_command_expect_same_prompt('show vlan brief', return_as_list=True):
+
+
+            # captures the line of output only after there has been a line of dashes
+            if startflag is True:
+                output.append(line)
+
+            # if there is a line of dashes we will begin capturing the output after the line of dashes
+            if '----' in line:
+                startflag = True
+
+        # splits each line of output and only takes the first element (vlan number)
+        output = [x.split()[0] for x in output if len(x.split()) >= 1 if x.split()[0].isdigit()]
+
+        # returns output
+        return output
+
+
     def last_input_and_output(self, interface):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)

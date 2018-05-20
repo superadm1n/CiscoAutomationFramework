@@ -173,6 +173,30 @@ class ASA(ASATerminalCommands):
 
         return output
 
+    def list_configured_vlans(self):
+
+        self.terminal_length()  # sets the length of the terminal to infinite
+
+        commandOutput = self.ssh.send_command_expect_same_prompt('show switch vlan', return_as_list=True)[:-1]
+
+        sanitizedOutput = []
+        startflag = False
+        for line in commandOutput:
+
+            # captures the line of output only after there has been a line of dashes
+            if startflag is True:
+                sanitizedOutput.append(line)
+
+            # if there is a line of dashes we will begin capturing the output after the line of dashes
+            if '----' in line:
+                startflag = True
+
+        # takes the first column for each line of output only if it is greater than 1 character when split
+        # and also is a digit and puts it into a list for return out of the method
+        vlans = [x.split()[0] for x in sanitizedOutput if len(x.split()) >= 1 if x.split()[0].isdigit()]
+        return vlans
+
+
     def last_input_and_output(self, interface):
 
         return [interface, 'stats unavailable on ASA', 'stats unavailable on ASA']

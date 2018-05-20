@@ -510,6 +510,35 @@ class IOS(TerminalCommands):
 
         return output
 
+    def list_configured_vlans(self):
+
+        initial_term_width = self.ssh.terminal_width_value
+        self.terminal_width()  # sets terminal width to infinite
+
+        commandOutput = self.ssh.send_command_expect_same_prompt('show vlan brief', return_as_list=True)[:-1]
+
+
+        # The reason this for loop is here is because instead of slicing off a predermined number of lines in output
+        # I thought it better to begin capturing the output only after the line of dashes because I could see
+        # the potential for  different firmware versions giving more or less lines of output before the VLANS
+        output = []
+        startflag = False
+        for line in commandOutput:
+
+            # captures the line of output only after there has been a line of dashes
+            if startflag is True:
+                output.append(line)
+
+            # if there is a line of dashes we will begin capturing the output after the line of dashes
+            if '----' in line:
+                startflag = True
+
+        # splits each line of output and only takes the first element (vlan number)
+        output = [x.split()[0] for x in output]
+
+        # returns output
+        return output
+
     def global_last_input_and_output(self):
 
         self.terminal_length()

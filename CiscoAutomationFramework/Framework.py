@@ -280,6 +280,9 @@ class CommandInterface:
         except CustomExceptions.MethodNotImplemented as E:
             raise E
 
+    def list_configured_vlans(self):
+        return self.ssh.list_configured_vlans()
+
     def global_last_input_and_output(self):
 
         try:
