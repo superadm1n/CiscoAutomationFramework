@@ -2,6 +2,10 @@
 
 The CiscoAutomationFramework is a framework that is built on top of paramiko and pyserial that is designed to detect the type of Cisco device you connect to and issue commands based on the firmware its running and return consistent output. The goal is to give a network engineer an easy way to write automation scripts for Cisco devices.
 
+## Project Goal
+
+The goal of this project is to allow a Network Administrator to write scripts to gather data or modify configuration and be able to  run it against any Cisco device, regardless of hardware or firmware version and have the command sequence and syntax be correct while returning a consistent output.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -82,7 +86,8 @@ We use [SemVer](http://semver.org/) for versioning.
 
 * **Kyle Kowalczyk** - *Initial work* - Github: [superadm1n](https://github.com/superadm1n) Personal Website: [SmallGuysIT](https://smallguysit.com)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+## Code Documentation
+[CiscoAutomationFramework Code Documentation](http://git.smallguysit.com/)
 
 ## License
 
