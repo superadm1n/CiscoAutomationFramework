@@ -79,7 +79,6 @@ class PingTest:
         else:
             return False
 
-
 class CredCheck(PingTest):
     '''
     This class contains methods to test user authentication both to the switch/router and into enable mode.
@@ -238,14 +237,72 @@ class CredCheck(PingTest):
 
 class IPaddress:
 
+    subnets = (('30', '255.255.255.252'),
+               ('29', '255.255.255.248'),
+               ('28', '255.255.255.240'),
+               ('27', '255.255.255.224'),
+               ('26', '255.255.255.192'),
+               ('25', '255.255.255.128'),
+               ('24', '255.255.255.0'),
+               ('23', '255.255.254.0'),
+               ('22', '255.255.252.0'),
+               ('21', '255.255.248.0'),
+               ('20', '255.255.240.0'),
+               ('19', '255.255.224.0'),
+               ('18', '255.255.192.0'),
+               ('17', '255.255.128.0'),
+               ('16', '255.255.0.0')
+               )
+
+
     @classmethod
     def is_valid_addr(cls, ipaddr):
-        pass
+        '''Method to validate that a string that is passed in is a valid IP address
+
+        :param ipaddr: IP address to check
+        :type ipaddr: str
+        :return: True if valid, False if invalid
+        :rtype: bool
+        '''
+
+        try:
+            socket.inet_aton(ipaddr)
+            return True
+        except:
+            return False
 
     @classmethod
     def subnet_to_cidr(cls, mask):
+
+        '''Method to convert a subnet mask (255.255.255.0) to a cidr notation (24)
+
+        :param mask: Subnet mask ex.255.255.255.0
+        :type mask: str
+        :return: CIDR notation of subnet mask
+        :rtype: str
+        '''
+
         pass
 
     @classmethod
     def cidr_to_subnet(cls, cidr):
+
+        '''Method to convert a CIDR notation ex. /24 into a subnet mask ex. 255.255.255.0
+
+        :param cidr: CIDR notation, can be in format with or without preceeding slash ex. /24; 24
+        :type cidr: str
+        :return: Subnet mask of CIDR notation
+        :rtype: str
+        '''
+
+        if '/' in cidr:
+            cidr = cidr.strip('/')
+
+        if len(cidr) > 2:
+            raise ValueError('The CIDR notation {} that you submitted is invalid'.format(cidr))
+
+
+
+        print(cidr)
+
         pass
