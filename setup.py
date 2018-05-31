@@ -7,7 +7,7 @@ scripts atop the framework and dont have to worry about the nuances of CLI scrap
 
 setup(
     name='CiscoAutomationFramework',
-    version='0.5.9',
+    version='0.5.10+dev',
     packages=['CiscoAutomationFramework'],
     keywords='cisco automation framework network',
     url='https://github.com/superadm1n/CiscoAutomationFramework',
