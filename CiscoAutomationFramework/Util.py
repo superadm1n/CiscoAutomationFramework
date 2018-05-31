@@ -235,3 +235,17 @@ class CredCheck(PingTest):
             enable_password = self.gather_enable()
 
         return [username, password, enable_password]
+
+class IPaddress:
+
+    @classmethod
+    def is_valid_addr(cls, ipaddr):
+        pass
+
+    @classmethod
+    def subnet_to_cidr(cls, mask):
+        pass
+
+    @classmethod
+    def cidr_to_subnet(cls, cidr):
+        pass
