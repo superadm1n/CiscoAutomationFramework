@@ -299,17 +299,23 @@ class IPaddress:
         :rtype: str
         '''
 
+        # Generates a list of valid subnets
         validSubnets = [x[1] for x in cls.subnets]
 
+        # throws error if the subnet submitted is not valid
         if subnet not in validSubnets:
             raise ValueError('Subnet mask {} that was submitted is not a valid subnet mask!'.format(subnet))
 
+        # At this point we are assuming that the subnet that was submitted is a valid
+        # subnet and is ready to be converted.
+
+        # converts the subnet into CIDR notation
         cidr = None
         for validSub in cls.subnets:
             if validSub[1] == subnet:
                 cidr = validSub[0]
 
-
+        # returns the CIDR notation
         if cidr is not None:
             return cidr
         else:
