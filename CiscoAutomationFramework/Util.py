@@ -289,17 +289,32 @@ class IPaddress:
             return False
 
     @classmethod
-    def subnet_to_cidr(cls, mask):
+    def subnet_to_cidr(cls, subnet):
 
         '''Method to convert a subnet mask (255.255.255.0) to a cidr notation (24)
 
-        :param mask: Subnet mask ex.255.255.255.0
-        :type mask: str
+        :param subnet: Subnet mask ex.255.255.255.0
+        :type subnet: str
         :return: CIDR notation of subnet mask
         :rtype: str
         '''
 
-        pass
+        validSubnets = [x[1] for x in cls.subnets]
+
+        if subnet not in validSubnets:
+            raise ValueError('Subnet mask {} that was submitted is not a valid subnet mask!'.format(subnet))
+
+        cidr = None
+        for validSub in cls.subnets:
+            if validSub[1] == subnet:
+                cidr = validSub[0]
+
+
+        if cidr is not None:
+            return cidr
+        else:
+            raise Exception('An unknown exception has occured with supplied subnet {}'.format(subnet))
+
 
     @classmethod
     def cidr_to_subnet(cls, cidr):
@@ -310,6 +325,8 @@ class IPaddress:
         :type cidr: str
         :return: Subnet mask of CIDR notation
         :rtype: str
+        :raises ValueError: if the CIDR notation supplied was invalid.
+        :raises Exception: if an unknown exception occured.
         '''
 
         valid_cidrs = [x[0] for x in cls.subnets]
