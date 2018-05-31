@@ -2,12 +2,12 @@
 from distutils.core import setup
 
 description = '''The CiscoAutomationFramework is designed to be an interface for network engineers to 
-issue commands and retrieve output from cisco devices regardless of firmware so they can easily build automation 
+issue commands and retrieve output from Cisco devices regardless of firmware so they can easily build automation 
 scripts atop the framework and dont have to worry about the nuances of CLI scraping.'''
 
 setup(
     name='CiscoAutomationFramework',
-    version='0.5.9+dev',
+    version='0.5.9',
     packages=['CiscoAutomationFramework'],
     keywords='cisco automation framework network',
     url='https://github.com/superadm1n/CiscoAutomationFramework',
