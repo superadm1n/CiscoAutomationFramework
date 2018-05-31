@@ -19,7 +19,20 @@ This Module contains all the logic that pertains to issuing commands to a device
 '''
 
 import time
+import logging
 from .CustomExceptions import *
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+
+logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+
+debug_handler = logging.FileHandler('debug.log')
+debug_handler.setFormatter(logFormatter)
+debug_handler.setLevel(logging.DEBUG)
+
+logger.addHandler(debug_handler)
 
 
 
@@ -71,11 +84,13 @@ class TerminalCommands:
         to elevate into enable mode it will raise this exception
         '''
 
-        if self.enable_password is None:
-            raise NoEnablePassword('There was no enable password supplied to the server')
-
         if '#' not in self.ssh.prompt:
-            #enpassword = str(bz2.decompress(self.enable).decode('utf-8'))
+
+            if self.enable_password is None:
+                logger.debug('No enable password supplied, exception raised')
+                raise NoEnablePassword('There was no enable password supplied to the server')
+
+            logger.debug('sending enable command')
             self.ssh.send_command('enable')
             time.sleep(.5)
             return self.ssh.send_command_expect_different_prompt(self.enable_password)
@@ -100,16 +115,19 @@ class TerminalCommands:
             self.priv_exec()
 
         if '(config' not in self.ssh.prompt:
+            logger.debug('sending configure terminal command')
             output += self.ssh.send_command_expect_different_prompt('configure terminal')
 
             return output
         else:
+            logger.debug('already in config t mode')
             return 'Already in config mode'
 
     def check_and_exit_config_t(self):
 
         output = ''
         if '(config' in self.ssh.prompt:
+            logger.debug('in config T, backing out')
             output += self.send_end()
 
         return output
@@ -146,20 +164,25 @@ class IOS(TerminalCommands):
 
         return output
 
-    def show_run(self):
+    def show_run(self, timeout=15):
         '''
         Issues 'show running-config' command to to the remote router/switch
         :return: output from command
         '''
         # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
         # issuing the 'show running-config' command
+        logger.debug('Issuing show run commands')
         self.priv_exec()
         self.check_and_exit_config_t()
 
         # sets terminal length to infinite so all the output is captured
         self.terminal_length()
 
-        return self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50)
+        logger.debug('Sending show run command, expecting same prompt')
+        output = self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50, timeout=timeout)
+        logger.debug('Output function returned.')
+
+        return output
     
     def get_local_users(self):
         '''
@@ -341,7 +364,7 @@ class IOS(TerminalCommands):
         self.terminal_length()
         return self.ssh.send_command_expect_same_prompt('show interfaces status')[3:][:-1]
 
-    def power_inline(self, summary=False):
+    def power_inline(self, summary):
         self.terminal_length()
 
         data_from_device = self.ssh.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
@@ -485,6 +508,35 @@ class IOS(TerminalCommands):
                 break
 
 
+        return output
+
+    def list_configured_vlans(self):
+
+        initial_term_width = self.ssh.terminal_width_value
+        self.terminal_width()  # sets terminal width to infinite
+
+        commandOutput = self.ssh.send_command_expect_same_prompt('show vlan brief', return_as_list=True)[:-1]
+
+
+        # The reason this for loop is here is because instead of slicing off a predermined number of lines in output
+        # I thought it better to begin capturing the output only after the line of dashes because I could see
+        # the potential for  different firmware versions giving more or less lines of output before the VLANS
+        output = []
+        startflag = False
+        for line in commandOutput:
+
+            # captures the line of output only after there has been a line of dashes
+            if startflag is True:
+                output.append(line)
+
+            # if there is a line of dashes we will begin capturing the output after the line of dashes
+            if '----' in line:
+                startflag = True
+
+        # splits each line of output and only takes the first element (vlan number)
+        output = [x.split()[0] for x in output]
+
+        # returns output
         return output
 
     def global_last_input_and_output(self):
@@ -739,3 +791,27 @@ class IOS(TerminalCommands):
         return self.ssh.get_output()
 
     # END Functions used primarily by the User
+    '''
+    def test(self):
+
+        self.priv_exec()
+
+        self.terminal_length()
+
+        try:
+            output = self.ssh.send_command_expect_same_prompt('show run', timeout=1)
+        except Exception as E:
+            print(E)
+
+        for x in range(10):
+            self.ssh.send_command_expect_same_prompt(' ')
+            time.sleep(.5)
+
+        self.terminal_length()
+
+        output = self.ssh.send_command_expect_same_prompt('show run')
+
+        #output = self.ssh.send_command_expect_same_prompt('show run')
+
+        return output
+    '''

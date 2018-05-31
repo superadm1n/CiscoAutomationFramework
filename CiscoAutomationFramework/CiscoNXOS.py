@@ -15,6 +15,9 @@ limitations under the License.
 '''
 
 import time
+from . import CustomExceptions
+
+not_implemented_text = 'This method has not been implemented in the CiscoNXOS module'
 
 class TerminalCommands:
 
@@ -57,6 +60,9 @@ class TerminalCommands:
         self.ssh.terminal_width_value = str(number)
 
         return self.ssh.send_command_expect_same_prompt('terminal width {}'.format(number))
+
+    def priv_exec(self):
+        raise CustomExceptions.MethodNotSupported
 
 
 class NXOS(TerminalCommands):
@@ -143,6 +149,9 @@ class NXOS(TerminalCommands):
 
         return output
 
+    def show_run_interface(self, interface):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def get_local_users(self):
         users = []
 
@@ -153,6 +162,41 @@ class NXOS(TerminalCommands):
                 users.append(line.split()[1])
 
         return users
+
+    def delete_local_user(self, username):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_description(self, interface, description):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_access_vlan(self, interface, vlan):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def power_cycle_port(self, interface, delay):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_router_lan_subinterface(
+            self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def physical_port_inventory(self):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def physical_port_inventory_longname(self):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def port_status(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def power_inline(self, summary):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def list_ospf_configuration(self):
 
@@ -183,6 +227,75 @@ class NXOS(TerminalCommands):
             return 'No OSPF process configured'
 
         return ospf_config
+
+    def list_eigrp_configuration(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_down_ports(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_configured_vlans(self):
+
+
+        self.terminal_length()
+
+        output = []
+        startflag = False
+        for line in self.ssh.send_command_expect_same_prompt('show vlan brief', return_as_list=True):
+
+
+            # captures the line of output only after there has been a line of dashes
+            if startflag is True:
+                output.append(line)
+
+            # if there is a line of dashes we will begin capturing the output after the line of dashes
+            if '----' in line:
+                startflag = True
+
+        # splits each line of output and only takes the first element (vlan number)
+        output = [x.split()[0] for x in output if len(x.split()) >= 1 if x.split()[0].isdigit()]
+
+        # returns output
+        return output
+
+
+    def last_input_and_output(self, interface):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def global_last_input_and_output(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def find_mac_address(self, mac_address):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def mac_address_table(self, mac_address):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def cdp_neighbor_table(self, mac_address):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def arp_table(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_interface_status(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_interface_description(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_routes(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def write_mem(self):
 

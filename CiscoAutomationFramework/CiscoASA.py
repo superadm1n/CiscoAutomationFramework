@@ -20,8 +20,10 @@ This Module contains the code that is specific to issuing commands to ASA's
 
 
 from .CiscoIOS import *
+from . import CustomExceptions
 import time
 
+not_implemented_text = 'This Method is not implemented in the CiscoASA Module'
 
 class ASATerminalCommands(TerminalCommands):
 
@@ -44,12 +46,12 @@ class ASATerminalCommands(TerminalCommands):
         return self.ssh.send_command_expect_same_prompt('terminal pager {}'.format(number))
 
 
-class ASA(ASATerminalCommands, IOS):
+class ASA(ASATerminalCommands):
 
     def __init__(self, ssh_object):
         ASATerminalCommands.__init__(self, ssh_object)
-        IOS.__init__(self, ssh_object)
         self.ssh = ssh_object
+        self.ios = IOS(ssh_object)
 
     def get_uptime(self):
         output = ''
@@ -65,9 +67,35 @@ class ASA(ASATerminalCommands, IOS):
 
         return output
 
+    def show_run(self):
+
+        return self.ios.show_run()
+
+    def show_run_interface(self, interface):
+
+        return self.ios.show_run_interface(interface)
+
+    def get_local_users(self):
+
+        return self.ios.get_local_users()
+
+    def delete_local_user(self, username):
+
+        return self.ios.delete_local_user(username)
+
+    def configure_description(self, interface, description):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def configure_access_vlan(self, interface, vlan):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def power_cycle_port(self, interface, delay):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def configure_router_lan_subinterface(
             self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
-        return 'Command not configured'
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def physical_port_inventory(self):
         return self.physical_port_inventory_longname()
@@ -117,6 +145,18 @@ class ASA(ASATerminalCommands, IOS):
                     output += '{}\n'.format(line)
         return output
 
+    def power_inline(self, summary):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_ospf_configuration(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def list_eigrp_configuration(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
     def list_down_ports(self):
 
         # This method gets placed into the proper CLI prompt by the self.port_status() method so no manual
@@ -133,9 +173,40 @@ class ASA(ASATerminalCommands, IOS):
 
         return output
 
+    def list_configured_vlans(self):
+
+        self.terminal_length()  # sets the length of the terminal to infinite
+
+        commandOutput = self.ssh.send_command_expect_same_prompt('show switch vlan', return_as_list=True)[:-1]
+
+        sanitizedOutput = []
+        startflag = False
+        for line in commandOutput:
+
+            # captures the line of output only after there has been a line of dashes
+            if startflag is True:
+                sanitizedOutput.append(line)
+
+            # if there is a line of dashes we will begin capturing the output after the line of dashes
+            if '----' in line:
+                startflag = True
+
+        # takes the first column for each line of output only if it is greater than 1 character when split
+        # and also is a digit and puts it into a list for return out of the method
+        vlans = [x.split()[0] for x in sanitizedOutput if len(x.split()) >= 1 if x.split()[0].isdigit()]
+        return vlans
+
+
     def last_input_and_output(self, interface):
 
         return [interface, 'stats unavailable on ASA', 'stats unavailable on ASA']
+
+    def global_last_input_and_output(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def find_mac_address(self, mac_address):
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def mac_address_table(self):
 
@@ -164,11 +235,15 @@ class ASA(ASATerminalCommands, IOS):
 
         :return: Soft Error message in the format the Programmer is expecting
         '''
-        return [['Command', 'not', 'Supported', 'on ASA']]
+        raise CustomExceptions.MethodNotSupported('This method is not supported on ASA')
+
+    def arp_table(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
     def show_interface_status(self):
         # TODO: Generate Psudo command for this method as its not contained within the firmware directly
-        return 'Command not available on ASA'
+        raise CustomExceptions.MethodNotSupported('This command is not supported')
 
     def show_interface_description(self):
         '''
@@ -242,3 +317,12 @@ class ASA(ASATerminalCommands, IOS):
             master_list.append(interface_list)
 
         return master_list
+
+    def show_routes(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def write_mem(self):
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+

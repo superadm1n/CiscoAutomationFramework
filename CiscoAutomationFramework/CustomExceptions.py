@@ -52,8 +52,16 @@ class UsernameOrPasswordNotSupplied(SerialException):
 class LoginFailed(SerialException):
     pass
 
+
 class CafExceptions(Exception):
     pass
 
 class EngineNotSelected(CafExceptions):
+    pass
+
+
+class MethodNotImplemented(Exception):
+    pass
+
+class MethodNotSupported(Exception):
     pass

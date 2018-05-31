@@ -17,21 +17,21 @@ limitations under the License.
 =========================================================================
 
 Author: Kyle Kowalczyk
-Basic Backup script that will take an IP address from a user along with their credentials, login to the device, capture the running config,
-and save that to a file.
+Basic Backup script that will take an IP address from a user along with their credentials, login to the device,
+capture the running config, and save that to a file.
 '''
 import datetime
-from CiscoAutomationFramework import CAF
+from CiscoAutomationFramework import CAF, Util
 from getpass import getpass
 
 # Prints a header for the user
 print('Welcome to Config_Backup.py\n')
 
-# Gathers IP address and login info
+# Gathers IP address and login info and handles checking them against the remote device to
+# validate that the credentials are correct and handle them if they are not
 ip = input('Enter Router/Switch IP address: ')
-username = input('Enter Username: ')
-password = getpass('Enter Password: ')
-en_password = getpass('Enter Enable Password: ')
+cred = Util.CredCheck('ssh', [ip])
+username, password, en_password = cred.cli_run_with_enable()
 
 # configures todays date
 date = datetime.datetime.now()
@@ -39,7 +39,8 @@ today_date = '{}-{}-{}'.format(date.month, date.day, date.year)
 
 try:
     # Logs into the device, grabs running config and the hostname
-    with CAF('ssh', ip, username, password, en_password) as ssh:
+    with CAF('ssh') as ssh:
+        ssh.connect(ip, username, password, en_password)
         hostname = ssh.hostname
         print('Successfuly Logged into {}, grabbing running config.'.format(hostname))
         running_config = ssh.show_run()
