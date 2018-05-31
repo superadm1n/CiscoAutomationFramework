@@ -237,7 +237,9 @@ class CredCheck(PingTest):
 
 class IPaddress:
 
-    subnets = (('30', '255.255.255.252'),
+    subnets = (('32', '255.255.255.255'),
+               ('31', '255.255.255.254'),
+               ('30', '255.255.255.252'),
                ('29', '255.255.255.248'),
                ('28', '255.255.255.240'),
                ('27', '255.255.255.224'),
@@ -251,7 +253,22 @@ class IPaddress:
                ('19', '255.255.224.0'),
                ('18', '255.255.192.0'),
                ('17', '255.255.128.0'),
-               ('16', '255.255.0.0')
+               ('16', '255.255.0.0'),
+               ('15', '255.254.0.0'),
+               ('14', '255.252.0.0'),
+               ('13', '255.248.0.0'),
+               ('12', '255.240.0.0'),
+               ('11', '255.224.0.0'),
+               ('10', '255.192.0.0'),
+               ('9', '255.128.0.0'),
+               ('8', '255.0.0.0'),
+               ('7', '254.0.0.0'),
+               ('6', '252.0.0.0'),
+               ('5', '248.0.0.0'),
+               ('4', '240.0.0.0'),
+               ('3', '224.0.0.0'),
+               ('2', '192.0.0.0'),
+               ('1', '128.0.0.0')
                )
 
 
@@ -295,14 +312,32 @@ class IPaddress:
         :rtype: str
         '''
 
+        valid_cidrs = [x[0] for x in cls.subnets]
+
+        # removes a preceding slash if there is one
         if '/' in cidr:
             cidr = cidr.strip('/')
 
+        # validates that there is no more than 2 digits
         if len(cidr) > 2:
             raise ValueError('The CIDR notation {} that you submitted is invalid'.format(cidr))
 
+        # validats the CIDR notation is in fact a valid one
+        if cidr not in valid_cidrs:
+            raise ValueError('The CIDR notation {} that was submitted is invalid'.format(cidr))
 
+        # By this point we are assuming that the CIDR notation has passed the proper
+        # checks and is a valid CIDR notation.
 
-        print(cidr)
+        # grabs the corresponding subnet for the supplied CIDR
+        subnet = None
+        for entry in cls.subnets:
+            if entry[0] == cidr:
+                subnet = entry[1]
 
-        pass
+        # this if/else is here just in case there is an exception that has not been already accounted for.
+        if subnet is not None:
+            return subnet
+        else:
+            raise Exception('An unknown exception occurred with CIDR {}'.format(cidr))
+
