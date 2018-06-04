@@ -275,6 +275,14 @@ class IOSXE(TerminalCommands):
 
         return self.ios.show_routes()
 
+    def show_configured_syslog_server(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+        return self.ios.show_configured_syslog_server()
+
+
     def write_mem(self):
         if '#' not in self.ssh.prompt:
             self.priv_exec()

@@ -368,6 +368,16 @@ class CommandInterface:
         except CustomExceptions.MethodNotImplemented as E:
             raise E
 
+    def show_configured_syslog_server(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+        try:
+            return self.ssh.show_configured_syslog_server()
+        except CustomExceptions.MethodNotImplemented as E:
+            raise E
+
     def write_mem(self):
 
         '''

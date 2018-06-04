@@ -297,6 +297,26 @@ class NXOS(TerminalCommands):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)
 
+
+    def show_configured_syslog_server(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+        runningConfig = self.show_run()
+
+        servers = []
+        for line in runningConfig.splitlines():
+            if len(line.split()) > 0:
+                if line.split()[0] == 'logging' and line.split()[1] == 'server':
+                    servers.append(line.split()[2:][0])
+
+        if len(servers) == 0:
+            return [None]
+        else:
+            return servers
+
+
     def write_mem(self):
 
         if self.check_admin_role() is False:

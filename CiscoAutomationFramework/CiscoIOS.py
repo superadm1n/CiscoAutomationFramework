@@ -778,6 +778,26 @@ class IOS(TerminalCommands):
 
         return masterlist
 
+    def show_configured_syslog_server(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+        runningConfig = self.show_run()
+
+        servers = []
+        for line in runningConfig.splitlines():
+            if len(line.split()) > 0:
+                if line.split()[0] == 'logging' and line.split()[1] == 'host':
+                    servers.append(line.split()[-1:][0])
+
+        if len(servers) == 0:
+            return [None]
+        else:
+            return servers
+
+
+
     def write_mem(self):
         if '#' not in self.ssh.prompt:
             self.priv_exec()
