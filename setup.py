@@ -16,7 +16,7 @@ setup(
     author_email='kowalkyl@gmail.com',
     description='Framework for issuing commands on Cisco devices',
     long_description=description,
-    install_requires=['paramiko==2.3.1', 'pyserial==3.4'],
+    install_requires=['paramiko', 'pyserial==3.4'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: System Administrators',
