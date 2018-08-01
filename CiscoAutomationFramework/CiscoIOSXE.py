@@ -275,7 +275,7 @@ class IOSXE(TerminalCommands):
 
         return self.ios.show_routes()
 
-    def show_configured_syslog_server(self):
+    def show_configured_syslog_sever(self):
         '''Returns the value configured for syslog
 
         :return:

@@ -22,18 +22,62 @@ import time
 import logging
 from .CustomExceptions import *
 
+DISABLED = 60
+level = DISABLED
+logFile = 'CiscoAutomationFramework.log'
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(level)
 logger.propagate = False
 
-logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+logFormatter = logging.Formatter('%(name)s:%(levelname)s:%(asctime)s:%(message)s')
 
-debug_handler = logging.FileHandler('debug.log')
-debug_handler.setFormatter(logFormatter)
-debug_handler.setLevel(logging.DEBUG)
+if level <= 50:
+    try:
 
-logger.addHandler(debug_handler)
+        # file handler for debug logs
+        if level <= 10:
+            debug_handler = logging.FileHandler(logFile)
+            debug_handler.setFormatter(logFormatter)
+            debug_handler.setLevel(logging.DEBUG)
+            logger.addHandler(debug_handler)
 
+        # file handler for info logs
+        if level <= 20:
+            info_handler = logging.FileHandler(logFile)
+            info_handler.setFormatter(logFormatter)
+            info_handler.setLevel(logging.DEBUG)
+            logger.addHandler(info_handler)
+
+        # file handler for warning logs
+        if level <= 30:
+            warning_handler = logging.FileHandler(logFile)
+            warning_handler.setFormatter(logFormatter)
+            warning_handler.setLevel(logging.WARNING)
+            logger.addHandler(warning_handler)
+
+        # file handler for error logs
+        if level <= 40:
+            error_handler = logging.FileHandler(logFile)
+            error_handler.setFormatter(logFormatter)
+            error_handler.setLevel(logging.ERROR)
+            logger.addHandler(error_handler)
+
+        # file handler for critical logs
+        if level <= 50:
+            critical_handler = logging.FileHandler(logFile)
+            critical_handler.setFormatter(logFormatter)
+            critical_handler.setLevel(logging.CRITICAL)
+            logger.addHandler(critical_handler)
+
+    except PermissionError as E:
+        print(E)
+        print('CiscoAutomationFramework does not have permission to write log file, disabling logging')
+        logger.disabled = True
+
+    except:
+        print('Unknown error occured when trying to setup logging, disabling logging!')
+        logger.disabled = True
 
 
 class TerminalCommands:
