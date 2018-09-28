@@ -21,11 +21,15 @@ def factory(transport_engine):
     # determine parent object based on firmware
     obj = None
     versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS, 'ASA': ASA}
-    for ver in versions:
-        if firmware == ver:
-            obj = versions[ver]
-            break
-    if obj is None:
+    if firmware == 'IOS':
+        obj = IOS
+    elif firmware == 'IOSXE':
+        obj = IOSXE
+    elif firmware == 'NXOS':
+        obj = NXOS
+    elif firmware == 'ASA':
+        obj = ASA
+    else:
         raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
 
     # Build Interface Class
