@@ -24,8 +24,14 @@ import os
 import subprocess
 from getpass import getpass
 import socket
-from .Framework import CAF
 
+import time
+
+from .CiscoIOSXE import IOSXE
+from .CiscoIOS import IOS
+from .CiscoNXOS import NXOS
+from .CiscoASA import ASA
+from . import CustomExceptions
 # Exceptions used in this module
 
 class NoIPAvailable(Exception):
@@ -364,3 +370,74 @@ class IPaddress:
         else:
             raise Exception('An unknown exception occurred with CIDR {}'.format(cidr))
 
+
+def detect_firmware(transport):
+    '''
+    Detects the firmware running on the remote device by counting the number of times specific keywords are
+    called out in the 'show version' command and tallies them up and returns the one with the highest result
+
+    :return: str IOSXE, IOS, NXOS, ASA
+    '''
+
+    transport.send_command(command='show version')
+    time.sleep(.2)
+    for n in range(1, 4):
+        transport.send_command(' ')
+        time.sleep(.1)
+
+    output = transport.send_command_expect_same_prompt(' ', detecting_firmware=True, return_as_list=True,
+                                                            timeout=10)
+
+    # defines counter variable to keep track of the number of times a string is found
+    iosxe = 0
+    ios = 0
+    nxos = 0
+    asa = 0
+
+    # parses the first 10 lines looking for 4 specific strings
+    for line in output[:10]:
+
+        if 'ios-xe' in line.lower() or 'ios xe' in line.lower():
+            iosxe += 1
+
+        elif 'ios' in line.lower():
+            ios += 1
+
+        elif 'nx-os' in line.lower():
+            nxos += 1
+
+        elif 'adaptive security appliance' in line.lower():
+            asa += 1
+
+    # puts the results in a dictionary
+    results = {'IOSXE': iosxe, 'IOS': ios, 'NXOS': nxos, 'ASA': asa}
+
+    # stores the key with the highest value in a variable
+    firmware_version = max(results, key=results.get)
+
+    # returns variable (Firmware version) from the function
+    return firmware_version
+
+def instantiate_object(firmware_version):
+
+    '''
+    Sets up self.ssh to reference the proper module based on the IOS version of the devicve
+
+    :return: SSH object to interface with remote device
+    :rtype: object
+    '''
+
+    if firmware_version == 'IOS':
+        return IOS
+
+    elif firmware_version == 'IOSXE':
+        return IOSXE
+
+    elif firmware_version == 'NXOS':
+        return NXOS
+
+    elif firmware_version == 'ASA':
+        return ASA
+
+    else:
+        raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')

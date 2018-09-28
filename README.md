@@ -69,7 +69,7 @@ pip install git+https://github.com/superadm1n/CiscoAutomationFramework.git
 Now you can begin creating your scripts using the framework, to import the framework below is an example of the import statements.
 
 ```
-from CiscoAutomationFramework import CAF
+from CiscoAutomationFramework import connect_as_ssh
 ```
 
 ## Built With
