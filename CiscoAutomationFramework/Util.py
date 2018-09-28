@@ -417,27 +417,3 @@ def detect_firmware(transport):
 
     # returns variable (Firmware version) from the function
     return firmware_version
-
-def instantiate_object(firmware_version):
-
-    '''
-    Sets up self.ssh to reference the proper module based on the IOS version of the devicve
-
-    :return: SSH object to interface with remote device
-    :rtype: object
-    '''
-
-    if firmware_version == 'IOS':
-        return IOS
-
-    elif firmware_version == 'IOSXE':
-        return IOSXE
-
-    elif firmware_version == 'NXOS':
-        return NXOS
-
-    elif firmware_version == 'ASA':
-        return ASA
-
-    else:
-        raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')

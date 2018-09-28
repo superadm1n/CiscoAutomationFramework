@@ -6,7 +6,7 @@ Notes:
 '''
 
 from . import Util
-from .TransportEngines import SSHEngine, SerialEngine
+from .TransportEngines import SSHEngine, SerialEngine, TestEngine
 from .CiscoIOSXE import IOSXE
 from .CiscoIOS import IOS
 from .CiscoNXOS import NXOS
@@ -19,21 +19,20 @@ def factory(transport_engine):
     firmware = Util.detect_firmware(transport_engine)
 
     # determine parent object based on firmware
-    if firmware == 'IOS':
-        obj = IOS
-    elif firmware == 'IOSXE':
-        obj = IOSXE
-    elif firmware == 'NXOS':
-        obj = NXOS
-    elif firmware == 'ASA':
-        obj = ASA
-    else:
+    obj = None
+    versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS, 'ASA': ASA}
+    for ver in versions:
+        if firmware == ver:
+            obj = versions[ver]
+            break
+    if obj is None:
         raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
 
     # Build Interface Class
     class CAF(obj):
         def __init__(self, transport):
             self.transport = transport
+            self.firmware = firmware
             super().__init__(transport)
 
         def __enter__(self):
@@ -57,3 +56,7 @@ def connect_serial(COM, username, password, enable_password=None):
     ser.enable_password = enable_password
     ser.connect_to_server(COM, username, password)
     return factory(ser)
+
+def connect_test():
+    transport = TestEngine()
+    return factory(transport)

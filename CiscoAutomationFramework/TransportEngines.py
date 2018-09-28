@@ -853,3 +853,33 @@ class SerialEngine(BaseClass, serial.Serial):
 
         self.send_command('exit')
         self.ser.close()
+
+
+class TestEngine(BaseClass):
+    def __init__(self):
+        self.last_command = ''
+        super().__init__()
+
+    def connect_to_server(self):
+        self.prompt = 'switch>'
+        self.hostname = 'switch'
+
+    def send_command(self, command):
+        self.last_command = command
+
+    def get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+        pass
+
+    def get_output_different_prompt(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+        pass
+
+    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
+        pass
+
+    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
+        if detecting_firmware is True:
+            return '\n'.join('ios' for x in range(15)).splitlines()
+
+
+    def close_connection(self):
+        return True
