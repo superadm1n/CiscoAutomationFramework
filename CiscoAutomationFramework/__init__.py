@@ -37,6 +37,7 @@ def factory(transport_engine):
         def __init__(self, transport):
             self.transport = transport
             self.firmware = firmware
+            self.hostname = transport.hostname
             super().__init__(transport)
 
         def __enter__(self):
