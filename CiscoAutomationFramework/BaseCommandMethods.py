@@ -3,6 +3,11 @@ from .CustomExceptions import MethodNotImplemented
 
 class CommandMethods:
 
+    '''
+    Generic class that all other command classes should inherit from. When a new method
+    is added it should be added here first
+    '''
+
     def get_uptime(self):
         raise MethodNotImplemented('This method has not been implemented!')
 
