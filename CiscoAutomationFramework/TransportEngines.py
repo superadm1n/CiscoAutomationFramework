@@ -30,17 +30,62 @@ import threading
 import logging
 from . import CustomExceptions
 
+DISABLED = 60
+level = DISABLED
+logFile = 'CiscoAutomationFramework.log'
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(level)
 logger.propagate = False
 
-logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+logFormatter = logging.Formatter('%(name)s:%(levelname)s:%(asctime)s:%(message)s')
 
-debug_handler = logging.FileHandler('debug.log')
-debug_handler.setFormatter(logFormatter)
-debug_handler.setLevel(logging.DEBUG)
+if level <= 50:
+    try:
 
-logger.addHandler(debug_handler)
+        # file handler for debug logs
+        if level <= 10:
+            debug_handler = logging.FileHandler(logFile)
+            debug_handler.setFormatter(logFormatter)
+            debug_handler.setLevel(logging.DEBUG)
+            logger.addHandler(debug_handler)
+
+        # file handler for info logs
+        if level <= 20:
+            info_handler = logging.FileHandler(logFile)
+            info_handler.setFormatter(logFormatter)
+            info_handler.setLevel(logging.DEBUG)
+            logger.addHandler(info_handler)
+
+        # file handler for warning logs
+        if level <= 30:
+            warning_handler = logging.FileHandler(logFile)
+            warning_handler.setFormatter(logFormatter)
+            warning_handler.setLevel(logging.WARNING)
+            logger.addHandler(warning_handler)
+
+        # file handler for error logs
+        if level <= 40:
+            error_handler = logging.FileHandler(logFile)
+            error_handler.setFormatter(logFormatter)
+            error_handler.setLevel(logging.ERROR)
+            logger.addHandler(error_handler)
+
+        # file handler for critical logs
+        if level <= 50:
+            critical_handler = logging.FileHandler(logFile)
+            critical_handler.setFormatter(logFormatter)
+            critical_handler.setLevel(logging.CRITICAL)
+            logger.addHandler(critical_handler)
+
+    except PermissionError as E:
+        print(E)
+        print('CiscoAutomationFramework does not have permission to write log file, disabling logging')
+        logger.disabled = True
+
+    except:
+        print('Unknown error occured when trying to setup logging, disabling logging!')
+        logger.disabled = True
 
 
 class OutputThread(threading.Thread):
@@ -188,11 +233,61 @@ class OutputThread(threading.Thread):
 
 
 class BaseClass:
+
+
     def __init__(self):
         self.prompt = ''
         self.hostname = ''
         self.shell = None
         self.total_discarded_buffer_bytes = 0
+        self.enable_password = ''
+        self.terminal_length_value = None
+        self.terminal_width_value = None
+
+        self._output = ''
+    def throw_away_buffer_data(self):
+        '''
+        Will capture any data waiting in the incoming buffer and discard it
+
+        :return: int: total bytes discarded from the buffer
+        :rtype: int
+        '''
+
+        bytes_discarded = 0
+
+        while True:
+            if self.shell.recv_ready():
+                bytes.decode(self.shell.recv(1))
+                bytes_discarded += 1
+                time.sleep(.01)
+            else:
+                break
+
+        return bytes_discarded
+
+    def get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+
+        output = self._output.splitlines()[2:]
+
+        if detecting_firmware is True:
+            # This is needed because of the way CAF detects firmware, it will leave extra lines of the prompt in the buffer
+            # and methods grabbing data downstream will cause issues on other commands. This will take those lines from the buffer
+            # and throw them away this  will only run if this method is run with the 'detecting_firmware' flag set to 'True'
+            # to prevent necessary data from being thrown away.
+            self.total_discarded_buffer_bytes += self.throw_away_buffer_data()
+
+        self.prompt = output[-1]
+
+        if return_as_list is False:
+            # Formats the output as a string and returns it
+            cleanoutput = ''
+
+            for line in output:
+                cleanoutput += '{}\n'.format(line)
+
+            return cleanoutput
+
+        return output
 
 
 class SSHEngine(BaseClass):
@@ -296,10 +391,11 @@ class SSHEngine(BaseClass):
 
         else:
             time.sleep(.1)
-            self.invoke_shell()
+            self._invoke_shell()
+            self._get_initial_prompt()
             return 'Connection Successful'
 
-    def invoke_shell(self):
+    def _invoke_shell(self):
         '''
         Invokes shell with remote server
 
@@ -313,9 +409,9 @@ class SSHEngine(BaseClass):
             raise CustomExceptions.InvokeShellError('Unable to Invoke Shell in SSHEngine Class')
 
         # I think to stop the second exception I should add a longer wait time here
-        return self.get_initial_prompt()
+        return True
 
-    def get_initial_prompt(self):
+    def _get_initial_prompt(self):
         '''
         Gathers the initial prompt from the remote device
 
@@ -354,77 +450,9 @@ class SSHEngine(BaseClass):
 
         self.shell.send('{}\n'.format(command))
 
-    def throw_away_buffer_data(self):
-        '''
-        Will capture any data waiting in the incoming buffer and discard it
-
-        :return: int: total bytes discarded from the buffer
-        :rtype: int
-        '''
-
-        bytes_discarded = 0
-
-        while True:
-            if self.shell.recv_ready():
-                bytes.decode(self.shell.recv(1))
-                bytes_discarded += 1
-                time.sleep(.01)
-            else:
-                break
-
-        return bytes_discarded
-
     def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
-        '''
-        This method will use a pre determined time to capture output, if the server doesnt begin to return output
-        within that predetermined amount of time it will be missed, also if the server hangs for more than 1 second
-        while returning the output, the rest will be missed. This method should only be used when issuing a command
-        to the server that will return a different prompt, if it will return the same prompt use the 'get_output'
-        method.
-
-        :param wait_time: The time to wait before gathering buffer data (used to give the device time to fill the buffer
-        :type wait_time: float
-        :param return_as_list: default set to False will return as a string, set to True it will output as a list \
-        split by lines
-        :type return_as_list: bool
-        :param buffer_size: Number of bytes to gather at a time when retrieving data from buffer
-        :type buffer_size: int
-
-        :return: Output from server in string or list format
-
-        '''
-
-
-        time.sleep(wait_time)
-
-        output = '\n\n'
-
-        # starts the data collection thread to gather data from the remote device
-        dataThread = OutputThread(output, self.shell,
-                                  expectsamePrompt=False,
-                                  buffersize=buffer_size,
-                                  prompt=self.prompt,
-                                  engine='ssh')
-
-        dataThread.start()
-
-        # watches thread for the time specified in the timeout NOTE this throws IOError exception if it times out
-        output += self._thread_handler(dataThread, timeout)
-
-        output = output.splitlines()[2:]
-
-        self.prompt = output[-1]
-
-        if return_as_list is False:
-            # formats output as a string for return to user
-            cleanoutput = ''
-
-            for line in output:
-                cleanoutput += '{}\n'.format(line)
-
-            return cleanoutput
-
-        return output
+        return self.get_output(wait_time = wait_time, return_as_list=return_as_list, buffer_size=buffer_size,
+                               timeout=timeout, detecting_firmware=False)
 
     def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
 
@@ -452,80 +480,18 @@ class SSHEngine(BaseClass):
         '''
 
         time.sleep(wait_time)
-        output = '\n\n'
+        self._output = '\n\n'
+        #output = '\n\n'
 
-        # starts the data collection thread to gather data from the server
-        dataThread = OutputThread(output, self.shell,  buffersize=buffer_size, prompt=self.prompt, engine='ssh')
-        dataThread.start()
-        logger.debug('Started output thread')
-
-        # handles thread and grabs the output from it and appends it to our local output variable
-        # NOTE this throws an IO error if it times out
-        output += self._thread_handler(dataThread, timeout)
-
-        output = output.splitlines()[2:]
-
-        if detecting_firmware is True:
-            # This is needed because of the way CAF detects firmware, it will leave extra lines of the prompt in the buffer
-            # and methods grabbing data downstream will cause issues on other commands. This will take those lines from the buffer
-            # and throw them away this  will only run if this method is run with the 'detecting_firmware' flag set to 'True'
-            # to prevent necessary data from being thrown away.
-            self.total_discarded_buffer_bytes += self.throw_away_buffer_data()
-
-        self.prompt = output[-1]
-
-        if return_as_list is False:
-            # Formats the output as a string and returns it
-            cleanoutput = ''
-
-            for line in output:
-                cleanoutput += '{}\n'.format(line)
-
-            return cleanoutput
-
-        return output
-
-    def _thread_handler(self, thread, timeout):
-
-        '''
-
-        :param thread: Thread that is going to be watched
-        :param timeout: the time we are going to watch the thread before we throw and IOError
-        :return: data that was collected from the server
-        '''
-
-        counter = 0
         while True:
-
-            if thread.is_alive():
-                logger.debug('Thread is alive')
-
-                if thread.recievedData is True:
-                    thread.recievedData = False
-                    counter = 0
-
-            else:
-                logger.debug('Thread has returned data')
-
-                output = thread.output
+            self._output += bytes.decode(self.shell.recv(buffer_size))
+            self.recievedData = True
+            if '>' in self._output.splitlines()[-1] or '#' in self._output.splitlines()[-1]:
                 break
+            if not self.shell.recv_ready():
+                time.sleep(.5)
 
-            time.sleep(1)
-
-            counter += 1
-
-            if counter == timeout:
-                # if the code reaches here and breaks out we timed out of our data collection
-                # so I need to decide what to do in the event that happens. I think i might
-                # throw an exception but I would need to build in a handler for that exception.
-                logger.debug('Timeout has been reached')
-
-                while thread.is_alive():
-                    # loops until the thread is confirmed dead
-                    pass
-
-                raise IOError('Server did not return all expected data within the timeout of {}'.format(timeout))
-        return output
+        return super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
 
     def close_connection(self):
         '''
@@ -889,93 +855,31 @@ class SerialEngine(BaseClass, serial.Serial):
         self.ser.close()
 
 
-class TransportInterface(SSHEngine, SerialEngine):
-    '''
-    This class is a polymorphic interface that allows CAF and firmware specific code downstream to
-    seamlessly interface with the ssh and serial engines. It is responsible for handling calls from CAF
-    and sending them to either the SSH or Serial engine depending on what the user has specified
-    '''
+class TestEngine(BaseClass):
+    def __init__(self):
+        self.last_command = ''
+        super().__init__()
 
-    def __init__(self, engine):
-        '''
-        Initializes a TransportInterface object and gets it ready to interface calls
-
-        :param engine: serial or ssh depending on which engine the user wants to use
-        :type engine: str
-        '''
-        self.engine = engine
-
-        # calls factor function to initiate a transport object that will hold the calls for the corresponding engine
-        transport = self.transport_factory()
-        transport.__init__(self)  # initializes the transport object
-
-        self.transport = transport  # makes transport object an instance variable
-
-    def transport_factory(self):
-
-        '''
-        Factory function that will return an object that points to the proper engine the user has specified to use
-
-        :return: Engine object
-        :raises EngineNotSelected: Error raised if the user did not pass the proper string for which engine they \
-        wished to use
-        '''
-
-        if self.engine == 'serial':
-            return SerialEngine
-        elif self.engine == 'ssh':
-            return SSHEngine
-        else:
-            raise CustomExceptions.EngineNotSelected('Valid Transport Engine not Specified!')
-
-    def __enter__(self):
-
-        return self.transport.__enter__(self)
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-
-        return self.transport.__exit__(self, exc_type, exc_val, exc_tb)
-
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
-
-        return self.transport.send_command_expect_different_prompt(self, command=command, return_as_list=return_as_list,
-                                                                   buffer_size=buffer_size, timeout=timeout)
-
-    def send_command_expect_same_prompt(self, command, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
-        return self.transport.send_command_expect_same_prompt(self, command=command,
-                                                              detecting_firmware=detecting_firmware,
-                                                              return_as_list=return_as_list, buffer_size=buffer_size,
-                                                              timeout=timeout)
-
-    def connect_to_server(self, ip, username, password):
-        return self.transport.connect_to_server(self, ip, username, password)
-
-    def invoke_shell(self):
-        return self.transport.invoke_shell(self)
-
-    def get_initial_prompt(self):
-        return self.transport.get_initial_prompt(self)
+    def connect_to_server(self):
+        self.prompt = 'switch>'
+        self.hostname = 'switch'
 
     def send_command(self, command):
-        return self.transport.send_command(self, command=command)
+        self.last_command = command
 
-    def throw_away_buffer_data(self):
-        return self.transport.throw_away_buffer_data(self)
+    def get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+        pass
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
-        return self.transport.get_output_different_prompt(self, wait_time=wait_time, return_as_list=return_as_list,
-                                                          buffer_size=buffer_size, timeout=timeout)
+    def get_output_different_prompt(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+        pass
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
-        return self.transport.get_output(self, wait_time=wait_time, detecting_firmware=detecting_firmware,
-                                         return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
+    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
+        pass
+
+    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
+        if detecting_firmware is True:
+            return '\n'.join('ios' for x in range(15)).splitlines()
+
 
     def close_connection(self):
-        return self.transport.close_connection(self)
-
-    '''
-
-    def determine_location(self):
-
-        return self.determine_location()
-    '''
+        return True

@@ -21,7 +21,7 @@ Basic Backup script that will take an IP address from a user along with their cr
 capture the running config, and save that to a file.
 '''
 import datetime
-from CiscoAutomationFramework import CAF, Util
+from CiscoAutomationFramework import connect_ssh
 from getpass import getpass
 
 # Prints a header for the user
@@ -30,8 +30,9 @@ print('Welcome to Config_Backup.py\n')
 # Gathers IP address and login info and handles checking them against the remote device to
 # validate that the credentials are correct and handle them if they are not
 ip = input('Enter Router/Switch IP address: ')
-cred = Util.CredCheck('ssh', [ip])
-username, password, en_password = cred.cli_run_with_enable()
+username = input('Enter Username: ')
+password = getpass('Enter Password: ')
+en_password = getpass('Enter Enable Password')
 
 # configures todays date
 date = datetime.datetime.now()
@@ -39,8 +40,7 @@ today_date = '{}-{}-{}'.format(date.month, date.day, date.year)
 
 try:
     # Logs into the device, grabs running config and the hostname
-    with CAF('ssh') as ssh:
-        ssh.connect(ip, username, password, en_password)
+    with connect_ssh(ip, username, password, en_password) as ssh:
         hostname = ssh.hostname
         print('Successfuly Logged into {}, grabbing running config.'.format(hostname))
         running_config = ssh.show_run()

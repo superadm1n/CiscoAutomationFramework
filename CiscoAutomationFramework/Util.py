@@ -24,9 +24,10 @@ import os
 import subprocess
 from getpass import getpass
 import socket
-from .Framework import CAF
 
-# Exceptions used in this module
+
+import time
+
 
 class NoIPAvailable(Exception):
     pass
@@ -79,161 +80,29 @@ class PingTest:
         else:
             return False
 
-class CredCheck(PingTest):
+
+def gather_user_pass():
     '''
-    This class contains methods to test user authentication both to the switch/router and into enable mode.
+    CLI method to gather a username and password
+
+    :return: List containing username and password
+    :rtype: list
     '''
+    username = input('Enter Username: ')
+    password = getpass('Enter Password: ')
+    return [username, password]
 
-    def __init__(self, transport, listofipsorserialinterface):
-        '''
+def gather_enable():
+    '''
+    CLI method to gather an enable password
 
-        :param transport: serial or ssh, the transport engine to use
-        :type transport: str
-        :param listofipsorserialinterface: this variable will either be a string or a list of strings, a list if ssh is the transport, a string \
-        if serial is the transport
-        :type listofipsorserialinterface: str/list
-        '''
-
-        self.transport = transport
-        self.destination = None
-
-        if transport == 'ssh':
-            if type(listofipsorserialinterface) is not type(list()):
-                raise ListOfIPsNotProvided('You did not provide a list of IP addresses')
-            self.destination = self.decide_ip_to_use(listofipsorserialinterface)
-
-        elif transport == 'serial':
-            self.destination = listofipsorserialinterface
-        else:
-            pass
+    :return: Enable password entered by user
+    :rtype: str
+    '''
+    enable_password = getpass('Enter enable password: ')
+    return enable_password
 
 
-        '''
-        if self.destination is None:
-            raise CustomExceptions.NoHostPingable('None of the IP addresses provided ping. Addresses provided: {}'.format(', '.join(list_of_IOS_devices)))
-        '''
-
-    def decide_ip_to_use(self, list_of_IP_addresses):
-
-        '''Cycles through list of IP addresses provided pinging each one and will return the first one that responds to ping
-
-        :param list_of_IP_addresses: list of IP addresses that we can use to check authentication against
-        :type list_of_IP_addresses: list
-        :return: first IP that responds to ping
-        '''
-
-        ping = PingTest()
-
-        for ip in list_of_IP_addresses:
-            if ping.ping(ip) is True:
-                return ip
-
-        raise NoIPAvailable('No IP address is pingable in the list of IP addresss supplied: {}'.format(list_of_IP_addresses))
-
-    def gather_user_pass(self):
-        '''
-        CLI method to gather a username and password
-
-        :return: List containing username and password
-        :rtype: list
-        '''
-        username = input('Enter Username: ')
-        password = getpass('Enter Password: ')
-        return [username, password]
-
-    def gather_enable(self):
-        '''
-        CLI method to gather an enable password
-
-        :return: Enable password entered by user
-        :rtype: str
-        '''
-        enable_password = getpass('Enter enable password: ')
-        return enable_password
-
-    def test_user_pass(self, username, password):
-        '''
-        Method to test a username and password against a router or switch
-
-        :param username: Username to supply to the device
-        :type username: str
-        :param password: Password to supply to the device
-        :type password: str
-        :return: True or False depending if the username and password were accepted
-        :rtype: bool
-        '''
-        try:
-            with CAF(self.transport) as ssh:
-                ssh.connect(self.destination, username, password)
-                pass
-            return True
-
-        except:
-            return False
-
-    def test_enable(self, username, password, enable_password):
-        '''
-        Method to test an enable password and validate it is able to elevate privilege into enable mode
-
-        .. note:: The Username and Password supplied must be previously tested to have access
-
-        :param username: Confirmed working username for the device
-        :type username: str
-        :param password: Confirmed working password that corresponds to the username
-        :type password: str
-        :param enable_password: Enable password to attempt authentication with
-        :type enable_password: str
-        :return: True/False depending on if the enable password is accepted or not
-        :rtype: bool
-        '''
-        with CAF(self.transport) as ssh:
-            ssh.connect(self.destination, username, password, enable_password=enable_password)
-            output = ssh.priv_exec().lower()
-
-        for line in output.splitlines():
-            if 'denied' in line:
-                return False
-
-        return True
-
-    def cli_run_no_enable(self):
-        '''
-        CLI utility to gather a username and password and test its authentication against a cisco device, this method will loop
-        until a username and password combination is accepted
-
-        :return: List containing username and password
-        :rtype: list
-        '''
-
-        username, password = self.gather_user_pass()
-
-        while self.test_user_pass(username, password) is False:
-            print('Username or Password incorrect! Please try again\n')
-            username, password = self.gather_user_pass()
-
-        return [username, password]
-
-    def cli_run_with_enable(self):
-        '''
-        CLI utility to gather both a username and password combination and an enable password, this will loop until a successful username and
-        password combination and enable password is received.
-
-        :return: List containing username, password, and enable password.
-        :rtype: List
-        '''
-        username, password = self.gather_user_pass()
-
-        while self.test_user_pass(username, password) is False:
-            print('Username or Password incorrect! Please try again\n')
-            username, password = self.gather_user_pass()
-
-        enable_password = self.gather_enable()
-
-        while self.test_enable(username, password, enable_password) is False:
-            print('Enable password incorrect! Please try again\n')
-            enable_password = self.gather_enable()
-
-        return [username, password, enable_password]
 
 class IPaddress:
 
@@ -364,3 +233,50 @@ class IPaddress:
         else:
             raise Exception('An unknown exception occurred with CIDR {}'.format(cidr))
 
+
+def detect_firmware(transport):
+    '''
+    Detects the firmware running on the remote device by counting the number of times specific keywords are
+    called out in the 'show version' command and tallies them up and returns the one with the highest result
+
+    :return: str IOSXE, IOS, NXOS, ASA
+    '''
+
+    transport.send_command(command='show version')
+    time.sleep(.2)
+    for n in range(1, 4):
+        transport.send_command(' ')
+        time.sleep(.1)
+
+    output = transport.send_command_expect_same_prompt(' ', detecting_firmware=True, return_as_list=True,
+                                                            timeout=10)
+
+    # defines counter variable to keep track of the number of times a string is found
+    iosxe = 0
+    ios = 0
+    nxos = 0
+    asa = 0
+
+    # parses the first 10 lines looking for 4 specific strings
+    for line in output[:10]:
+
+        if 'ios-xe' in line.lower() or 'ios xe' in line.lower():
+            iosxe += 1
+
+        elif 'ios' in line.lower():
+            ios += 1
+
+        elif 'nx-os' in line.lower():
+            nxos += 1
+
+        elif 'adaptive security appliance' in line.lower():
+            asa += 1
+
+    # puts the results in a dictionary
+    results = {'IOSXE': iosxe, 'IOS': ios, 'NXOS': nxos, 'ASA': asa}
+
+    # stores the key with the highest value in a variable
+    firmware_version = max(results, key=results.get)
+
+    # returns variable (Firmware version) from the function
+    return firmware_version

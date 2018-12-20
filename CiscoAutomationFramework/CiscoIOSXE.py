@@ -18,9 +18,10 @@ limitations under the License.
 import time
 from . import CustomExceptions
 from .CiscoIOS import IOS, TerminalCommands
+from .BaseCommandMethods import CommandMethods
 
 
-class IOSXE(TerminalCommands):
+class IOSXE(TerminalCommands, CommandMethods):
     '''
     THis class is where the code resides for issuing commands to IOSXE devices. The majority of how you send commands and retrieve data to
     IOSXE and IOS devices are the same so most of the methods contained here simply use the code in the CiscoIOS Module.
@@ -274,6 +275,14 @@ class IOSXE(TerminalCommands):
     def show_routes(self):
 
         return self.ios.show_routes()
+
+    def show_configured_syslog_sever(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+        return self.ios.show_configured_syslog_server()
+
 
     def write_mem(self):
         if '#' not in self.ssh.prompt:

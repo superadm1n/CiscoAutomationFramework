@@ -21,19 +21,64 @@ This Module contains all the logic that pertains to issuing commands to a device
 import time
 import logging
 from .CustomExceptions import *
+from .BaseCommandMethods import CommandMethods
+
+DISABLED = 60
+level = DISABLED
+logFile = 'CiscoAutomationFramework.log'
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(level)
 logger.propagate = False
 
-logFormatter = logging.Formatter('%(name)s:%(asctime)s:%(message)s')
+logFormatter = logging.Formatter('%(name)s:%(levelname)s:%(asctime)s:%(message)s')
 
-debug_handler = logging.FileHandler('debug.log')
-debug_handler.setFormatter(logFormatter)
-debug_handler.setLevel(logging.DEBUG)
+if level <= 50:
+    try:
 
-logger.addHandler(debug_handler)
+        # file handler for debug logs
+        if level <= 10:
+            debug_handler = logging.FileHandler(logFile)
+            debug_handler.setFormatter(logFormatter)
+            debug_handler.setLevel(logging.DEBUG)
+            logger.addHandler(debug_handler)
 
+        # file handler for info logs
+        if level <= 20:
+            info_handler = logging.FileHandler(logFile)
+            info_handler.setFormatter(logFormatter)
+            info_handler.setLevel(logging.DEBUG)
+            logger.addHandler(info_handler)
+
+        # file handler for warning logs
+        if level <= 30:
+            warning_handler = logging.FileHandler(logFile)
+            warning_handler.setFormatter(logFormatter)
+            warning_handler.setLevel(logging.WARNING)
+            logger.addHandler(warning_handler)
+
+        # file handler for error logs
+        if level <= 40:
+            error_handler = logging.FileHandler(logFile)
+            error_handler.setFormatter(logFormatter)
+            error_handler.setLevel(logging.ERROR)
+            logger.addHandler(error_handler)
+
+        # file handler for critical logs
+        if level <= 50:
+            critical_handler = logging.FileHandler(logFile)
+            critical_handler.setFormatter(logFormatter)
+            critical_handler.setLevel(logging.CRITICAL)
+            logger.addHandler(critical_handler)
+
+    except PermissionError as E:
+        print(E)
+        print('CiscoAutomationFramework does not have permission to write log file, disabling logging')
+        logger.disabled = True
+
+    except:
+        print('Unknown error occured when trying to setup logging, disabling logging!')
+        logger.disabled = True
 
 
 class TerminalCommands:
@@ -137,7 +182,7 @@ class TerminalCommands:
         return self.ssh.send_command_expect_different_prompt('end')
 
 
-class IOS(TerminalCommands):
+class IOS(TerminalCommands, CommandMethods):
     '''
     This class contains the code that is responsible for auctualy sending the commands to the remote device, retrieveing, and parsing the output.
 
@@ -777,6 +822,26 @@ class IOS(TerminalCommands):
                         [line[0], line[1], line[2], ' '.join([i for i in line[3:]])])
 
         return masterlist
+
+    def show_configured_syslog_server(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+        runningConfig = self.show_run()
+
+        servers = []
+        for line in runningConfig.splitlines():
+            if len(line.split()) > 0:
+                if line.split()[0] == 'logging' and line.split()[1] == 'host':
+                    servers.append(line.split()[-1:][0])
+
+        if len(servers) == 0:
+            return [None]
+        else:
+            return servers
+
+
 
     def write_mem(self):
         if '#' not in self.ssh.prompt:

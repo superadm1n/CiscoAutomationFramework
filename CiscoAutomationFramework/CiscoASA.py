@@ -21,7 +21,9 @@ This Module contains the code that is specific to issuing commands to ASA's
 
 from .CiscoIOS import *
 from . import CustomExceptions
+from .BaseCommandMethods import CommandMethods
 import time
+
 
 not_implemented_text = 'This Method is not implemented in the CiscoASA Module'
 
@@ -46,7 +48,7 @@ class ASATerminalCommands(TerminalCommands):
         return self.ssh.send_command_expect_same_prompt('terminal pager {}'.format(number))
 
 
-class ASA(ASATerminalCommands):
+class ASA(ASATerminalCommands, CommandMethods):
 
     def __init__(self, ssh_object):
         ASATerminalCommands.__init__(self, ssh_object)
@@ -196,7 +198,6 @@ class ASA(ASATerminalCommands):
         vlans = [x.split()[0] for x in sanitizedOutput if len(x.split()) >= 1 if x.split()[0].isdigit()]
         return vlans
 
-
     def last_input_and_output(self, interface):
 
         return [interface, 'stats unavailable on ASA', 'stats unavailable on ASA']
@@ -321,6 +322,35 @@ class ASA(ASATerminalCommands):
     def show_routes(self):
 
         raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+    def show_configured_syslog_server(self):
+        '''Returns the value configured for syslog
+
+        :return:
+        '''
+
+        '''
+        Need to sort out issues with the show run command and utilizing code in the IOS module for this to work
+        for now leaving it to throw an error
+        
+        
+        runningConfig = self.show_run()
+
+        servers = []
+        for line in runningConfig.splitlines():
+            if len(line.split()) > 0:
+                if line.split()[0] == 'logging' and line.split()[1] == 'host':
+                    servers.append(line.split()[-1:][0])
+
+        if len(servers) == 0:
+            return [None]
+        else:
+            return servers
+        '''
+
+        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+
+
 
     def write_mem(self):
 

@@ -29,7 +29,7 @@ git clone https://github.com/superadm1n/CiscoAutomationFramework.git
 cd CiscoAutomationFramework
 virtualenv -p python3 env
 source env/bin/activate
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 Windows
@@ -39,7 +39,7 @@ git clone https://github.com/superadm1n/CiscoAutomationFramework.git
 cd CiscoAutomationFramework
 virtualenv -p python3 env
 env\scripts\activate
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 
@@ -69,7 +69,7 @@ pip install git+https://github.com/superadm1n/CiscoAutomationFramework.git
 Now you can begin creating your scripts using the framework, to import the framework below is an example of the import statements.
 
 ```
-from CiscoAutomationFramework import CAF
+from CiscoAutomationFramework import connect_as_ssh
 ```
 
 ## Built With
