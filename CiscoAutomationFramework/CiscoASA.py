@@ -21,7 +21,9 @@ This Module contains the code that is specific to issuing commands to ASA's
 
 from .CiscoIOS import *
 from . import CustomExceptions
+from .BaseCommandMethods import CommandMethods
 import time
+
 
 not_implemented_text = 'This Method is not implemented in the CiscoASA Module'
 
@@ -46,7 +48,7 @@ class ASATerminalCommands(TerminalCommands):
         return self.ssh.send_command_expect_same_prompt('terminal pager {}'.format(number))
 
 
-class ASA(ASATerminalCommands):
+class ASA(ASATerminalCommands, CommandMethods):
 
     def __init__(self, ssh_object):
         ASATerminalCommands.__init__(self, ssh_object)

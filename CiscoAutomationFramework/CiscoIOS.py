@@ -21,6 +21,7 @@ This Module contains all the logic that pertains to issuing commands to a device
 import time
 import logging
 from .CustomExceptions import *
+from .BaseCommandMethods import CommandMethods
 
 DISABLED = 60
 level = DISABLED
@@ -181,7 +182,7 @@ class TerminalCommands:
         return self.ssh.send_command_expect_different_prompt('end')
 
 
-class IOS(TerminalCommands):
+class IOS(TerminalCommands, CommandMethods):
     '''
     This class contains the code that is responsible for auctualy sending the commands to the remote device, retrieveing, and parsing the output.
 

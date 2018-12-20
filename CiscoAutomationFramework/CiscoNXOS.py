@@ -16,6 +16,7 @@ limitations under the License.
 
 import time
 from . import CustomExceptions
+from .BaseCommandMethods import CommandMethods
 
 not_implemented_text = 'This method has not been implemented in the CiscoNXOS module'
 
@@ -65,7 +66,7 @@ class TerminalCommands:
         raise CustomExceptions.MethodNotSupported
 
 
-class NXOS(TerminalCommands):
+class NXOS(TerminalCommands, CommandMethods):
 
     def __init__(self, ssh_object):
         TerminalCommands.__init__(self, ssh_object)
@@ -150,7 +151,7 @@ class NXOS(TerminalCommands):
         return output
 
     def show_run_interface(self, interface):
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().show_run_interface(interface)
 
     def get_local_users(self):
         users = []
@@ -165,38 +166,38 @@ class NXOS(TerminalCommands):
 
     def delete_local_user(self, username):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().delete_local_user(username)
 
     def configure_description(self, interface, description):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().configure_description(interface, description)
 
     def configure_access_vlan(self, interface, vlan):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().configure_access_vlan(interface, vlan)
 
     def power_cycle_port(self, interface, delay):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().power_cycle_port(interface, delay)
 
     def configure_router_lan_subinterface(
             self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().configure_router_lan_subinterface(
+            physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses
+        )
 
     def physical_port_inventory(self):
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().physical_port_inventory()
 
     def physical_port_inventory_longname(self):
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().physical_port_inventory_longname()
 
     def port_status(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().port_status()
 
     def power_inline(self, summary):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().power_inline(summary)
 
     def list_ospf_configuration(self):
 
@@ -229,12 +230,10 @@ class NXOS(TerminalCommands):
         return ospf_config
 
     def list_eigrp_configuration(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().list_eigrp_configuration()
 
     def list_down_ports(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().list_down_ports()
 
     def list_configured_vlans(self):
 
@@ -262,40 +261,34 @@ class NXOS(TerminalCommands):
 
 
     def last_input_and_output(self, interface):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().last_input_and_output(interface)
 
     def global_last_input_and_output(self):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().global_last_input_and_output()
 
     def find_mac_address(self, mac_address):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().find_mac_address(mac_address)
 
-    def mac_address_table(self, mac_address):
+    def mac_address_table(self):
 
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().mac_address_table()
 
-    def cdp_neighbor_table(self, mac_address):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+    def cdp_neighbor_table(self):
+        return super().cdp_neighbor_table()
 
     def arp_table(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().arp_table()
 
     def show_interface_status(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().show_interface_status()
 
     def show_interface_description(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().show_interface_description()
 
     def show_routes(self):
-
-        raise CustomExceptions.MethodNotImplemented(not_implemented_text)
+        return super().show_routes()
 
 
     def show_configured_syslog_server(self):
