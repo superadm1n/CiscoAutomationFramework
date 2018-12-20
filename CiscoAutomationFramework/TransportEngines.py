@@ -172,9 +172,6 @@ class OutputThread(threading.Thread):
         bitsRcvd = 0
 
         while output[-1] != self.prompt:
-            if self._check_for_kill() is True:
-                logger.debug('Thread got signal to die')
-                break
             for line in self.shell.readlines():
                 fromDevice = line.decode().strip('\r\n')
                 output.append(fromDevice)
@@ -541,7 +538,6 @@ class SerialEngine(BaseClass, serial.Serial):
         else:
             self.get_initial_prompt()
 
-
     def _login_to_device(self, username, password):
 
         if username is None or password is None:
@@ -602,7 +598,7 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
-    def send_command_expect_different_prompt(self, command, timeout, return_as_list=False, buffer_size=1, pause=1):
+    def send_command_expect_different_prompt(self, command, timeout=10, return_as_list=False, buffer_size=1, pause=1):
         '''
         High level method for sending a command when expecting the prompt to return differently. This uses the
         SSHEngine methods of send_command and get_output_different_prompt
@@ -625,7 +621,7 @@ class SerialEngine(BaseClass, serial.Serial):
             timeout=timeout
         )
 
-    def send_command_expect_same_prompt(self, command, timeout, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
         '''
         Sends commands and gathers the output in a way that expects the same prompt to be returned
         DO NOT use this method if you are not SURE that the prompt returned will be the same
@@ -661,8 +657,6 @@ class SerialEngine(BaseClass, serial.Serial):
         output = self.get_output_different_prompt(10, return_as_list=True)
 
         #output = self.send_command_expect_different_prompt(command=' ', return_as_list=True, timeout=10)
-
-
 
     def send_command(self, command):
         '''
@@ -703,7 +697,7 @@ class SerialEngine(BaseClass, serial.Serial):
 
         return total_bytes_discarded
 
-    def get_output(self, timeout, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def get_output(self, timeout=10, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
 
         '''
         Gets output when the same prompt is expected to be returned
@@ -725,19 +719,21 @@ class SerialEngine(BaseClass, serial.Serial):
 
         output = ['\n', '\n']
 
-        dataThread = OutputThread(output, self.ser, buffersize=buffer_size, prompt=self.prompt, engine='serial')
-        dataThread.start()
-        logger.debug('Started serial output thread')
+        bitsRcvd = 0
 
-        output = self._serthread_handler(dataThread, timeout)
-        logger.debug('Output from serial thread captured')
+        while output[-1] != self.prompt:
+            for line in self.ser.readlines():
+                fromDevice = line.decode().strip('\r\n')
+                output.append(fromDevice)
+                bitsRcvd += len(fromDevice)
+                if len(fromDevice) > 0:
+                    logger.debug('Recieved {} bits from device'.format(len(fromDevice)))
 
         bytes_discarded = 0
 
         if detecting_firmware is True:
             # :TODO: Add logic here
             self.throw_away_buffer_data()
-
             pass
 
         try:
@@ -753,7 +749,7 @@ class SerialEngine(BaseClass, serial.Serial):
             logging.debug('Serial engine completed getting output from device')
             return output
 
-    def get_output_different_prompt(self, timeout, wait_time=.2, return_as_list=False, buffer_size=1):
+    def get_output_different_prompt(self, timeout=10, wait_time=.2, return_as_list=False, buffer_size=1):
 
         '''
         Gets outut when a different prompt is expected to be returned
@@ -775,18 +771,26 @@ class SerialEngine(BaseClass, serial.Serial):
 
         output = ['\n', '\n']
 
-        # starts the data collection thread to gather data from the remote device
-        dataThread = OutputThread(output, self.ser,
-                                  expectsamePrompt=False,
-                                  buffersize=buffer_size,
-                                  prompt=self.prompt,
-                                  engine='serial')
+        while True:
 
-        dataThread.start()
-        logger.debug('Started serial thread to get output')
+            time.sleep(1)
 
-        output = self._serthread_handler(dataThread, timeout)
-        logger.debug('Output from serial thread captured')
+            bitsRcvd = 0
+
+            if self.ser.in_waiting:
+                logging.debug('data waiting on serial')
+                for line in self.ser.readlines():
+                    fromDevice = line.decode().strip('\r\n')
+                    output.append(fromDevice)
+                    bitsRcvd += len(fromDevice)
+
+                if bitsRcvd > 0:
+                    self.recievedData = True
+
+            if '>' in output[-1] or '#' in output[-1]:
+                logging.debug('End of output from device')
+                break
+
 
         if len(output) > 0:
             self.prompt = output[-1].strip()
