@@ -29,7 +29,7 @@ git clone https://github.com/superadm1n/CiscoAutomationFramework.git
 cd CiscoAutomationFramework
 virtualenv -p python3 env
 source env/bin/activate
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 Windows
@@ -39,7 +39,7 @@ git clone https://github.com/superadm1n/CiscoAutomationFramework.git
 cd CiscoAutomationFramework
 virtualenv -p python3 env
 env\scripts\activate
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 
