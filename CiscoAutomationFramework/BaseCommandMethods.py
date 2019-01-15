@@ -111,3 +111,12 @@ class CommandMethods:
 
     def show_vlan(self):
         raise MethodNotImplemented('This method has not been implemented!')
+
+    def shutdown_interface(self, interface):
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def no_shutdown_interface(self, interface):
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def set_access_vlan_on_interface(self, interface, vlan_number):
+        raise MethodNotImplemented('This method has not been implemented!')

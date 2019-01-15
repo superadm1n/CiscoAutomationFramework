@@ -885,6 +885,26 @@ class IOS(TerminalCommands, CommandMethods):
 
         return returnable_data
 
+    def shutdown_interface(self, interface):
+        self.config_t()
+        self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
+        self.ssh.send_command_expect_same_prompt('shutdown')
+        self.ssh.send_command_expect_different_prompt('exit')
+
+    def no_shutdown_interface(self, interface):
+        self.config_t()
+        self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
+        self.ssh.send_command_expect_same_prompt('no shutdown')
+        self.ssh.send_command_expect_different_prompt('exit')
+
+    def set_access_vlan_on_interface(self, interface, vlan_number):
+        configured_vlans = [x['vlan'] for x in self.show_vlan()]
+        if vlan_number not in configured_vlans:
+            raise AttributeError('Vlan {} is not configured on the switch!'.format(vlan_number))
+        self.config_t()
+        self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
+        self.ssh.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan_number))
+        self.ssh.send_command_expect_different_prompt('exit')
 
     def write_mem(self):
         if '#' not in self.ssh.prompt:
