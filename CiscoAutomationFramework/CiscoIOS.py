@@ -22,9 +22,9 @@ import time
 import logging
 from .CustomExceptions import *
 from .BaseCommandMethods import CommandMethods
+from CiscoAutomationFramework import log_level
 
-DISABLED = 60
-level = DISABLED
+level = log_level
 logFile = 'CiscoAutomationFramework.log'
 
 logger = logging.getLogger(__name__)
@@ -650,8 +650,9 @@ class IOS(TerminalCommands, CommandMethods):
 
         return mac_table_list
 
-    def find_mac_address(self, mac_address):
-        mac_table = self.mac_address_table()
+    def find_mac_address(self, mac_address, mac_table=None):
+        if not mac_table:
+            mac_table = self.mac_address_table()
 
         results = []
         for line in mac_table:

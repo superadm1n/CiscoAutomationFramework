@@ -88,7 +88,7 @@ class CommandMethods:
     def mac_address_table(self):
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def find_mac_address(self, mac_address):
+    def find_mac_address(self, mac_address, mac_table):
         raise MethodNotImplemented('This method has not been implemented!')
 
     def cdp_neighbor_table(self):
