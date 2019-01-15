@@ -854,9 +854,9 @@ class IOS(TerminalCommands, CommandMethods):
 
         def gather_interfaces(line):
             if line.split()[2] == 'active':
-                return line.split()[3:]
+                return [x.strip(',') for x in line.split()[3:]]
             else:
-                return line.split()[2:]
+                return [x.strip(',') for x in line.split()[2:]]
 
         # sets terminal length and width
         self.terminal_length()
