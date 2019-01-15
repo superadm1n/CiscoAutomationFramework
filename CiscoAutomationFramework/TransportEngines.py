@@ -29,9 +29,9 @@ import time
 import threading
 import logging
 from . import CustomExceptions
+from CiscoAutomationFramework import log_level
 
-DISABLED = 60
-level = DISABLED
+level = log_level
 logFile = 'CiscoAutomationFramework.log'
 
 logger = logging.getLogger(__name__)
@@ -721,13 +721,18 @@ class SerialEngine(BaseClass, serial.Serial):
 
         bitsRcvd = 0
 
+        loopBreaker = 0
         while output[-1] != self.prompt:
+            loopBreaker += 1
             for line in self.ser.readlines():
                 fromDevice = line.decode().strip('\r\n')
                 output.append(fromDevice)
                 bitsRcvd += len(fromDevice)
                 if len(fromDevice) > 0:
                     logger.debug('Recieved {} bits from device'.format(len(fromDevice)))
+
+            if loopBreaker > 1000:
+                logging.debug('LoopBreaker exceeded, breaking serial recieve loop')
 
         bytes_discarded = 0
 
