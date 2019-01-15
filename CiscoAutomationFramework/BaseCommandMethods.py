@@ -108,3 +108,6 @@ class CommandMethods:
 
     def show_configured_syslog_server(self):
         raise MethodNotImplemented('This method has not been implemented!')
+
+    def show_vlan(self):
+        raise MethodNotImplemented('This method has not been implemented!')

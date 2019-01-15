@@ -842,6 +842,48 @@ class IOS(TerminalCommands, CommandMethods):
         else:
             return servers
 
+    def show_vlan(self):
+        def gather_description(line):
+            if line.split()[2] == 'active':
+                return line.split()[1]
+            else:
+                return None
+
+        def gather_vlan(line):
+            return line.split()[0]
+
+        def gather_interfaces(line):
+            if line.split()[2] == 'active':
+                return line.split()[3:]
+            else:
+                return line.split()[2:]
+
+        # sets terminal length and width
+        self.terminal_length()
+        self.terminal_width()
+
+        # grabs output of show vlan command
+        data = self.ssh.send_command_expect_same_prompt('show vlan', return_as_list=True, buffer_size=200)[2:][:-1]
+        flag = 0
+        returnable_data = []
+
+
+        for x in data:
+            # parses out all of the unneeded data
+            if '--' in x:
+                flag += 1
+                continue
+            if flag == 1:
+                if len(x.split()) == 0:
+                    continue
+                elif x.split()[0].lower() == 'vlan':
+                    continue
+                elif 'act/unsup' in x.split()[-1].lower():
+                    continue
+                else:  # formats the needed data into a dictionary
+                    returnable_data.append({'vlan': gather_vlan(x), 'description': gather_description(x), 'interfaces': gather_interfaces(x)})
+
+        return returnable_data
 
 
     def write_mem(self):
