@@ -407,7 +407,31 @@ class IOS(TerminalCommands, CommandMethods):
 
     def port_status(self):
         self.terminal_length()
-        return self.ssh.send_command_expect_same_prompt('show interfaces status')[3:][:-1]
+        switch_data = self.ssh.send_command_expect_same_prompt('show interfaces status', return_as_list=True)
+
+        flag = False
+        usable_data = []
+        header = []
+        for line in switch_data:
+            if 'port' in line.lower() and 'status' in line.lower():
+                flag = True
+                header = [x.lower() for x in line.split()]
+                continue
+
+            if flag == True:
+                if len(line.split()) >= 7:
+                    var = line.split()
+                    usable_data.append(
+                        {header[0]: var[0], header[1]: ' '.join(var[:-5][1:]), header[2]: var[2], header[3]: var[3], header[4]: var[4], header[5]: var[5],
+                         header[6]: var[6]}
+                    )
+                elif len(line.split()) == 6:
+                    var = line.split()
+                    usable_data.append(
+                        {header[0]: var[0], header[1]: '', header[2]: var[1], header[3]: var[2], header[4]: var[3], header[5]: var[4],
+                         header[6]: var[5]}
+                    )
+        return usable_data
 
     def power_inline(self):
         self.terminal_length()
