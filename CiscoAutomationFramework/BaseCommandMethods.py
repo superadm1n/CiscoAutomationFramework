@@ -123,3 +123,6 @@ class CommandMethods:
 
     def set_access_vlan_on_interface(self, interface, vlan_number):
         raise MethodNotImplemented('This method has not been implemented!')
+
+    def show_inventory_data(self):
+        raise MethodNotImplemented('This method has not been implemented!')

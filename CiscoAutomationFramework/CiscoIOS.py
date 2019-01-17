@@ -924,6 +924,35 @@ class IOS(TerminalCommands, CommandMethods):
         self.ssh.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan_number))
         self.ssh.send_command_expect_different_prompt('exit')
 
+    def show_inventory_data(self):
+        self.terminal_width()
+        self.terminal_length()
+        output = self.ssh.send_command_expect_same_prompt('show inventory raw', return_as_list=True)
+
+        data = []
+        tmp = ''
+        # for loop takes the 2 lines of each output and combines them to one line, storing them in a list split
+        # by each entry seperated by comma
+        for line in output:
+            if len(line) == 0:
+                data.append(tmp[:-2].split(','))
+                tmp = ''
+                continue
+            tmp += '{}, '.format(line)
+
+        # This loop takes each of the lists and converts them into a dictionary based on what was gathered
+        # from the switch
+        final_data = []
+        for x in data[1:][:-1]:
+            tmp_dict = {}
+            for entry in x:
+                tmp = entry.split(':')
+                print(tmp)
+                tmp_dict[tmp[0].lower().strip()] = tmp[1].strip().strip('"')
+            final_data.append(tmp_dict)
+
+        return final_data
+
     def write_mem(self):
         if '#' not in self.ssh.prompt:
             self.priv_exec()
