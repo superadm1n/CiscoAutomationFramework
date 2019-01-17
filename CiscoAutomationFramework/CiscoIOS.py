@@ -409,55 +409,28 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_length()
         return self.ssh.send_command_expect_same_prompt('show interfaces status')[3:][:-1]
 
-    def power_inline(self, summary):
+    def power_inline(self):
         self.terminal_length()
 
-        data_from_device = self.ssh.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
+        data = self.ssh.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
 
-        if summary == False:
-            int_flag = 0
-            general_data = []
-            for line in data_from_device:
-                newline = []
-                if len(line.split()) > 1:
-                    line = line.split()
+        usable_data = []
+        flag = 0
+        for line in data:
+            if '---' in line:
+                flag += 1
+                continue
 
-                    if int_flag == 2:
+            if flag == 2:
+                usable_data.append(line)
 
-                        # The next 10 lines constructs a new list to handle if there are any spaces in the 5th column such as "Ieee PD"
-                        for element in line[:4]:
-                            newline.append(element)
-                            line.remove(element)
-
-                        newline.append(' '.join([str(i) for i in line[:-2]]))
-
-                        for element in line[-2:]:
-                            newline.append(element)
-
-                        general_data.append(newline)
-
-                    if '---' in str(line[0]):
-                        int_flag += 1
-
-            return general_data
-
-        elif summary == True:
-            int_flag = 0
-            general_data = []
-            for line in data_from_device:
-                if len(line.split()) > 1:
-                    line = line.split()
-
-                    if int_flag == 1:
-                        if 'int' in line[0].lower():
-                            int_flag += 1
-                        else:
-                            general_data.append(line)
-
-                    if '---' in str(line[0]):
-                        int_flag += 1
-
-            return general_data
+        returnable_data = []
+        for x in usable_data:
+            line = x.split()
+            returnable_data.append(
+                {'interface': line[0], 'admin':line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]}
+            )
+        return returnable_data
 
     def list_ospf_configuration(self):
 
