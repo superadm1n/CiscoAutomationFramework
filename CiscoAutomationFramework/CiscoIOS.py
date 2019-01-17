@@ -940,14 +940,11 @@ class IOS(TerminalCommands, CommandMethods):
                 continue
             tmp += '{}, '.format(line)
 
-        # This loop takes each of the lists and converts them into a dictionary based on what was gathered
-        # from the switch
         final_data = []
         for x in data[1:][:-1]:
             tmp_dict = {}
             for entry in x:
                 tmp = entry.split(':')
-                print(tmp)
                 tmp_dict[tmp[0].lower().strip()] = tmp[1].strip().strip('"')
             final_data.append(tmp_dict)
 
