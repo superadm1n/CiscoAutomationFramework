@@ -79,6 +79,9 @@ class CommandMethods:
     def last_input_and_output(self, interface):
         raise MethodNotImplemented('This method has not been implemented!')
 
+    def last_input_and_output_all(self):
+        raise MethodNotImplemented('This method has not been implemented!')
+
     def list_configured_vlans(self):
         raise MethodNotImplemented('This method has not been implemented!')
 

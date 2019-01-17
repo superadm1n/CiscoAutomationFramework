@@ -552,6 +552,27 @@ class IOS(TerminalCommands, CommandMethods):
 
         return output
 
+    def last_input_and_output_all(self):
+        '''Very similar to the last input output method, but instead returns all interfaces in a matter of seconds
+        in a list of dictionaries'''
+        self.terminal_length()
+        sw_output = self.ssh.send_command_expect_same_prompt('show interfaces', buffer_size=200, return_as_list=True)
+
+
+        data = []
+        tmp = {'interface': '', 'input': '', 'output': ''}
+        for line in sw_output:
+            if line[0].isalpha():
+                tmp['interface'] = line.split()[0]
+
+            if 'last input' in line.lower():
+                tmp['input'] = line.lstrip().split()[2].strip(',')
+                tmp['output'] = line.lstrip().split(',')[1].strip().split()[1]
+                data.append(tmp)
+                tmp = {}
+
+        return data
+
     def list_configured_vlans(self):
 
         initial_term_width = self.ssh.terminal_width_value
