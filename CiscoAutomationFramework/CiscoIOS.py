@@ -661,7 +661,11 @@ class IOS(TerminalCommands, CommandMethods):
         for line in device_output[:-1]:
             if len(line.split()) >= 4:
                 if flag == 1:
-                    mac_table_list.append(line.split())
+                    tmp = line.split()
+                    mac_table_list.append(
+                        {'vlan': tmp[0], 'mac':tmp[1], 'type': tmp[2], 'ports': tmp[3]}
+                    )
+                    #mac_table_list.append(line.split())
 
                 if '--' in line.split()[0]:
                     flag = 1
@@ -672,20 +676,8 @@ class IOS(TerminalCommands, CommandMethods):
         if not mac_table:
             mac_table = self.mac_address_table()
 
-        results = []
-        for line in mac_table:
-            if mac_address in line[1]:
-                results.append([line[1], line[3]])
+        return [item for item in mac_table if item['mac'] == mac_address]
 
-        if len(results) > 1:
-            for result in results:
-                if 'po' in str(result[-1]).lower() or 'vl' in str(result[-1]).lower():
-                    results.remove(result)
-
-        if len(results) == 0:
-            return ['', '']
-        else:
-            return results[0]
 
     def cdp_neighbor_table(self):
 
