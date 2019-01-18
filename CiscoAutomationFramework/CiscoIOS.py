@@ -698,54 +698,32 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.priv_exec()
 
-        cdp_output = self.ssh.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True)
+        cdp_output = self.ssh.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
+        data = []
+        tmp = {}
+        for line in cdp_output[2:]:
+            if 'device id' in line.lower():
+                tmp['deviceid'] = line.split(':')[1].strip()
+            if 'interface' in line.lower() and 'outgoing' in line.lower():
+                tmp['localinterface'] = line.split(',')[0].split(':')[1].strip()
+                tmp['remoteinterface'] = line.split(',')[1].split(':')[1].strip()
 
-        startflag = False
-        grab_ip_flag = False
-        masterlist = []
-        interfacelist = []
-        round_count = 0
-        for line in cdp_output[1:][:-2]:
-            round_count += 1
+            if 'platform' in line.lower():
+                tmp['platform'] = line.split(',')[0].split(':')[1].strip()
 
-            if startflag is True:
+            if 'ip address' in line.lower():
+                try:
+                    tmp['remoteip']
+                except KeyError:
+                    tmp['remoteip'] = line.split(':')[1].strip()
 
-                if 'device id' in line.lower():
-                    interfacelist.append(line.split(':')[1].strip())  # remote device name
+            if '-----' in line:
+                data.append(tmp)
+                tmp = {}
 
-                if 'interface' in line.lower():
-                    interfacelist.append(line.split(',')[0].split(':')[1].strip())  # local interface
-                    interfacelist.append(line.split(',')[1].split(':')[1].strip())  # remote interface
-
-                if 'ip address' in line.lower():
-
-                    if grab_ip_flag is False:
-                        grab_ip_flag = True
-                        interfacelist.append(line.split(':')[1].strip())  # remote device IP
-
-                    elif grab_ip_flag is True:
-                        grab_ip_flag = False
-
-            if '---' in line:
-                if startflag is False:
-                    startflag = True
-
-                elif startflag is True:
-
-                    masterlist.append(interfacelist)
-                    interfacelist = []
-
-                    startflag = False
-
-            # Allows method to be handled if there is only 1 CDP entry because there wont be 2 ---- lines to
-            # reset the start flag
-            if round_count == len(cdp_output[1:][:-2]) and startflag is True:
-                masterlist.append(interfacelist)
-                interfacelist = []
+        return data
 
 
-
-        return masterlist
 
     def arp_table(self):
 
