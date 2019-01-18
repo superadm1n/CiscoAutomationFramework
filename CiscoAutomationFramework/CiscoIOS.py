@@ -752,12 +752,25 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_length()
 
         output = []
-
+        header = []
+        flag = 0
         for line in self.ssh.send_command_expect_same_prompt('show ip arp', return_as_list=True, buffer_size=40):
-            if len(line.split()) == 6:
-                output.append(line.split())
-            else:
-                pass
+            if 'protocol' in line.lower() and 'address' in line.lower():
+                header = line.split()
+                flag += 1
+                continue
+
+            if flag == 1:
+                if len(line.split()) == 6:
+                    tmp = line.split()
+                    output.append(
+                        {'protocol': tmp[0], 'address': tmp[1], 'age': tmp[2], 'mac': tmp[3], 'type': tmp[4], 'interface': tmp[5]}
+                    )
+                elif flag > 1:
+                    tmp = line.split()
+                    output.append(
+                        {'protocol': tmp[0], 'address': tmp[1], 'age': tmp[2], 'mac': tmp[3], 'type': tmp[4], 'interface': ''}
+                    )
 
         return output
 
