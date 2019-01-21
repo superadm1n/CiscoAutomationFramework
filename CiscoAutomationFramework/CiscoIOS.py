@@ -602,45 +602,6 @@ class IOS(TerminalCommands, CommandMethods):
         # returns output
         return output
 
-    def global_last_input_and_output(self):
-
-        self.terminal_length()
-
-        sw_output = self.ssh.send_command_expect_same_prompt('show interfaces', buffer_size=200, return_as_list=True)[1:][:-1]
-
-
-        captureflag = 0
-        masterlist = []
-        interface_stats = []
-        ioflag = 0
-        for line in sw_output:
-            if line[0].isalpha():
-                captureflag = 1
-
-                if captureflag == 1:
-                    interface_stats.append(line.split()[0])
-                    captureflag = 0
-                    ioflag += 1
-
-            if 'last input' in line.lower():
-
-
-                line = line.split(',')
-
-                if ioflag == 1:
-                    last_input = line[0].strip().split()[-1:][0]
-                    last_output = line[1].strip().split()[-1:][0]
-                    interface_stats.append(last_input)
-                    interface_stats.append(last_output)
-
-                    masterlist.append(interface_stats)
-                    interface_stats = []
-
-                    ioflag -= 1
-
-
-        return masterlist
-
     def mac_address_table(self):
         mac_table_list = []
 
@@ -749,30 +710,59 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_length()
 
         routing_table = self.ssh.send_command_expect_same_prompt('show ip route', return_as_list=True)
+        flag = 0
+        fixed_ouput = []
+        tmp = ''
+        for line in routing_table:
+            if len(line) <= 1:
+                continue
+            if 'last resort' in line:
+                flag += 1
 
-        masterlist = []
-        route = []
-        working_list = []
-        final_list = []
-        for line in routing_table[1:][:-1]:
-            if 'is subnetted' in line.lower() or 'variably subnetted' in line.lower():
-                pass
+            if flag != 1:
+                continue
+
+            if line[0].isalpha() and line[1] == ' ':
+                if tmp != '':
+                    fixed_ouput.append(tmp)
+                    tmp = ''
+                tmp += line
+            if line[0] == ' ' and 'subnetted' not in line:
+                tmp += '| {}'.format(line)
+        data = []
+        for route in fixed_ouput:
+            tmp = route.split()
+            tmp_dict = {}
+            codes = []
+            for section in tmp:
+                if section[0].isalpha():
+                    codes.append(section)
+                else:
+                    network = section
+                    break
+            tmp_dict['codes'] = codes
+            tmp_dict['subnet'] = network
+            hoplist = []
+            if 'directly' in route:
+                td = {}
+                td['nexthop'] = 'directly connected'
+                td['nexthoplocation'] = route.split(',')[-1].strip()
+                hoplist.append(td)
             else:
-                working_list.append(line)
+                tmp = route.split('|')
+                td = {}
+                for x in tmp:
+                    try:
+                        print(x.split('via'))
+                        td['nexthop'] = x.split('via')[1].split(',')[0].strip()
+                        td['nexthoplocation'] = x.split('via')[1].split(',')[-1].strip()
+                        hoplist.append(td)
+                    except IndexError:
+                        continue
+            tmp_dict['nexthops'] = hoplist
+            data.append(tmp_dict)
+        return data
 
-        for line in working_list:
-            if len(line) >= 1:
-                if line[0] != ' ':
-                    masterlist.append(route)
-                    route = []
-                    route.append(line.strip())
-                if line[0] == ' ':
-                    route.append(line.strip())
-
-        for line in masterlist:
-            final_list.append(''.join(element for element in line))
-
-        return final_list
 
     def show_interface_status(self):
 
