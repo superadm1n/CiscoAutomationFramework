@@ -780,7 +780,6 @@ class IOS(TerminalCommands, CommandMethods):
             elif 'disabled' in line:
                 data.append({'interface': line.split()[0], 'status': 'disabled'})
             else:
-                print(line)
                 data.append({'interface': line.split()[0], 'status': 'connected'})
         return data
 
