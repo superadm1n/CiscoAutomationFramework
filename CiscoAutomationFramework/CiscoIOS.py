@@ -770,12 +770,17 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        switch_output = self.ssh.send_command_expect_same_prompt('show interfaces status')
+        switch_output = self.ssh.send_command_expect_same_prompt('show interfaces description', return_as_list=True)
+        data = []
+        for line in switch_output:
+            if len(line.split()) == 1:
+                continue
+            if 'down' in line:
+                data.append({'interface': line.split()[0], 'status': 'down'})
+            elif 'up' in line:
+                data.append({'interface': line.split()[0], 'status': 'up'})
+        return data
 
-        for line in str(switch_output).splitlines()[3:][:-1]:
-            output += '{}\n'.format(line)
-
-        return output
 
     def show_interface_description(self):
         '''
