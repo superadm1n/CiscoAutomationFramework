@@ -775,10 +775,12 @@ class IOS(TerminalCommands, CommandMethods):
         for line in switch_output:
             if len(line.split()) == 1:
                 continue
-            if 'down' in line:
-                data.append({'interface': line.split()[0], 'status': 'down'})
-            elif 'up' in line:
-                data.append({'interface': line.split()[0], 'status': 'up'})
+            if 'notconnect' in line:
+                data.append({'interface': line.split()[0], 'status': 'notconnected'})
+            elif 'disabled' in line:
+                data.append({'interface': line.split()[0], 'status': 'disabled'})
+            else:
+                data.append({'interface': line.split()[0], 'status': 'connected'})
         return data
 
 
