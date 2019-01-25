@@ -770,16 +770,17 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        switch_output = self.ssh.send_command_expect_same_prompt('show interfaces description', return_as_list=True)
+        switch_output = self.ssh.send_command_expect_same_prompt('show interfaces status', return_as_list=True)[1:]
         data = []
         for line in switch_output:
-            if len(line.split()) == 1:
+            if len(line.split()) <= 1:
                 continue
             if 'notconnect' in line:
                 data.append({'interface': line.split()[0], 'status': 'notconnected'})
             elif 'disabled' in line:
                 data.append({'interface': line.split()[0], 'status': 'disabled'})
             else:
+                print(line)
                 data.append({'interface': line.split()[0], 'status': 'connected'})
         return data
 
