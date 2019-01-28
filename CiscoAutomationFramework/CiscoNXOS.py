@@ -273,10 +273,49 @@ class NXOS(TerminalCommands, CommandMethods):
 
     def mac_address_table(self):
 
-        return super().mac_address_table()
+        self.terminal_length()
+        data = self.ssh.send_command_expect_different_prompt('show mac address-table', return_as_list=True, buffer_size=200)[:-1]
+
+        clean_data = []
+        capture_flag = False
+        for line in data:
+            if len(line.split()) == 0:
+                continue
+            if '----' in line:
+                capture_flag = True
+                continue
+            if capture_flag is True:
+                tmp = line.split()
+                clean_data.append({'vlan': tmp[1], 'mac': tmp[2], 'type': tmp[3], 'ports': tmp[-1]})
+
+        return clean_data
 
     def cdp_neighbor_table(self):
-        return super().cdp_neighbor_table()
+        self.terminal_length()
+        cdp_output = self.ssh.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
+        data = []
+        tmp = {}
+        for line in cdp_output[2:]:
+            if 'device id' in line.lower():
+                tmp['deviceid'] = line.split(':')[1].strip()
+            if 'interface' in line.lower() and 'outgoing' in line.lower():
+                tmp['localinterface'] = line.split(',')[0].split(':')[1].strip()
+                tmp['remoteinterface'] = line.split(',')[1].split(':')[1].strip()
+
+            if 'platform' in line.lower():
+                tmp['platform'] = line.split(',')[0].split(':')[1].strip()
+
+            if 'ipv4 address' in line.lower():
+                try:
+                    tmp['remoteip']
+                except KeyError:
+                    tmp['remoteip'] = line.split(':')[1].strip()
+
+            if '-----' in line:
+                data.append(tmp)
+                tmp = {}
+
+        return data
 
     def arp_table(self):
         return super().arp_table()
