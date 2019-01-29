@@ -1,12 +1,7 @@
 CiscoAutomationFramework Code Documentation
 ===========================================
 
-Framework.py
-------------
-.. automodule:: CiscoAutomationFramework.Framework
-    :members:
-
-Util.py
+Scripting API
 -------
-.. automodule:: CiscoAutomationFramework.Util
+.. automodule:: CiscoAutomationFramework.BaseCommandMethods
     :members:

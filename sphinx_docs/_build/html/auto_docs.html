@@ -1,206 +1,107 @@
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>CiscoAutomationFramework Code Documentation &mdash; Cisco Automation Framework 0.58 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Cisco Automation Framework 0.58 documentation" href="index.html"/>
-        <link rel="prev" title="Usage Examples" href="tutorial.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CiscoAutomationFramework Code Documentation &#8212; Cisco Automation Framework 0.6.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Usage Examples" href="tutorial.html" />
    
-  <div class="wy-grid-for-nav">
-
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="index.html" class="icon icon-home"> Cisco Automation Framework
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.58
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="project.html">Project Goals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install_instructions.html">Install Instructions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Usage Examples</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CiscoAutomationFramework Code Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-CiscoAutomationFramework.Framework">Framework.py</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-CiscoAutomationFramework.Util">Util.py</a></li>
-</ul>
-</li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Cisco Automation Framework</a>
-        
-      </nav>
-
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>CiscoAutomationFramework Code Documentation</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/auto_docs.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
             
   <div class="section" id="ciscoautomationframework-code-documentation">
 <h1>CiscoAutomationFramework Code Documentation<a class="headerlink" href="#ciscoautomationframework-code-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-CiscoAutomationFramework.Framework">
-<span id="framework-py"></span><h2>Framework.py<a class="headerlink" href="#module-CiscoAutomationFramework.Framework" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="scripting-api">
+<h2>Scripting API<a class="headerlink" href="#scripting-api" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-CiscoAutomationFramework.BaseCommandMethods"></span><p>Copyright 2018 Kyle Kowalczyk</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<hr class="docutils" />
+<p>This module contains the code of the abstract API class that the user will
+interface with when writing their automation scripts</p>
 <dl class="class">
-<dt id="CiscoAutomationFramework.Framework.CAF">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Framework.</code><code class="descname">CAF</code><span class="sig-paren">(</span><em>engine</em>, <em>destination</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is the class that the user will interface with, this class is responsible for detecting
-the firmware of the device and then issuing commands based on that firmware version.</p>
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.BaseCommandMethods.</code><code class="descname">CommandMethods</code><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic class that all other command classes should inherit from. When a new method
+is added it should be added here first, documentation for each method should be held here</p>
 <dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.configure_access_vlan">
-<code class="descname">configure_access_vlan</code><span class="sig-paren">(</span><em>interface</em>, <em>vlan</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.configure_access_vlan" title="Permalink to this definition">¶</a></dt>
-<dd><p>this method should be used when the user needs to configure an interface as an access port on a specific vlan</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.arp_table">
+<code class="descname">arp_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.arp_table" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>interface</strong> – interface to configure ex. gi1/0/1, fa0/1, etc.</li>
-<li><strong>vlan</strong> – Vlan number to configure</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">commands sent to server and their output</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.configure_description">
-<code class="descname">configure_description</code><span class="sig-paren">(</span><em>interface</em>, <em>description</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.configure_description" title="Permalink to this definition">¶</a></dt>
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.cdp_neighbor_table">
+<code class="descname">cdp_neighbor_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.cdp_neighbor_table" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.configure_access_vlan">
+<code class="descname">configure_access_vlan</code><span class="sig-paren">(</span><em>interface</em>, <em>vlan</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.configure_access_vlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configues a specific interface as an access vlan on
+the specified vlan</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>interface</strong> – Interface to configure discription on</li>
-<li><strong>description</strong> – str description to configure the interface with</li>
+<li><strong>interface</strong> (<em>str</em>) – Interface to configure</li>
+<li><strong>vlan</strong> (<em>str</em>) – Vlan to configure</li>
 </ul>
 </td>
 </tr>
@@ -212,13 +113,58 @@ the firmware of the device and then issuing commands based on that firmware vers
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.delete_local_user">
-<code class="descname">delete_local_user</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.delete_local_user" title="Permalink to this definition">¶</a></dt>
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.configure_description">
+<code class="descname">configure_description</code><span class="sig-paren">(</span><em>interface</em>, <em>description</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.configure_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configures a description on a specific interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>interface</strong> – Interface to configure the description on</li>
+<li><strong>description</strong> – Description to add</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.configure_router_lan_subinterface">
+<code class="descname">configure_router_lan_subinterface</code><span class="sig-paren">(</span><em>physical_interface</em>, <em>vlan_number</em>, <em>ip_address</em>, <em>subnet_mask</em>, <em>dhcp_servers_ip_addresses</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.configure_router_lan_subinterface" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – Username to delete</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>physical_interface</strong> – </li>
+<li><strong>vlan_number</strong> – </li>
+<li><strong>ip_address</strong> – </li>
+<li><strong>subnet_mask</strong> – </li>
+<li><strong>dhcp_servers_ip_addresses</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.delete_local_user">
+<code class="descname">delete_local_user</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.delete_local_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to delete the specified local user</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -227,346 +173,34 @@ the firmware of the device and then issuing commands based on that firmware vers
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.detect_firmware">
-<code class="descname">detect_firmware</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.detect_firmware" title="Permalink to this definition">¶</a></dt>
-<dd><p>Detects the firmware running on the remote device by counting the number of times specific keywords are
-called out in the ‘show version’ command and tallies them up and returns the one with the highest result</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str IOSXE, IOS, NXOS, ASA</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.find_mac_address">
-<code class="descname">find_mac_address</code><span class="sig-paren">(</span><em>mac_address</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.find_mac_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>Searches the MAC address table for a MAC address entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mac_address</strong> – MAC address or partial MAC address to search for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List [Mac Address, Interface ]</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.get_local_users">
-<code class="descname">get_local_users</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.get_local_users" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to extract the local users configured on the system out of the running config</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of the users configured locally on the system</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.get_uptime">
-<code class="descname">get_uptime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.get_uptime" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the uptime of the remote device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">str System uptime</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.instantiate_object">
-<code class="descname">instantiate_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.instantiate_object" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up self.ssh to reference the proper module based on the IOS version of the devicve</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">SSH object to interface with remote device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">object</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.last_input_and_output">
-<code class="descname">last_input_and_output</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.last_input_and_output" title="Permalink to this definition">¶</a></dt>
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.find_mac_address">
+<code class="descname">find_mac_address</code><span class="sig-paren">(</span><em>mac_address</em>, <em>mac_table</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.find_mac_address" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interface</strong> – Interface you wish to check the last input &amp; output on</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mac_address</strong> – </li>
+<li><strong>mac_table</strong> – </li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a list [Interface, Last Input, Last Output]</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.list_down_ports">
-<code class="descname">list_down_ports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.list_down_ports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Issues show interface description command, skips any vlan or port channel interfaces, also skips any interfaces that are not ‘down’
-all others are considered physical interfaces in an ‘up’ status and will add those interface names to a list to return that list
-to the user</p>
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.get_local_users">
+<code class="descname">get_local_users</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.get_local_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gathers the local users that are configured on the Cisco device</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of physical interfaces in an ‘up’ status</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.list_eigrp_configuration">
-<code class="descname">list_eigrp_configuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.list_eigrp_configuration" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">EIGRP Configuration</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.list_ospf_configuration">
-<code class="descname">list_ospf_configuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.list_ospf_configuration" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">OSPF Configuration</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.mac_address_table">
-<code class="descname">mac_address_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.mac_address_table" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of lists containing the MAC address table and its contents</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.physical_port_inventory">
-<code class="descname">physical_port_inventory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.physical_port_inventory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gathers an inventory of physical ports on the remote device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of physical interfaces on device</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.physical_port_inventory_longname">
-<code class="descname">physical_port_inventory_longname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.physical_port_inventory_longname" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gathers an inventory of physical ports on the remote device with their full name ex. GigabitEthernet1/0/1
-vs their abbreviated name ex. Gi1/0/1</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of ports</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.port_status">
-<code class="descname">port_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.port_status" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.power_inline">
-<code class="descname">power_inline</code><span class="sig-paren">(</span><em>summary=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.power_inline" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to get the power inline statics for remote POE device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>summary</strong> – bool if set to true it will get the overview information and not the individual port information</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of lists containing the power inline details</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.priv_exec">
-<code class="descname">priv_exec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.priv_exec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enters privilege exec mode, will exit config T if you are in config t, and elevate from standard user mode
-if you are in standard user mode</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Output from command</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.show_interface_description">
-<code class="descname">show_interface_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.show_interface_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets terminal length to infinite, issues show interface description command, gathers output from remote device,
-split in a list by line</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of output, split by line in output</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.show_interface_status">
-<code class="descname">show_interface_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.show_interface_status" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.show_routes">
-<code class="descname">show_routes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.show_routes" title="Permalink to this definition">¶</a></dt>
-<dd><p>‘
-Returns list of lists containing the routing table.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.show_run">
-<code class="descname">show_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.show_run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Issues ‘show running-config’ command to to the remote router/switch</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">output from command</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.show_run_interface">
-<code class="descname">show_run_interface</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.show_run_interface" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interface</strong> – Interface to capture the running config of</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Running Configuration of specified interface</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.CAF.write_mem">
-<code class="descname">write_mem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.CAF.write_mem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves the running configuration to startup configuration</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="CiscoAutomationFramework.Framework.TransportInterface">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Framework.</code><code class="descname">TransportInterface</code><span class="sig-paren">(</span><em>engine</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.TransportInterface" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class is a polymorphic interface that allows CAF and firmware specific code downstream to
-seamlessly interface with the ssh and serial engines. It is responsible for handling calls from CAF
-and sending them to either the SSH or Serial engine depending on what the user has specified</p>
-<dl class="method">
-<dt id="CiscoAutomationFramework.Framework.TransportInterface.transport_factory">
-<code class="descname">transport_factory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Framework.TransportInterface.transport_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Factory function that will return an object that points to the proper engine the user has specified to use</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Engine object</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>EngineNotSelected</strong> – Error raised if the user did not pass the proper string for which engine they         wished to use</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-CiscoAutomationFramework.Util">
-<span id="util-py"></span><h2>Util.py<a class="headerlink" href="#module-CiscoAutomationFramework.Util" title="Permalink to this headline">¶</a></h2>
-<p>Code in the “Util.py” module contains various utilities that might need to be used along side an ssh connection such as
-running a ping test to validate the host is up or an automated utility to check authentication against a Cisco device.</p>
-<dl class="class">
-<dt id="CiscoAutomationFramework.Util.CredCheck">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Util.</code><code class="descname">CredCheck</code><span class="sig-paren">(</span><em>transport</em>, <em>listofipsorserialinterface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class contains methods to test user authentication both to the switch/router and into enable mode.</p>
-<dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.cli_run_no_enable">
-<code class="descname">cli_run_no_enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.cli_run_no_enable" title="Permalink to this definition">¶</a></dt>
-<dd><p>CLI utility to gather a username and password and test its authentication against a cisco device, this method will loop
-until a username and password combination is accepted</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List containing username and password</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of local users configured</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
 </tr>
@@ -575,93 +209,194 @@ until a username and password combination is accepted</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.cli_run_with_enable">
-<code class="descname">cli_run_with_enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.cli_run_with_enable" title="Permalink to this definition">¶</a></dt>
-<dd><p>CLI utility to gather both a username and password combination and an enable password, this will loop until a successful username and
-password combination and enable password is received.</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.get_uptime">
+<code class="descname">get_uptime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.get_uptime" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List containing username, password, and enable password.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">List</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.decide_ip_to_use">
-<code class="descname">decide_ip_to_use</code><span class="sig-paren">(</span><em>list_of_IP_addresses</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.decide_ip_to_use" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cycles through list of IP addresses provided pinging each one and will return the first one that responds to ping</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.global_last_input_and_output">
+<code class="descname">global_last_input_and_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.global_last_input_and_output" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>list_of_IP_addresses</strong> (<em>list</em>) – list of IP addresses that we can use to check authentication against</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">first IP that responds to ping</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.gather_enable">
-<code class="descname">gather_enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.gather_enable" title="Permalink to this definition">¶</a></dt>
-<dd><p>CLI method to gather an enable password</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.last_input_and_output">
+<code class="descname">last_input_and_output</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.last_input_and_output" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Enable password entered by user</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interface</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.gather_user_pass">
-<code class="descname">gather_user_pass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.gather_user_pass" title="Permalink to this definition">¶</a></dt>
-<dd><p>CLI method to gather a username and password</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.last_input_and_output_all">
+<code class="descname">last_input_and_output_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.last_input_and_output_all" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List containing username and password</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.test_enable">
-<code class="descname">test_enable</code><span class="sig-paren">(</span><em>username</em>, <em>password</em>, <em>enable_password</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.test_enable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to test an enable password and validate it is able to elevate privilege into enable mode</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The Username and Password supplied must be previously tested to have access</p>
-</div>
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_configured_vlans">
+<code class="descname">list_configured_vlans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_configured_vlans" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_down_ports">
+<code class="descname">list_down_ports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_down_ports" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_eigrp_configuration">
+<code class="descname">list_eigrp_configuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_eigrp_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_ospf_configuration">
+<code class="descname">list_ospf_configuration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.list_ospf_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.mac_address_table">
+<code class="descname">mac_address_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.mac_address_table" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.no_shutdown_interface">
+<code class="descname">no_shutdown_interface</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.no_shutdown_interface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interface</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.physical_port_inventory">
+<code class="descname">physical_port_inventory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.physical_port_inventory" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.physical_port_inventory_longname">
+<code class="descname">physical_port_inventory_longname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.physical_port_inventory_longname" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.port_status">
+<code class="descname">port_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.port_status" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.power_cycle_port">
+<code class="descname">power_cycle_port</code><span class="sig-paren">(</span><em>interface</em>, <em>delay</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.power_cycle_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Power cycles a specific port, leaving it in an admin down state for a
+specified amount of time</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>username</strong> (<em>str</em>) – Confirmed working username for the device</li>
-<li><strong>password</strong> (<em>str</em>) – Confirmed working password that corresponds to the username</li>
-<li><strong>enable_password</strong> (<em>str</em>) – Enable password to attempt authentication with</li>
+<li><strong>interface</strong> (<em>str</em>) – Interface to cycle</li>
+<li><strong>delay</strong> (<em>int</em>) – Time in seconds to leave off</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True/False depending on if the enable password is accepted or not</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
 </td>
 </tr>
 </tbody>
@@ -669,47 +404,175 @@ password combination and enable password is received.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.Util.CredCheck.test_user_pass">
-<code class="descname">test_user_pass</code><span class="sig-paren">(</span><em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.CredCheck.test_user_pass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to test a username and password against a router or switch</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.power_inline">
+<code class="descname">power_inline</code><span class="sig-paren">(</span><em>summary</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.power_inline" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>summary</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.set_access_vlan_on_interface">
+<code class="descname">set_access_vlan_on_interface</code><span class="sig-paren">(</span><em>interface</em>, <em>vlan_number</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.set_access_vlan_on_interface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>username</strong> (<em>str</em>) – Username to supply to the device</li>
-<li><strong>password</strong> (<em>str</em>) – Password to supply to the device</li>
+<li><strong>interface</strong> – </li>
+<li><strong>vlan_number</strong> – </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True or False depending if the username and password were accepted</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_configured_syslog_server">
+<code class="descname">show_configured_syslog_server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_configured_syslog_server" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
-<dl class="class">
-<dt id="CiscoAutomationFramework.Util.PingTest">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Util.</code><code class="descname">PingTest</code><a class="headerlink" href="#CiscoAutomationFramework.Util.PingTest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class that contains code for doing ping tests against network devices</p>
-<dl class="classmethod">
-<dt id="CiscoAutomationFramework.Util.PingTest.ping">
-<em class="property">classmethod </em><code class="descname">ping</code><span class="sig-paren">(</span><em>ipaddr</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.PingTest.ping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method that sends a basic ping to an IP address and returns true or false depending
-on if there was a response received.</p>
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_interface_description">
+<code class="descname">show_interface_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_interface_description" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_interface_status">
+<code class="descname">show_interface_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_interface_status" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_inventory_data">
+<code class="descname">show_inventory_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_inventory_data" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_routes">
+<code class="descname">show_routes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_routes" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_run">
+<code class="descname">show_run</code><span class="sig-paren">(</span><em>timeout=15</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the running config of the remote device</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ipaddr</strong> (<em>String</em>) – IP address to run a ping test against</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if a response is received False if there is no response</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_run_interface">
+<code class="descname">show_run_interface</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_run_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gathers the running configuration for a specific interface on the remote device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interface</strong> – Interface to gather the running config for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_vlan">
+<code class="descname">show_vlan</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.show_vlan" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.shutdown_interface">
+<code class="descname">shutdown_interface</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.shutdown_interface" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interface</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandMethods.write_mem">
+<code class="descname">write_mem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandMethods.write_mem" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
@@ -721,73 +584,62 @@ on if there was a response received.</p>
 </div>
 
 
-           </div>
-           <div class="articleComments">
-            
-           </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="tutorial.html" class="btn btn-neutral" title="Usage Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2017, Kyle Kowalczyk.
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
+          
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CiscoAutomationFramework Code Documentation</a><ul>
+<li><a class="reference internal" href="#scripting-api">Scripting API</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">Usage Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/auto_docs.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Kyle Kowalczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/auto_docs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
 
-    </section>
+    
 
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.58',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
-      });
-  </script>
-   
-
-</body>
+    
+  </body>
 </html>
