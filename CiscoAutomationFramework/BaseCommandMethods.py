@@ -284,9 +284,10 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def show_inventory_data(self):
-        '''
+        '''Returns the data of the inventory data of a Cisco device
 
-        :return:
+        :return: List of dictionaries containing the inventory data of the device
+        :rtype: list
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
