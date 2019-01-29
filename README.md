@@ -80,6 +80,10 @@ from CiscoAutomationFramework import connect_as_ssh
 
 ## Versioning
 
+NOTE! Until version 1.0 I will be committing directly to the master branch for all commits. 
+After version 1.0 each new version will have its own version branch and wil be merged into master
+once it is deemed stable.
+
 We use [SemVer](http://semver.org/) for versioning.
 
 ## Authors
