@@ -29,9 +29,10 @@ class CommandMethods:
     '''
 
     def get_uptime(self):
-        '''
+        '''Method to return the current uptime of the remote device.
 
-        :return:
+        :return: Uptime of device.
+        :rtype: str
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
@@ -103,7 +104,9 @@ class CommandMethods:
 
     def configure_router_lan_subinterface(
             self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
-        '''
+        '''Method to configure a sub interface on a Cisco router
+
+        *warning* This method will most likely be removed in the near future because it doesnt necessarily fit in the framework.
 
         :param physical_interface:
         :param vlan_number:
@@ -115,67 +118,75 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def physical_port_inventory(self):
-        '''
+        '''Gathers the physical ports of the device and returns them as a list of strings
 
-        :return:
+        :return: List of strings
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def physical_port_inventory_longname(self):
-        '''
+        '''Very similar to the physical port inventory but instead of returning the
+        abbreviated name `fa1/0/1` it returns the whole name `FastEthernet1/0/1`
 
-        :return:
+        :return: List of strings
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def port_status(self):
-        '''
+        '''Method to return the status of the ports on the Cisco device
 
-        :return:
+        :return: List of dictionaries
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def power_inline(self, summary):
-        '''
+    def power_inline(self):
+        '''Method to return the data that corresponds to the power output of the Cisco device
 
-        :param summary:
-        :return:
+        :return: List of dictionaries
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def list_ospf_configuration(self):
-        '''
+        '''Method to return the OSPF section(s) of the running configuration of the Cisco device
 
-        :return:
+        :return: OSPF running configuration
+        :rtype: str
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def list_eigrp_configuration(self):
-        '''
+        '''Method to return the EIGRP section(s) of the running configuration of the Cisco device
 
-        :return:
+        :return: EIGRP running configuration
+        :rtype: str
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def list_down_ports(self):
-        '''
+        '''Method to return a list of all of the down ports on a Cisco device
 
-        :return:
+        :return: List of down ports
+        :rtype: list
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def last_input_and_output(self, interface):
-        '''
+        '''Method to return the last input and last output of a specific interface on a Cisco device.
 
-        :param interface:
-        :return:
+        :param interface: Interface to return the data on
+        :return: List in the format of [Interface, Last Input, Last Output]
+        :rtype: list
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def last_input_and_output_all(self):
-        '''
+        '''Method to return the last input and last output of every interface on the Cisco device vs
+        just a single one. When you need to gather several interfaces this is a MUCH faster way to
+        get the data as the Cisco device only needs to compile the data a single time and returns it all
+        to the script.
 
-        :return:
+        :return: Last I/O for all of the interfaces on a Cisco device
+        :rtype: list of dicts
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
@@ -194,9 +205,10 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def mac_address_table(self):
-        '''
+        '''Method to return the data of the MAC address table on the Cisco device.
 
-        :return:
+        :return: MAC address table
+        :rtype: list of dicts
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
@@ -210,16 +222,23 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def cdp_neighbor_table(self):
-        '''
+        '''Method to return the data in the CDP Neighbor table in the following format.
 
-        :return:
+        [{deviceid: 'str', localinterface: 'str', remoteinterface: 'str', platform: 'str', remoteip: 'str'}, etc.]
+
+        :return: CDP neighbor table
+        :rtype: list of dicts in the format
+
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def arp_table(self):
-        '''
+        '''Method to return the arp table data of the Cisco device in the following format.
 
-        :return:
+        [{'protocol': str, 'address': str, 'age': str, 'mac': str, 'type': str, 'interface': str}]
+
+        :return: Data from arp table
+        :rtype: list of dicts
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
@@ -231,9 +250,12 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def show_interface_status(self):
-        '''
+        '''Method to return the status of each interface on the Cisco device in the following format.
 
-        :return:
+        [{'interface': str, 'status': notconnected/disabled/connected}]
+
+        :return: status of each interface
+        :rtype: list of dicts
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
