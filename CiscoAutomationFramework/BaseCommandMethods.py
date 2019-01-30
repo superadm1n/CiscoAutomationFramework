@@ -25,7 +25,15 @@ class CommandMethods:
 
     '''
     Generic class that all other command classes should inherit from. When a new method
-    is added it should be added here first, documentation for each method should be held here
+    is added it should be added here first, documentation for each method should be held here.
+
+    A note to any code contributer, Whenever a new method is implemented all reasonable efforts
+    should be attempted to have it return a list of dictionaries as its output if it is gathering data
+    and true/false if it is performing an action to keep the data returned from methods as consistent
+    as possible for anyone using the package.
+    If it is not possible to return the data in that format or is unreasonable to do so, it should be
+    clearly documented as to the format and why it is returning that way in the docstring in this class
+    of the method.
     '''
 
     def get_uptime(self):
@@ -267,37 +275,46 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def show_configured_syslog_server(self):
-        '''
+        '''Method to return a list of configured syslog servers.
+        This method has been implemented to return a simple list as it would not
+        make sense to store that data in a dictionary
 
-        :return:
+        :return: List of the configured syslog servers
+        :rtype: list
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def show_vlan(self):
-        '''
+        '''Method to return all of the vlans configured on the Cisco device and the ports associated
+        with them. Basically this is the output of the IOS command 'show vlan' but presented in a way
+        that can be used in a programmatic way. When implemented this method should return data in the
+        following format.
 
-        :return:
+        [{vlan: str, description: str, interfaces [int1, int2, etc]}]
+
+        :return: List of dictionaries with the data of the configured vlans on the Cisco device.
+        :rtype: list of dicts
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def shutdown_interface(self, interface):
-        '''
+        '''Method to place an interface in admin down, example issuing the 'shutdown' command on IOS.
 
-        :param interface:
-        :return:
+        :param interface: Interface to admin down.
+        :return: Nothing at this point.
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def no_shutdown_interface(self, interface):
-        '''
+        '''Method to enable an interface, example issuing the 'no shutdown' command on IOS.
 
-        :param interface:
-        :return:
+        :param interface: Interface to enable.
+        :return: Nothing at this point.
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
     def set_access_vlan_on_interface(self, interface, vlan_number):
-        '''
+        '''`
 
         :param interface:
         :param vlan_number:
@@ -306,7 +323,7 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def show_inventory_data(self):
-        '''Returns the data of the inventory data of a Cisco device
+        '''Returns the data of the inventory data of a Cisco device, example the data of 'show inventory' IOS command
 
         :return: List of dictionaries containing the inventory data of the device
         :rtype: list
@@ -314,7 +331,8 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def write_mem(self):
-        '''
+        '''Method to save the running config into NVRAM on the Cisco device. Example write memory or copy run start on
+        an IOS device.
 
         :return:
         '''
