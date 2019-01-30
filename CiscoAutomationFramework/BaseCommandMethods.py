@@ -64,7 +64,7 @@ class CommandMethods:
     def delete_local_user(self, username):
         '''Method to delete the specified local user
 
-        :param username:
+        :param username: User to delete
         :return:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
