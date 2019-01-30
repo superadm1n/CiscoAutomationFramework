@@ -452,7 +452,7 @@ class IOS(TerminalCommands, CommandMethods):
         for x in usable_data:
             line = x.split()
             returnable_data.append(
-                {'interface': line[0], 'admin':line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]}
+                {'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]}
             )
         return returnable_data
 
@@ -713,6 +713,7 @@ class IOS(TerminalCommands, CommandMethods):
         flag = 0
         fixed_ouput = []
         tmp = ''
+        # Sorts each line of the routing table, putting entries that belong together on the same line
         for line in routing_table:
             if len(line) <= 1:
                 continue
@@ -729,6 +730,8 @@ class IOS(TerminalCommands, CommandMethods):
                 tmp += line
             if line[0] == ' ' and 'subnetted' not in line:
                 tmp += '| {}'.format(line)
+
+        # Parses out data
         data = []
         for route in fixed_ouput:
             tmp = route.split()
