@@ -838,10 +838,7 @@ class IOS(TerminalCommands, CommandMethods):
                 if line.split()[0] == 'logging' and line.split()[1] == 'host':
                     servers.append(line.split()[-1:][0])
 
-        if len(servers) == 0:
-            return [None]
-        else:
-            return servers
+        return servers
 
     def show_vlan(self):
         def gather_description(line):
