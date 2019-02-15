@@ -8,7 +8,7 @@ Display running config using SSH
 
 .. code-block:: python
 
-    from CiscoAutomationFramework import CAF
+    from CiscoAutomationFramework import connect_ssh
 
     # credentials for remote device
     ip = '192.168.1.1'
@@ -17,7 +17,7 @@ Display running config using SSH
     enable_password = 'myenablePassword1'
 
     # log into device and capture the running config
-    with CAF('ssh' ip, username, password, enable_password) as ssh:
+    with connect_ssh(ip, username, password, enable_password) as ssh:
         running_config = ssh.show_run()
 
     # print running config
@@ -28,7 +28,7 @@ List the number of ports on a device using SSH
 
 .. code-block:: python
 
-    from CiscoAutomationFramework import CAF
+    from CiscoAutomationFramework import connect_ssh
 
     # credentials for remote device
     ip = '192.168.1.1'
@@ -37,7 +37,7 @@ List the number of ports on a device using SSH
     enable_password = 'myenablePassword1'
 
     # log into device and capture the running config
-    with CAF('ssh' ip, username, password, enable_password) as ssh:
+    with connect_ssh(ip, username, password, enable_password) as ssh:
         hostname = ssh.hostname
         port_inv = ssh.physical_port_inventory_longname()
 
@@ -49,7 +49,7 @@ List running config of a device using serial interface
 
 .. code-block:: python
 
-    from CiscoAutomationFramework import CAF
+    from CiscoAutomationFramework import connect_serial
 
     # credentials for remote device
     interface = 'COM4'
@@ -58,7 +58,7 @@ List running config of a device using serial interface
     enable_password = 'myenablePassword1'
 
     # log into device and capture the running config
-    with CAF('serial' interface, username, password, enable_password) as serial:
+    with connect_serial(interface, username, password, enable_password) as serial:
         running_config = serial.show_run()
 
     # print running config

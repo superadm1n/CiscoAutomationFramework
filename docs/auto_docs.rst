@@ -3,7 +3,7 @@ CiscoAutomationFramework Code Documentation
 
 Framework.py
 ------------
-.. automodule:: CiscoAutomationFramework.Framework
+.. automodule:: CiscoAutomationFramework.BaseCommandMethods
     :members:
 
 Util.py

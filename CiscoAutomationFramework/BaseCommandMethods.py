@@ -314,7 +314,7 @@ class CommandMethods:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def set_access_vlan_on_interface(self, interface, vlan_number):
-        '''`
+        '''
 
         :param interface:
         :param vlan_number:
