@@ -191,7 +191,7 @@ class IOS(TerminalCommands, CommandMethods):
 
     def __init__(self, ssh_object):
         TerminalCommands.__init__(self, ssh_object)
-        
+
         self.ssh = ssh_object
 
     def get_uptime(self):
@@ -228,7 +228,7 @@ class IOS(TerminalCommands, CommandMethods):
         logger.debug('Output function returned.')
 
         return output
-    
+
     def get_local_users(self):
         '''
         Method to extract the local users configured on the system out of the running config
@@ -237,7 +237,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         users = []
 
-        running_config = self.ssh.show_run()  
+        running_config = self.ssh.show_run()
 
         # Finds a line that has the string 'username' in it, then splits the line by spaces and if the string 'username' is the
         # string in index 0 it appends index 1 to the output.
@@ -929,6 +929,37 @@ class IOS(TerminalCommands, CommandMethods):
             final_data.append(tmp_dict)
 
         return final_data
+
+    def show_hsrp_info(self):
+
+        self.terminal_length()
+
+        data = self.ssh.send_command_expect_same_prompt('show standby brief', return_as_list=True)
+        if len(data) == 2:
+            raise NotConfigured('HSRP has not been configured! on the device!')
+        user_data = []
+        flag = False
+        for line in data:
+            if 'interface' in line.lower():
+                flag = True
+                continue
+            if flag == True:
+                x = line.split()
+
+                if len(x) < 7:
+                    # prevents any line from being interpreted if it has less than 7 columns
+                    continue
+
+                print(line)
+                if len(x) == 7:
+                    linedict = {'interface': x[0], 'group': x[1], 'priority': x[2], 'preempt': 'not configured', 'state': x[3],
+                                'activerouter': x[4], 'standbyrouter': x[5], 'virtualip': x[6]}
+                else:
+                    linedict = {'interface': x[0], 'group': x[1], 'priority': x[2], 'preempt': 'configured', 'state': x[4],
+                                'activerouter': x[5], 'standbyrouter': x[6], 'virtualip': x[7]}
+                user_data.append(linedict)
+
+        return user_data
 
     def write_mem(self):
         if '#' not in self.ssh.prompt:

@@ -65,3 +65,6 @@ class MethodNotImplemented(Exception):
 
 class MethodNotSupported(Exception):
     pass
+
+class NotConfigured(Exception):
+    pass

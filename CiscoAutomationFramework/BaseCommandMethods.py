@@ -330,6 +330,17 @@ class CommandMethods:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
+    def show_hsrp_info(self):
+        '''Returns the data of show standby brief in  a list of dictionaries. This will alow the user to
+        get information about HSRP such as the interfaces, group numbers, priority, status, Virtual IP's, etc.
+
+        :raises: NotConfiguredError
+        :return: List of dictionaries
+        '''
+
+        raise MethodNotImplemented('This method has not been implemented!')
+
+
     def write_mem(self):
         '''Method to save the running config into NVRAM on the Cisco device. Example write memory or copy run start on
         an IOS device.
