@@ -950,7 +950,6 @@ class IOS(TerminalCommands, CommandMethods):
                     # prevents any line from being interpreted if it has less than 7 columns
                     continue
 
-                print(line)
                 if len(x) == 7:
                     linedict = {'interface': x[0], 'group': x[1], 'priority': x[2], 'preempt': 'not configured', 'state': x[3],
                                 'activerouter': x[4], 'standbyrouter': x[5], 'virtualip': x[6]}
