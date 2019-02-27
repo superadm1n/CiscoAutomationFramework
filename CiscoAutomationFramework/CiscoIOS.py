@@ -607,7 +607,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        device_output = self.ssh.send_command_expect_same_prompt('show mac address-table').splitlines()[1:][:-1]
+        device_output = self.ssh.send_command_expect_same_prompt('show mac address-table', buffer_size=200).splitlines()[1:][:-1]
 
         # This is needed as routers with a wic card require you to issue the command in priv exec mode with a dash in between
         # the words 'mac' and 'address'
@@ -615,20 +615,22 @@ class IOS(TerminalCommands, CommandMethods):
             if len(line) >= 1:
                 if line[0] == '%':
                     self.priv_exec()
-                    device_output = self.ssh.send_command_expect_same_prompt('show mac-address-table').splitlines()[1:][:-1]
+                    device_output = self.ssh.send_command_expect_same_prompt('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
                     break
-
+        print(device_output[:10])
         flag = 0
         for line in device_output[:-1]:
             if len(line.split()) >= 4:
                 if flag == 1:
-                    tmp = line.split()
+                    tmp = line.strip('*').split()
                     mac_table_list.append(
-                        {'vlan': tmp[0], 'mac':tmp[1], 'type': tmp[2], 'ports': tmp[3]}
+                        {'vlan': tmp[0], 'mac':tmp[1], 'type': tmp[2], 'ports': tmp[-1]}
                     )
                     #mac_table_list.append(line.split())
 
+            if len(line.split()) >= 1:
                 if '--' in line.split()[0]:
+                    print(line)
                     flag = 1
 
         return mac_table_list
