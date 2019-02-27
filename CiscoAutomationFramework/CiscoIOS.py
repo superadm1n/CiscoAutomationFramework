@@ -617,7 +617,6 @@ class IOS(TerminalCommands, CommandMethods):
                     self.priv_exec()
                     device_output = self.ssh.send_command_expect_same_prompt('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
                     break
-        print(device_output[:10])
         flag = 0
         for line in device_output[:-1]:
             if len(line.split()) >= 4:
