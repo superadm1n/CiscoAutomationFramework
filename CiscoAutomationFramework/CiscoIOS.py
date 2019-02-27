@@ -629,7 +629,6 @@ class IOS(TerminalCommands, CommandMethods):
 
             if len(line.split()) >= 1:
                 if '--' in line.split()[0]:
-                    print(line)
                     flag = 1
 
         return mac_table_list
