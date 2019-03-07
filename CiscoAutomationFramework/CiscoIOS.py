@@ -384,15 +384,11 @@ class IOS(TerminalCommands, CommandMethods):
 
     def physical_port_inventory_longname(self):
 
-        # TODO: THis method takes a while to run, I need to explore making it run faster, possibly due to that
-        # TODO: only 1 byte is captured from the device at a time and it takes too long looping to capture it all
-        # TODO: the fix might be to modify the sshengine to detect when its getting behind on the buffer
-
         port_list = []
         self.terminal_length()
 
         # issues 'show interfaces' command on device
-        for line in self.ssh.send_command_expect_same_prompt('show interfaces', return_as_list=True)[1:][:-1]:
+        for line in self.ssh.send_command_expect_same_prompt('show interfaces', return_as_list=True, buffer_size=200)[1:][:-1]:
 
             if line[0] is not ' ':
 
