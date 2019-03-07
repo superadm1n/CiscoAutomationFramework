@@ -188,10 +188,32 @@ class NXOS(TerminalCommands, CommandMethods):
         )
 
     def physical_port_inventory(self):
-        return super().physical_port_inventory()
+
+        data = []
+
+        interfaces = self.physical_port_inventory_longname()
+        for x in interfaces:
+            beginning = x[:3]
+            end = ''.join([y for y in x if not y.isalpha()])
+            data.append('{}{}'.format(beginning, end))
+
+        return data
 
     def physical_port_inventory_longname(self):
-        return super().physical_port_inventory_longname()
+        self.terminal_length()
+
+        interfaces = []
+
+        for line in self.ssh.send_command_expect_same_prompt('show interface', buffer_size=200, return_as_list=True)[1:][:-1]:
+            if len(line) < 1:
+                continue
+
+            if line[0].isalpha() and line.split()[0] != 'admin':
+                if 'port-channel' in line or 'Vlan' in line or 'loop' in line or 'mgmt' in line:
+                    continue
+                #print(line)
+                interfaces.append(line.split()[0])
+        return interfaces
 
     def port_status(self):
         return super().port_status()
@@ -230,10 +252,49 @@ class NXOS(TerminalCommands, CommandMethods):
         return ospf_config
 
     def list_eigrp_configuration(self):
-        return super().list_eigrp_configuration()
+        output = ''
+        running_config = self.show_run()
+        flag = False
+        for line in running_config.splitlines():
+            if len(line.split()) < 1:
+                continue
+
+            if 'router' in line.split()[0].lower() and 'eigrp' in line.split()[1].lower():
+                flag = True
+                output += '{}\n'.format(line)
+                continue
+
+            if flag is True:
+
+                if not line[0].isalpha():
+                    output += '{}\n'.format(line)
+                else:
+                    flag = False
+
+        if len(output) == 0:
+            output = 'No EIGRP process configured'
+
+        return output
 
     def list_down_ports(self):
-        return super().list_down_ports()
+        self.terminal_length()
+
+        output = []
+
+        for line in self.ssh.send_command_expect_same_prompt('show interface status', return_as_list=True, buffer_size=100):
+            if len(line.split()) < 1:
+                continue
+            if 'Vlan' in line.split()[0]:
+                continue
+            if 'Po' in line.split()[0]:
+                continue
+            if 'Lo' in line.split()[0]:
+                continue
+
+            if 'down' in line or 'disabled' in line:
+                output.append(line.split()[0])
+
+        return output
 
     def list_configured_vlans(self):
 
@@ -263,13 +324,16 @@ class NXOS(TerminalCommands, CommandMethods):
     def last_input_and_output(self, interface):
         return super().last_input_and_output(interface)
 
-    def global_last_input_and_output(self):
+    def last_input_and_output_all(self):
 
         return super().global_last_input_and_output()
 
-    def find_mac_address(self, mac_address):
+    def find_mac_address(self, mac_address, mac_table):
+        if not mac_table:
+            mac_table = self.mac_address_table()
 
-        return super().find_mac_address(mac_address)
+        return [item for item in mac_table if item['mac'] == mac_address]
+
 
     def mac_address_table(self):
 
@@ -318,7 +382,26 @@ class NXOS(TerminalCommands, CommandMethods):
         return data
 
     def arp_table(self):
-        return super().arp_table()
+        # [{'protocol': str, 'address': str, 'age': str, 'mac': str, 'type': str, 'interface': str}]
+        self.terminal_length()
+
+        data = []
+
+        flag = False
+        output = self.ssh.send_command_expect_same_prompt('show ip arp', buffer_size=200, return_as_list=True)
+        for line in output[:-1]:
+            if 'mac address' in line.lower():
+                flag = True
+                continue
+
+            if flag is True:
+                x = line.split()
+                try:
+                    data.append({'protocol': None, 'address': x[0], 'age': x[1], 'mac': x[2], 'type': False, 'interface': x[3]})
+                except IndexError:
+                    pass
+
+        return data
 
     def show_interface_status(self):
         return super().show_interface_status()
