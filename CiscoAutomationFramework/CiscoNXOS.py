@@ -22,8 +22,8 @@ not_implemented_text = 'This method has not been implemented in the CiscoNXOS mo
 
 class TerminalCommands:
 
-    def __init__(self, ssh_object):
-        self.ssh = ssh_object
+    def __init__(self, transport_object):
+        self.transport = transport_object
 
     def terminal_length(self, number='0'):
         '''
@@ -33,12 +33,12 @@ class TerminalCommands:
         '''
 
         # checks if terminal length that the user is requesting is already set and if it has been it breaks out of the function.
-        if self.ssh.terminal_length_value == str(number):
+        if self.transport.terminal_length_value == str(number):
             return 'Terminal length already set to proper value'
 
-        self.ssh.terminal_length_value = str(number)
+        self.transport.terminal_length_value = str(number)
 
-        return self.ssh.send_command_expect_same_prompt('terminal length {}'.format(number))
+        return self.transport.send_command_expect_same_prompt('terminal length {}'.format(number))
 
     def terminal_width(self, number=511):
         '''
@@ -55,12 +55,12 @@ class TerminalCommands:
             number = 24
 
         # checks if terminal length that the user is requesting is already set and if it has been it breaks out of the function.
-        if self.ssh.terminal_width_value == str(number):
+        if self.transport.terminal_width_value == str(number):
             return 'Terminal length already set to proper value'
 
-        self.ssh.terminal_width_value = str(number)
+        self.transport.terminal_width_value = str(number)
 
-        return self.ssh.send_command_expect_same_prompt('terminal width {}'.format(number))
+        return self.transport.send_command_expect_same_prompt('terminal width {}'.format(number))
 
     def priv_exec(self):
         raise CustomExceptions.MethodNotSupported
@@ -70,7 +70,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
     def __init__(self, ssh_object):
         TerminalCommands.__init__(self, ssh_object)
-        self.ssh = ssh_object
+        self.transport = ssh_object
         self.terminal_width(200)
         self.roles = self.get_user_roles()
 
@@ -85,7 +85,7 @@ class NXOS(TerminalCommands, CommandMethods):
         '''
         :return: Username of current user logged in
         '''
-        output = self.ssh.send_command_expect_same_prompt('show users')
+        output = self.transport.send_command_expect_same_prompt('show users')
 
         for line in output.splitlines():
             if '*' in line:
@@ -99,7 +99,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        output = self.ssh.send_command_expect_same_prompt('show user-account')
+        output = self.transport.send_command_expect_same_prompt('show user-account')
 
         flag = 0
         for line in output.splitlines():
@@ -126,12 +126,12 @@ class NXOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        device_output = self.ssh.send_command_expect_same_prompt('show version')
+        device_output = self.transport.send_command_expect_same_prompt('show version')
 
         for line in device_output.splitlines():
 
             if 'kernel uptime' in line.lower():
-                output += '{} {}'.format(self.ssh.hostname, line)
+                output += '{} {}'.format(self.transport.hostname, line)
                 break
 
         return output
@@ -142,7 +142,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        device_output = self.ssh.send_command_expect_same_prompt('show running-config').splitlines()
+        device_output = self.transport.send_command_expect_same_prompt('show running-config').splitlines()
 
         output = ''
         for line in device_output[3:][:-2]:
@@ -204,7 +204,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
         interfaces = []
 
-        for line in self.ssh.send_command_expect_same_prompt('show interface', buffer_size=200, return_as_list=True)[1:][:-1]:
+        for line in self.transport.send_command_expect_same_prompt('show interface', buffer_size=200, return_as_list=True)[1:][:-1]:
             if len(line) < 1:
                 continue
 
@@ -281,7 +281,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
         output = []
 
-        for line in self.ssh.send_command_expect_same_prompt('show interface status', return_as_list=True, buffer_size=100):
+        for line in self.transport.send_command_expect_same_prompt('show interface status', return_as_list=True, buffer_size=100):
             if len(line.split()) < 1:
                 continue
             if 'Vlan' in line.split()[0]:
@@ -303,7 +303,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
         output = []
         startflag = False
-        for line in self.ssh.send_command_expect_same_prompt('show vlan brief', return_as_list=True):
+        for line in self.transport.send_command_expect_same_prompt('show vlan brief', return_as_list=True):
 
 
             # captures the line of output only after there has been a line of dashes
@@ -338,7 +338,7 @@ class NXOS(TerminalCommands, CommandMethods):
     def mac_address_table(self):
 
         self.terminal_length()
-        data = self.ssh.send_command_expect_different_prompt('show mac address-table', return_as_list=True, buffer_size=200)[:-1]
+        data = self.transport.send_command_expect_different_prompt('show mac address-table', return_as_list=True, buffer_size=200)[:-1]
 
         clean_data = []
         capture_flag = False
@@ -356,7 +356,7 @@ class NXOS(TerminalCommands, CommandMethods):
 
     def cdp_neighbor_table(self):
         self.terminal_length()
-        cdp_output = self.ssh.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
+        cdp_output = self.transport.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
         data = []
         tmp = {}
         for line in cdp_output[2:]:
@@ -388,7 +388,7 @@ class NXOS(TerminalCommands, CommandMethods):
         data = []
 
         flag = False
-        output = self.ssh.send_command_expect_same_prompt('show ip arp', buffer_size=200, return_as_list=True)
+        output = self.transport.send_command_expect_same_prompt('show ip arp', buffer_size=200, return_as_list=True)
         for line in output[:-1]:
             if 'mac address' in line.lower():
                 flag = True
@@ -437,7 +437,7 @@ class NXOS(TerminalCommands, CommandMethods):
         if self.check_admin_role() is False:
             return 'VDC-Admin role required'
         # sends the command to copy run start and grabs the output from that command
-        output = self.ssh.send_command_expect_same_prompt('copy running-config startup-config')
+        output = self.transport.send_command_expect_same_prompt('copy running-config startup-config')
 
         # Parses the output and checks for the line that will say 'copy complete' if the copy was successful
         # and returns a friendly success message to the user

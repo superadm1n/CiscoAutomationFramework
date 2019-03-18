@@ -29,10 +29,10 @@ not_implemented_text = 'This Method is not implemented in the CiscoASA Module'
 
 class ASATerminalCommands(TerminalCommands):
 
-    def __init__(self, ssh_object):
-        TerminalCommands.__init__(self, ssh_object)
-        self.ssh = ssh_object
-        self.enable_password = self.ssh.enable_password
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
+        self.transport = transport_object
+        self.enable_password = self.transport.enable_password
 
     def terminal_length(self, number=0):
         self.check_and_exit_config_t()
@@ -40,30 +40,30 @@ class ASATerminalCommands(TerminalCommands):
         self.priv_exec()
 
         # checks if terminal length that the user is requesting is already set and if it has been it breaks out of the function.
-        if self.ssh.terminal_length_value == str(number):
+        if self.transport.terminal_length_value == str(number):
             return 'Terminal length already set to proper value'
 
-        self.ssh.terminal_length_value = str(number)
+        self.transport.terminal_length_value = str(number)
 
-        return self.ssh.send_command_expect_same_prompt('terminal pager {}'.format(number))
+        return self.transport.send_command_expect_same_prompt('terminal pager {}'.format(number))
 
 
 class ASA(ASATerminalCommands, CommandMethods):
 
-    def __init__(self, ssh_object):
-        ASATerminalCommands.__init__(self, ssh_object)
-        self.ssh = ssh_object
-        self.ios = IOS(ssh_object)
+    def __init__(self, transport_object):
+        ASATerminalCommands.__init__(self, transport_object)
+        self.transport = transport_object
+        self.ios = IOS(transport_object)
 
     def get_uptime(self):
         output = ''
 
         self.terminal_length()
-        device_output = self.ssh.send_command_expect_same_prompt('show version')
+        device_output = self.transport.send_command_expect_same_prompt('show version')
 
         for line in device_output.splitlines():
 
-            if '{} up'.format(self.ssh.hostname.lower()) in line.lower():
+            if '{} up'.format(self.transport.hostname.lower()) in line.lower():
                 output += line
                 break
 
@@ -108,7 +108,7 @@ class ASA(ASATerminalCommands, CommandMethods):
         self.terminal_length()
 
         # issues 'show interfaces' command on device
-        for line in self.ssh.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
+        for line in self.transport.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
             # Only uses lines that begin with an f, g, t, or e for ten gig, gig, fast and eth interfaces and appends
             # the first column to a list
             if len(line) >= 1:
@@ -133,7 +133,7 @@ class ASA(ASATerminalCommands, CommandMethods):
         output = ''
 
         # issues 'show interfaces' command on device
-        for line in self.ssh.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
+        for line in self.transport.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
             # Only uses lines that begin with an f, g, t, or e for ten gig, gig, fast and eth interfaces and appends
             # the first column to a list
             if len(line) >= 1:
@@ -179,7 +179,7 @@ class ASA(ASATerminalCommands, CommandMethods):
 
         self.terminal_length()  # sets the length of the terminal to infinite
 
-        commandOutput = self.ssh.send_command_expect_same_prompt('show switch vlan', return_as_list=True)[:-1]
+        commandOutput = self.transport.send_command_expect_same_prompt('show switch vlan', return_as_list=True)[:-1]
 
         sanitizedOutput = []
         startflag = False
@@ -215,7 +215,7 @@ class ASA(ASATerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        device_output = self.ssh.send_command_expect_same_prompt('show switch mac-address-table').splitlines()[1:][:-1]
+        device_output = self.transport.send_command_expect_same_prompt('show switch mac-address-table').splitlines()[1:][:-1]
 
         flag = 0
         for line in device_output:
@@ -299,7 +299,7 @@ class ASA(ASATerminalCommands, CommandMethods):
         for int in self.physical_port_inventory_longname():
             interface_list = []
 
-            data = self.ssh.send_command_expect_same_prompt('show interface {}'.format(int)).splitlines()[1:][:-2]
+            data = self.transport.send_command_expect_same_prompt('show interface {}'.format(int)).splitlines()[1:][:-2]
 
             line = data[0].split(',')
 

@@ -87,9 +87,9 @@ class TerminalCommands:
     maneuver through different prompts on the commands line.
     '''
 
-    def __init__(self, ssh_object):
-        self.ssh = ssh_object
-        self.enable_password = self.ssh.enable_password
+    def __init__(self, transport_object):
+        self.transport = transport_object
+        self.enable_password = self.transport.enable_password
 
     def terminal_length(self, number='0'):
         '''
@@ -100,12 +100,12 @@ class TerminalCommands:
         self.check_and_exit_config_t()
 
         # checks if terminal length that the user is requesting is already set and if it has been it breaks out of the function.
-        if self.ssh.terminal_length_value == str(number):
+        if self.transport.terminal_length_value == str(number):
             return 'Terminal length already set to proper value'
 
-        self.ssh.terminal_length_value = str(number)
+        self.transport.terminal_length_value = str(number)
 
-        return self.ssh.send_command_expect_same_prompt('terminal length {}'.format(number))
+        return self.transport.send_command_expect_same_prompt('terminal length {}'.format(number))
 
     def terminal_width(self, number='0'):
         '''
@@ -114,12 +114,12 @@ class TerminalCommands:
         '''
         self.check_and_exit_config_t()
 
-        if self.ssh.terminal_width_value == str(number):
+        if self.transport.terminal_width_value == str(number):
             return 'Terminal width already set to proper value'
 
-        self.ssh.terminal_width_value = str(number)
+        self.transport.terminal_width_value = str(number)
 
-        return self.ssh.send_command_expect_same_prompt('terminal width {}'.format(number))
+        return self.transport.send_command_expect_same_prompt('terminal width {}'.format(number))
 
     def priv_exec(self):
         '''
@@ -129,18 +129,18 @@ class TerminalCommands:
         to elevate into enable mode it will raise this exception
         '''
 
-        if '#' not in self.ssh.prompt:
+        if '#' not in self.transport.prompt:
 
             if self.enable_password is None:
                 logger.debug('No enable password supplied, exception raised')
                 raise NoEnablePassword('There was no enable password supplied to the server')
 
             logger.debug('sending enable command')
-            self.ssh.send_command('enable')
+            self.transport.send_command('enable')
             time.sleep(.5)
-            return self.ssh.send_command_expect_different_prompt(self.enable_password)
+            return self.transport.send_command_expect_different_prompt(self.enable_password)
 
-        elif '(config' in self.ssh.prompt:
+        elif '(config' in self.transport.prompt:
             return self.send_end()
 
         else:
@@ -156,12 +156,12 @@ class TerminalCommands:
 
         # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
         # issuing the 'show running-config' command
-        if '#' not in self.ssh.prompt:
+        if '#' not in self.transport.prompt:
             self.priv_exec()
 
-        if '(config' not in self.ssh.prompt:
+        if '(config' not in self.transport.prompt:
             logger.debug('sending configure terminal command')
-            output += self.ssh.send_command_expect_different_prompt('configure terminal')
+            output += self.transport.send_command_expect_different_prompt('configure terminal')
 
             return output
         else:
@@ -171,7 +171,7 @@ class TerminalCommands:
     def check_and_exit_config_t(self):
 
         output = ''
-        if '(config' in self.ssh.prompt:
+        if '(config' in self.transport.prompt:
             logger.debug('in config T, backing out')
             output += self.send_end()
 
@@ -179,7 +179,7 @@ class TerminalCommands:
 
     def send_end(self):
 
-        return self.ssh.send_command_expect_different_prompt('end')
+        return self.transport.send_command_expect_different_prompt('end')
 
 
 class IOS(TerminalCommands, CommandMethods):
@@ -189,21 +189,21 @@ class IOS(TerminalCommands, CommandMethods):
     The code in this class is tailored to Devices running IOS
     '''
 
-    def __init__(self, ssh_object):
-        TerminalCommands.__init__(self, ssh_object)
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
 
-        self.ssh = ssh_object
+        self.transport = transport_object
 
     def get_uptime(self):
 
         output = ''
 
         self.terminal_length()
-        device_output = self.ssh.send_command_expect_same_prompt('show version')
+        device_output = self.transport.send_command_expect_same_prompt('show version')
 
         for line in device_output.splitlines():
 
-            if '{} uptime'.format(self.ssh.hostname.lower()) in line.lower():
+            if '{} uptime'.format(self.transport.hostname.lower()) in line.lower():
                 output += line
                 break
 
@@ -224,7 +224,7 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_length()
 
         logger.debug('Sending show run command, expecting same prompt')
-        output = self.ssh.send_command_expect_same_prompt('show running-config', buffer_size=50, timeout=timeout)
+        output = self.transport.send_command_expect_same_prompt('show running-config', buffer_size=50, timeout=timeout)
         logger.debug('Output function returned.')
 
         return output
@@ -237,7 +237,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         users = []
 
-        running_config = self.ssh.show_run()
+        running_config = self.transport.show_run()
 
         # Finds a line that has the string 'username' in it, then splits the line by spaces and if the string 'username' is the
         # string in index 0 it appends index 1 to the output.
@@ -253,7 +253,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         output += self.config_t()
 
-        output += self.ssh.send_command_expect_same_prompt('no username {}'.format(username))
+        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
 
         self.send_end()
 
@@ -269,7 +269,7 @@ class IOS(TerminalCommands, CommandMethods):
         # sets terminal length to infinite so all the output is captured
         self.terminal_length()
 
-        device_output = self.ssh.send_command_expect_same_prompt('show running-config interface {}'.format(interface))
+        device_output = self.transport.send_command_expect_same_prompt('show running-config interface {}'.format(interface))
 
         cleanoutput = ''
 
@@ -287,9 +287,9 @@ class IOS(TerminalCommands, CommandMethods):
 
         output += self.config_t()
 
-        output += self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
 
-        output += self.ssh.send_command_expect_same_prompt('description {}'.format(description))
+        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
 
         output += self.send_end()
 
@@ -309,9 +309,9 @@ class IOS(TerminalCommands, CommandMethods):
         output += self.config_t()
 
         # issues commands to configure the interface specified as an access vlan on the vlan specified
-        output += self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.ssh.send_command_expect_same_prompt('switchport mode access')
-        output += self.ssh.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_same_prompt('switchport mode access')
+        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
 
         output += self.send_end()
 
@@ -323,10 +323,10 @@ class IOS(TerminalCommands, CommandMethods):
         self.config_t()
         output = ''
 
-        output += self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.ssh.send_command_expect_same_prompt('shutdown')
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_same_prompt('shutdown')
         time.sleep(delay)
-        output += self.ssh.send_command_expect_same_prompt('no shutdown')
+        output += self.transport.send_command_expect_same_prompt('no shutdown')
 
         self.send_end()
 
@@ -346,16 +346,16 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.config_t()
 
-        output += self.ssh.send_command_expect_different_prompt('interface {}.{}\n'.format(physical_interface, vlan_number))
-        output += self.ssh.send_command_expect_same_prompt('encapsulation dot1Q {}\n'.format(vlan_number))
-        output += self.ssh.send_command_expect_same_prompt('ip address {} {}'.format(ip_address, subnet_mask))
+        output += self.transport.send_command_expect_different_prompt('interface {}.{}\n'.format(physical_interface, vlan_number))
+        output += self.transport.send_command_expect_same_prompt('encapsulation dot1Q {}\n'.format(vlan_number))
+        output += self.transport.send_command_expect_same_prompt('ip address {} {}'.format(ip_address, subnet_mask))
 
         if len(dhcp_servers_ip_addresses) > 0:
             for ip in dhcp_servers_ip_addresses:
-                output += self.ssh.send_command_expect_same_prompt('ip helper-address {}\n'.format(ip))
-                #output += self.ssh.get_output()
+                output += self.transport.send_command_expect_same_prompt('ip helper-address {}\n'.format(ip))
+                #output += self.transport.get_output()
 
-        output += self.ssh.send_command_expect_same_prompt('ip directed-broadcast\n')
+        output += self.transport.send_command_expect_same_prompt('ip directed-broadcast\n')
 
         self.send_end()
 
@@ -388,7 +388,7 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_length()
 
         # issues 'show interfaces' command on device
-        for line in self.ssh.send_command_expect_same_prompt('show interfaces', return_as_list=True, buffer_size=200)[1:][:-1]:
+        for line in self.transport.send_command_expect_same_prompt('show interfaces', return_as_list=True, buffer_size=200)[1:][:-1]:
 
             if line[0] is not ' ':
 
@@ -403,7 +403,7 @@ class IOS(TerminalCommands, CommandMethods):
 
     def port_status(self):
         self.terminal_length()
-        switch_data = self.ssh.send_command_expect_same_prompt('show interfaces status', return_as_list=True)
+        switch_data = self.transport.send_command_expect_same_prompt('show interfaces status', return_as_list=True)
 
         flag = False
         usable_data = []
@@ -430,9 +430,24 @@ class IOS(TerminalCommands, CommandMethods):
         return usable_data
 
     def power_inline(self):
+
+        def determine_flag(data):
+            count = 0
+            for line in data:
+                if '---' in line:
+                    count += 1
+
+            if count == 1:
+                return 1
+            else:
+                return 2
+
+
         self.terminal_length()
 
-        data = self.ssh.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
+        data = self.transport.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
+
+        trigger_seperators = determine_flag(data)
 
         usable_data = []
         flag = 0
@@ -441,21 +456,24 @@ class IOS(TerminalCommands, CommandMethods):
                 flag += 1
                 continue
 
-            if flag == 2:
+            if flag == trigger_seperators:
                 usable_data.append(line)
 
         returnable_data = []
         for x in usable_data:
             line = x.split()
-            returnable_data.append(
-                {'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]}
-            )
+            if len(line) == 7:
+                returnable_data.append({'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]})
+            else:
+                returnable_data.append(
+                {'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': ' '.join(line[4:][:-2]), 'class': line[-2], 'max': line[-1]})
+
         return returnable_data
 
     def list_ospf_configuration(self):
 
         output = ''
-        running_config = self.ssh.show_run()
+        running_config = self.transport.show_run()
         counter = 0
         for line in running_config.splitlines():
 
@@ -475,7 +493,7 @@ class IOS(TerminalCommands, CommandMethods):
 
     def list_eigrp_configuration(self):
         output = ''
-        running_config = self.ssh.show_run()
+        running_config = self.transport.show_run()
         counter = 0
         for line in running_config.splitlines():
 
@@ -526,7 +544,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        sw_output = self.ssh.send_command_expect_same_prompt('show interface {}'.format(interface), buffer_size=200, return_as_list=True)
+        sw_output = self.transport.send_command_expect_same_prompt('show interface {}'.format(interface), buffer_size=200, return_as_list=True)
 
 
 
@@ -552,7 +570,7 @@ class IOS(TerminalCommands, CommandMethods):
         '''Very similar to the last input output method, but instead returns all interfaces in a matter of seconds
         in a list of dictionaries'''
         self.terminal_length()
-        sw_output = self.ssh.send_command_expect_same_prompt('show interfaces', buffer_size=200, return_as_list=True)
+        sw_output = self.transport.send_command_expect_same_prompt('show interfaces', buffer_size=200, return_as_list=True)
 
 
         data = []
@@ -571,10 +589,10 @@ class IOS(TerminalCommands, CommandMethods):
 
     def list_configured_vlans(self):
 
-        initial_term_width = self.ssh.terminal_width_value
+        initial_term_width = self.transport.terminal_width_value
         self.terminal_width()  # sets terminal width to infinite
 
-        commandOutput = self.ssh.send_command_expect_same_prompt('show vlan brief', return_as_list=True)[:-1]
+        commandOutput = self.transport.send_command_expect_same_prompt('show vlan brief', return_as_list=True)[:-1]
 
 
         # The reason this for loop is here is because instead of slicing off a predermined number of lines in output
@@ -603,7 +621,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        device_output = self.ssh.send_command_expect_same_prompt('show mac address-table', buffer_size=200).splitlines()[1:][:-1]
+        device_output = self.transport.send_command_expect_same_prompt('show mac address-table', buffer_size=200).splitlines()[1:][:-1]
 
         # This is needed as routers with a wic card require you to issue the command in priv exec mode with a dash in between
         # the words 'mac' and 'address'
@@ -611,7 +629,7 @@ class IOS(TerminalCommands, CommandMethods):
             if len(line) >= 1:
                 if line[0] == '%':
                     self.priv_exec()
-                    device_output = self.ssh.send_command_expect_same_prompt('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
+                    device_output = self.transport.send_command_expect_same_prompt('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
                     break
         flag = 0
         for line in device_output[:-1]:
@@ -647,7 +665,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.priv_exec()
 
-        cdp_output = self.ssh.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
+        cdp_output = self.transport.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
         data = []
         tmp = {}
         for line in cdp_output[2:]:
@@ -681,7 +699,7 @@ class IOS(TerminalCommands, CommandMethods):
         output = []
         header = []
         flag = 0
-        for line in self.ssh.send_command_expect_same_prompt('show ip arp', return_as_list=True, buffer_size=40):
+        for line in self.transport.send_command_expect_same_prompt('show ip arp', return_as_list=True, buffer_size=40):
             if 'protocol' in line.lower() and 'address' in line.lower():
                 header = line.split()
                 flag += 1
@@ -705,7 +723,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        routing_table = self.ssh.send_command_expect_same_prompt('show ip route', return_as_list=True)
+        routing_table = self.transport.send_command_expect_same_prompt('show ip route', return_as_list=True)
         flag = 0
         fixed_ouput = []
         tmp = ''
@@ -769,7 +787,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        switch_output = self.ssh.send_command_expect_same_prompt('show interfaces status', return_as_list=True)[1:]
+        switch_output = self.transport.send_command_expect_same_prompt('show interfaces status', return_as_list=True)[1:]
         data = []
         for line in switch_output:
             if len(line.split()) <= 1:
@@ -795,7 +813,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         masterlist = []
 
-        for line in self.ssh.send_command_expect_same_prompt('show interface description', return_as_list=True, buffer_size=200)[2:][:-1]:
+        for line in self.transport.send_command_expect_same_prompt('show interface description', return_as_list=True, buffer_size=200)[2:][:-1]:
             line = line.split()
 
             # If the line is down with no description
@@ -857,7 +875,7 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_width()
 
         # grabs output of show vlan command
-        data = self.ssh.send_command_expect_same_prompt('show vlan', return_as_list=True, buffer_size=200)[2:][:-1]
+        data = self.transport.send_command_expect_same_prompt('show vlan', return_as_list=True, buffer_size=200)[2:][:-1]
         flag = 0
         returnable_data = []
 
@@ -881,29 +899,29 @@ class IOS(TerminalCommands, CommandMethods):
 
     def shutdown_interface(self, interface):
         self.config_t()
-        self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
-        self.ssh.send_command_expect_same_prompt('shutdown')
-        self.ssh.send_command_expect_different_prompt('exit')
+        self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        self.transport.send_command_expect_same_prompt('shutdown')
+        self.transport.send_command_expect_different_prompt('exit')
 
     def no_shutdown_interface(self, interface):
         self.config_t()
-        self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
-        self.ssh.send_command_expect_same_prompt('no shutdown')
-        self.ssh.send_command_expect_different_prompt('exit')
+        self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        self.transport.send_command_expect_same_prompt('no shutdown')
+        self.transport.send_command_expect_different_prompt('exit')
 
     def set_access_vlan_on_interface(self, interface, vlan_number):
         configured_vlans = [x['vlan'] for x in self.show_vlan()]
         if vlan_number not in configured_vlans:
             raise AttributeError('Vlan {} is not configured on the switch!'.format(vlan_number))
         self.config_t()
-        self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
-        self.ssh.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan_number))
-        self.ssh.send_command_expect_different_prompt('exit')
+        self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan_number))
+        self.transport.send_command_expect_different_prompt('exit')
 
     def show_inventory_data(self):
         self.terminal_width()
         self.terminal_length()
-        output = self.ssh.send_command_expect_same_prompt('show inventory raw', return_as_list=True)
+        output = self.transport.send_command_expect_same_prompt('show inventory raw', return_as_list=True)
 
         data = []
         tmp = ''
@@ -930,7 +948,7 @@ class IOS(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        data = self.ssh.send_command_expect_same_prompt('show standby brief', return_as_list=True)
+        data = self.transport.send_command_expect_same_prompt('show standby brief', return_as_list=True)
         if len(data) == 2:
             raise NotConfigured('HSRP has not been configured! on the device!')
         user_data = []
@@ -957,16 +975,16 @@ class IOS(TerminalCommands, CommandMethods):
         return user_data
 
     def write_mem(self):
-        if '#' not in self.ssh.prompt:
+        if '#' not in self.transport.prompt:
             self.priv_exec()
 
         self.check_and_exit_config_t()
 
-        self.ssh.send_command('copy run start\n')
+        self.transport.send_command('copy run start\n')
         time.sleep(.2)
-        self.ssh.send_command('')  # sends a return key
+        self.transport.send_command('')  # sends a return key
 
-        return self.ssh.get_output()
+        return self.transport.get_output()
 
     # END Functions used primarily by the User
     '''
@@ -977,19 +995,19 @@ class IOS(TerminalCommands, CommandMethods):
         self.terminal_length()
 
         try:
-            output = self.ssh.send_command_expect_same_prompt('show run', timeout=1)
+            output = self.transport.send_command_expect_same_prompt('show run', timeout=1)
         except Exception as E:
             print(E)
 
         for x in range(10):
-            self.ssh.send_command_expect_same_prompt(' ')
+            self.transport.send_command_expect_same_prompt(' ')
             time.sleep(.5)
 
         self.terminal_length()
 
-        output = self.ssh.send_command_expect_same_prompt('show run')
+        output = self.transport.send_command_expect_same_prompt('show run')
 
-        #output = self.ssh.send_command_expect_same_prompt('show run')
+        #output = self.transport.send_command_expect_same_prompt('show run')
 
         return output
     '''

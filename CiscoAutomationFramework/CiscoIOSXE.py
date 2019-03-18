@@ -30,11 +30,11 @@ class IOSXE(TerminalCommands, CommandMethods):
     module. If the need ever arises that the commands and everything are different I will need to create a new class specific to IOSXE
     '''
 
-    def __init__(self, ssh_object):
-        TerminalCommands.__init__(self, ssh_object)
-        self.ssh = ssh_object
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
+        self.transport = transport_object
 
-        self.ios = IOS(ssh_object)
+        self.ios = IOS(transport_object)
 
     def get_uptime(self):
         self.ios.get_uptime()
@@ -65,29 +65,27 @@ class IOSXE(TerminalCommands, CommandMethods):
         raise CustomExceptions.MethodNotImplemented()
         output = ''
 
-        output += self.ssh.config_t()
+        output += self.transport.config_t()
 
-        output += self.ssh.send_command_expect_same_prompt('no username {}'.format(username))
+        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
 
-        self.ssh.send_end()
+        self.transport.send_end()
 
         return output
 
     def configure_description(self, interface, description):
-        raise CustomExceptions.MethodNotImplemented
 
         output = ''
 
+        output += self.priv_exec()
 
-        output += self.ssh.priv_exec()
+        output += self.transport.config_t()
 
-        output += self.ssh.config_t()
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
 
-        output += self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
 
-        output += self.ssh.send_command_expect_same_prompt('description {}'.format(description))
-
-        output += self.ssh.send_end()
+        output += self.transport.send_end()
 
         return output
 
@@ -106,9 +104,9 @@ class IOSXE(TerminalCommands, CommandMethods):
         output += self.config_t()
 
         # issues commands to configure the interface specified as an access vlan on the vlan specified
-        output += self.ssh.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.ssh.send_command_expect_same_prompt('switchport mode access')
-        output += self.ssh.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_same_prompt('switchport mode access')
+        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
 
         output += self.send_end()
 
@@ -130,20 +128,20 @@ class IOSXE(TerminalCommands, CommandMethods):
         '''
         output = ''
 
-        self.ssh.config_t()
+        self.transport.config_t()
 
-        output += self.ssh.send_command_expect_different_prompt('interface {}.{}\n'.format(physical_interface, vlan_number))
-        output += self.ssh.send_command_expect_same_prompt('encapsulation dot1Q {}\n'.format(vlan_number))
-        output += self.ssh.send_command_expect_same_prompt('ip address {} {}'.format(ip_address, subnet_mask))
+        output += self.transport.send_command_expect_different_prompt('interface {}.{}\n'.format(physical_interface, vlan_number))
+        output += self.transport.send_command_expect_same_prompt('encapsulation dot1Q {}\n'.format(vlan_number))
+        output += self.transport.send_command_expect_same_prompt('ip address {} {}'.format(ip_address, subnet_mask))
 
         if len(dhcp_servers_ip_addresses) > 0:
             for ip in dhcp_servers_ip_addresses:
-                output += self.ssh.send_command_expect_same_prompt('ip helper-address {}\n'.format(ip))
-                #output += self.ssh.get_output()
+                output += self.transport.send_command_expect_same_prompt('ip helper-address {}\n'.format(ip))
+                #output += self.transport.get_output()
 
-        output += self.ssh.send_command_expect_same_prompt('ip directed-broadcast\n')
+        output += self.transport.send_command_expect_same_prompt('ip directed-broadcast\n')
 
-        self.ssh.send_end()
+        self.transport.send_end()
 
         return output
 
@@ -170,47 +168,33 @@ class IOSXE(TerminalCommands, CommandMethods):
 
         self.terminal_length()
 
-        data_from_device = self.ssh.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
+        data_from_device = self.transport.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
 
-        if summary is False:
-            general_data = []
-            for line in data_from_device:
-                newline = []
-                if len(line.split()) > 1:
-                    line = line.split()
+        interface_data = []
 
-                    if len(line) >= 7:
-                        if 'interface' in line[0].lower() or '----' in line[0].lower():
-                            pass
-                        else:
-                            for element in line[:4]:
-                                newline.append(element)
-                                line.remove(element)
+        count = 0
+        for line in data_from_device:
+            if '---' in line:
+                count += 1
+                continue
 
-                            newline.append(' '.join([str(i) for i in line[:-2]]))
+            if len(line) <= 1:
+                continue
 
-                            for element in line[-2:]:
-                                newline.append(element)
+            if (count % 2) == 0:
+                if line[0].isalpha() and 'module' not in line.lower():
+                    interface_data.append(line)
 
-                        if len(newline) == 7:
-                            general_data.append(newline)
+        user_data = []
+        for x in interface_data:
+            line = x.split()
+            if len(line) == 7:
+                user_data.append({'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]})
+            else:
+                user_data.append(
+                {'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': ' '.join(line[4:][:-2]), 'class': line[-2], 'max': line[-1]})
 
-                            #general_data.append(line)
-
-            return general_data
-
-        elif summary is True:
-            general_data = []
-            for line in data_from_device:
-                if len(line.split()) > 1:
-                    line = line.split()
-
-                    if len(line) == 4:
-                        if 'module' in line[0].lower() or '----' in line[0].lower():
-                            pass
-                        else:
-                            general_data.append(line)
-            return general_data
+        return user_data
 
     def list_ospf_configuration(self):
 
@@ -285,15 +269,15 @@ class IOSXE(TerminalCommands, CommandMethods):
 
 
     def write_mem(self):
-        if '#' not in self.ssh.prompt:
+        if '#' not in self.transport.prompt:
             self.priv_exec()
 
         self.check_and_exit_config_t()
 
-        self.ssh.send_command('copy run start\n')
+        self.transport.send_command('copy run start\n')
         time.sleep(.2)
-        self.ssh.send_command('')  # sends a return key
+        self.transport.send_command('')  # sends a return key
 
-        return self.ssh.get_output()
+        return self.transport.get_output()
 
     # END Functions used primarily by the User
