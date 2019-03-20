@@ -30,6 +30,7 @@ import threading
 import logging
 from . import CustomExceptions
 from CiscoAutomationFramework import log_level
+from .CustomExceptions import MethodNotImplemented
 
 level = log_level
 logFile = 'CiscoAutomationFramework.log'
@@ -242,27 +243,52 @@ class BaseClass:
         self.terminal_width_value = None
 
         self._output = ''
-    def throw_away_buffer_data(self):
+
+    def connect_to_server(self):
+        '''High level function that will call all the engine specific methods to connect to the server.
+        For instance if it is connecting via ssh it will call whatever private methods it needs to so it
+        has access to the console, for serial it will end up at the console but call different private methods
+        in the serial engine class
+
+        :return:
         '''
-        Will capture any data waiting in the incoming buffer and discard it
+        raise MethodNotImplemented('This method has not been implemented!')
 
-        :return: int: total bytes discarded from the buffer
-        :rtype: int
+    def send_command(self, command):
+        '''Method to send command to the device. This method will automatically send the return character
+        so there is no need to put that in the command
+
+        :param command: Command to send
+        :return: Nothing
         '''
+        raise MethodNotImplemented('This method has not been implemented!')
 
-        bytes_discarded = 0
+    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
+        '''Gets the outpu from the device when a different prompt is anticipated. This method will soon be
+        depreciated as there is a more robust algorthem used in the get_output method
 
-        while True:
-            if self.shell.recv_ready():
-                bytes.decode(self.shell.recv(1))
-                bytes_discarded += 1
-                time.sleep(.01)
-            else:
-                break
-
-        return bytes_discarded
+        :param wait_time:
+        :param return_as_list:
+        :param buffer_size:
+        :param timeout:
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
 
     def get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+        '''This method gathers the data that is waiting from the Cisco device and then returns it
+        for further parsing or directly to the user.
+
+        For Developers: This method should not be overwritten but rather extended via super() as it contains
+        code that regardless of the engine, needs to run.
+
+        :param wait_time:
+        :param detecting_firmware:
+        :param return_as_list:
+        :param buffer_size:
+        :param timeout:
+        :return:
+        '''
 
         output = self._output.splitlines()[2:]
 
@@ -285,6 +311,60 @@ class BaseClass:
             return cleanoutput
 
         return output
+
+    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
+        '''This is a high level method that will send a command to the Cisco device and automatically gather the output.
+        This method will soon be depreciated as it calls the legacy expect_different_prompt method to gather its output
+
+        :param command:
+        :param return_as_list:
+        :param buffer_size:
+        :param timeout:
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
+        '''High level method to send a command to a Cisco device and automatically gather the output. This is the method that should be used
+        each time you need to send a command and grab the output from a Cisco device
+
+        :param command:
+        :param timeout:
+        :param detecting_firmware:
+        :param return_as_list:
+        :param buffer_size:
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def close_connection(self):
+        '''Closes the connection to the Cisco device
+
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def throw_away_buffer_data(self):
+        '''Method to gather data from a Cisco device and throw away the output. This method
+        is typically only used when determining what Firmware the Cisco device.
+
+        :return: int: total bytes discarded from the buffer
+        :rtype: int
+        '''
+
+        bytes_discarded = 0
+
+        while True:
+            if self.shell.recv_ready():
+                bytes.decode(self.shell.recv(1))
+                bytes_discarded += 1
+                time.sleep(.01)
+            else:
+                break
+
+        return bytes_discarded
+
+
 
 
 class SSHEngine(BaseClass):
@@ -719,15 +799,9 @@ class SerialEngine(BaseClass, serial.Serial):
         time.sleep(.1)
         count = 0
         while True:
-            #if count == 2:
-            #    break
-            if self.ser.in_waiting > 0:
-                self._output += self.ser.read(self.ser.in_waiting).decode()
-                time.sleep(.1)
             if self.ser.in_waiting > 0:
                 self._output += self.ser.read(self.ser.in_waiting).decode()
             count += 1
-
             if '>' in self._output.splitlines()[-1] or '#' in self._output.splitlines()[-1] and self.ser.in_waiting == 0:
                 break
 
