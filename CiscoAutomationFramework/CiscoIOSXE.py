@@ -190,7 +190,7 @@ class IOSXE(TerminalCommands, CommandMethods):
             line = x.split()
             if len(line) == 7:
                 user_data.append({'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]})
-            else:
+            elif len(line) > 6:
                 user_data.append(
                 {'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': ' '.join(line[4:][:-2]), 'class': line[-2], 'max': line[-1]})
 
