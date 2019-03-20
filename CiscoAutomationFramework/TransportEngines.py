@@ -598,7 +598,7 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
-    def send_command_expect_different_prompt(self, command, timeout=10, return_as_list=False, buffer_size=1, pause=1):
+    def send_command_expect_different_prompt(self, command, timeout=10, return_as_list=False, buffer_size=10, pause=1):
         '''
         High level method for sending a command when expecting the prompt to return differently. This uses the
         SSHEngine methods of send_command and get_output_different_prompt
@@ -621,7 +621,7 @@ class SerialEngine(BaseClass, serial.Serial):
             timeout=timeout
         )
 
-    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=10):
         '''
         Sends commands and gathers the output in a way that expects the same prompt to be returned
         DO NOT use this method if you are not SURE that the prompt returned will be the same
@@ -667,7 +667,7 @@ class SerialEngine(BaseClass, serial.Serial):
         :return: Nothing
         '''
 
-        self.ser.write('{}\n'.format(command).encode())
+        self.ser.write('{}\r\n'.format(command).encode())
 
     def throw_away_buffer_data(self):
         '''
@@ -714,47 +714,29 @@ class SerialEngine(BaseClass, serial.Serial):
         # TODO: convert this method to have a timeout and use a thread
 
         logging.debug('Serial engine starting to get output from device')
+        self._output = '\n\n'
 
-        time.sleep(wait_time)
+        time.sleep(.1)
+        count = 0
+        while True:
+            #if count == 2:
+            #    break
+            if self.ser.in_waiting > 0:
+                self._output += self.ser.read(self.ser.in_waiting).decode()
+                time.sleep(.1)
+            if self.ser.in_waiting > 0:
+                self._output += self.ser.read(self.ser.in_waiting).decode()
+            count += 1
 
-        output = ['\n', '\n']
+            if '>' in self._output.splitlines()[-1] or '#' in self._output.splitlines()[-1] and self.ser.in_waiting == 0:
+                break
 
-        bitsRcvd = 0
+        return super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
 
-        loopBreaker = 0
-        while output[-1] != self.prompt:
-            loopBreaker += 1
-            for line in self.ser.readlines():
-                fromDevice = line.decode().strip('\r\n')
-                output.append(fromDevice)
-                bitsRcvd += len(fromDevice)
-                if len(fromDevice) > 0:
-                    logger.debug('Recieved {} bits from device'.format(len(fromDevice)))
-
-            if loopBreaker > 1000:
-                logging.debug('LoopBreaker exceeded, breaking serial recieve loop')
-
-        bytes_discarded = 0
-
-        if detecting_firmware is True:
-            # :TODO: Add logic here
-            self.throw_away_buffer_data()
-            pass
-
-        try:
-
-            self.prompt = output[-1].strip()
-        except:
-            raise IOError
-
-        if return_as_list is False:
-            logging.debug('Serial engine completed getting output from device')
-            return '\n'.join(output)
-        else:
-            logging.debug('Serial engine completed getting output from device')
-            return output
 
     def get_output_different_prompt(self, timeout=10, wait_time=.2, return_as_list=False, buffer_size=1):
+
+        return self.get_output(timeout, wait_time, return_as_list=return_as_list, buffer_size=buffer_size)
 
         '''
         Gets outut when a different prompt is expected to be returned
