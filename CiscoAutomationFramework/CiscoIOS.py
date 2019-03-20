@@ -21,7 +21,7 @@ This Module contains all the logic that pertains to issuing commands to a device
 import time
 import logging
 from .CustomExceptions import *
-from .BaseCommandMethods import CommandGetMethods
+from .BaseCommandMethods import CommandGetMethods, CommandConfigMethods
 from CiscoAutomationFramework import log_level
 
 level = log_level
@@ -90,6 +90,7 @@ class TerminalCommands:
     def __init__(self, transport_object):
         self.transport = transport_object
         self.enable_password = self.transport.enable_password
+
 
     def terminal_length(self, number='0'):
         '''
@@ -191,6 +192,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
     def __init__(self, transport_object):
         TerminalCommands.__init__(self, transport_object)
+        self.config = IOSConfigMethods(transport_object)
 
         self.transport = transport_object
 
@@ -248,17 +250,6 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         return users
 
-    def delete_local_user(self, username):
-        output = ''
-
-        output += self.config_t()
-
-        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
-
-        self.send_end()
-
-        return output
-
     def show_run_interface(self, interface):
         # Detects if the session is in priv exec mode on the switch, if not it enters priv exec mode prior to
         # issuing the 'show running-config' command
@@ -279,45 +270,6 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         return cleanoutput
 
-    def configure_description(self, interface, description):
-        output = ''
-
-
-        output += self.priv_exec()
-
-        output += self.config_t()
-
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-
-        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
-
-        output += self.send_end()
-
-        return output
-
-    def configure_access_vlan(self, interface, vlan):
-        '''
-        this method should be used when the user needs to configure an interface as an access port on a specific vlan
-        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
-        :param vlan: Vlan number to configure
-        :return: commands sent to server and their output
-        '''
-        output = ''
-
-        # get the terminal orientated where it needs to be to issue the commands
-        #output += self.priv_exec()
-        output += self.config_t()
-
-        # issues commands to configure the interface specified as an access vlan on the vlan specified
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.transport.send_command_expect_same_prompt('switchport mode access')
-        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
-
-        output += self.send_end()
-
-
-        return output
-
     def power_cycle_port(self, interface, delay):
 
         self.config_t()
@@ -331,7 +283,6 @@ class IOS(TerminalCommands, CommandGetMethods):
         self.send_end()
 
         return output
-
 
     def configure_router_lan_subinterface(
             self, physical_interface, vlan_number, ip_address, subnet_mask, dhcp_servers_ip_addresses):
@@ -653,7 +604,6 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         return [item for item in mac_table if item['mac'] == mac_address]
 
-
     def cdp_neighbor_table(self):
 
         '''
@@ -689,8 +639,6 @@ class IOS(TerminalCommands, CommandGetMethods):
                 tmp = {}
 
         return data
-
-
 
     def arp_table(self):
 
@@ -780,7 +728,6 @@ class IOS(TerminalCommands, CommandGetMethods):
             data.append(tmp_dict)
         return data
 
-
     def show_interface_status(self):
 
         output = ''
@@ -803,7 +750,6 @@ class IOS(TerminalCommands, CommandGetMethods):
             else:
                 data.append({'interface': line.split()[0], 'status': 'connected'})
         return data
-
 
     def show_interface_description(self):
         '''
@@ -992,28 +938,58 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         return self.transport.get_output()
 
-    # END Functions used primarily by the User
-    '''
-    def test(self):
 
-        self.priv_exec()
+class IOSConfigMethods(CommandConfigMethods, TerminalCommands):
 
-        self.terminal_length()
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
 
-        try:
-            output = self.transport.send_command_expect_same_prompt('show run', timeout=1)
-        except Exception as E:
-            print(E)
+    def configure_description(self, interface, description):
+        output = ''
 
-        for x in range(10):
-            self.transport.send_command_expect_same_prompt(' ')
-            time.sleep(.5)
 
-        self.terminal_length()
+        output += self.priv_exec()
 
-        output = self.transport.send_command_expect_same_prompt('show run')
+        output += self.config_t()
 
-        #output = self.transport.send_command_expect_same_prompt('show run')
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+
+        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
+
+        output += self.send_end()
 
         return output
-    '''
+
+    def configure_access_vlan(self, interface, vlan):
+        '''
+        this method should be used when the user needs to configure an interface as an access port on a specific vlan
+        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
+        :param vlan: Vlan number to configure
+        :return: commands sent to server and their output
+        '''
+        output = ''
+
+        # get the terminal orientated where it needs to be to issue the commands
+        #output += self.priv_exec()
+        output += self.config_t()
+
+        # issues commands to configure the interface specified as an access vlan on the vlan specified
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_same_prompt('switchport mode access')
+        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
+
+        output += self.send_end()
+
+
+        return output
+
+    def delete_local_user(self, username):
+        output = ''
+
+        output += self.config_t()
+
+        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
+
+        self.send_end()
+
+        return output

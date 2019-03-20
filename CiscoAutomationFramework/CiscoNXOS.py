@@ -16,7 +16,7 @@ limitations under the License.
 
 import time
 from . import CustomExceptions
-from .BaseCommandMethods import CommandGetMethods
+from .BaseCommandMethods import CommandGetMethods, CommandConfigMethods
 
 not_implemented_text = 'This method has not been implemented in the CiscoNXOS module'
 
@@ -163,18 +163,6 @@ class NXOS(TerminalCommands, CommandGetMethods):
                 users.append(line.split()[1])
 
         return users
-
-    def delete_local_user(self, username):
-
-        return super().delete_local_user(username)
-
-    def configure_description(self, interface, description):
-
-        return super().configure_description(interface, description)
-
-    def configure_access_vlan(self, interface, vlan):
-
-        return super().configure_access_vlan(interface, vlan)
 
     def power_cycle_port(self, interface, delay):
 
@@ -446,3 +434,20 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         # if the copy was not successful it returns the raw output from the server
         return output
+
+class NXOSConfigMethods(CommandConfigMethods, TerminalCommands):
+
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
+
+    def delete_local_user(self, username):
+
+        return super().delete_local_user(username)
+
+    def configure_description(self, interface, description):
+
+        return super().configure_description(interface, description)
+
+    def configure_access_vlan(self, interface, vlan):
+
+        return super().configure_access_vlan(interface, vlan)

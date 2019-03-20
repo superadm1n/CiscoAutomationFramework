@@ -18,7 +18,7 @@ limitations under the License.
 import time
 from . import CustomExceptions
 from .CiscoIOS import IOS, TerminalCommands
-from .BaseCommandMethods import CommandGetMethods
+from .BaseCommandMethods import CommandGetMethods, CommandConfigMethods
 
 
 class IOSXE(TerminalCommands, CommandGetMethods):
@@ -33,6 +33,7 @@ class IOSXE(TerminalCommands, CommandGetMethods):
     def __init__(self, transport_object):
         TerminalCommands.__init__(self, transport_object)
         self.transport = transport_object
+        self.config = CommandConfigMethods(transport_object)
 
         self.ios = IOS(transport_object)
 
@@ -59,59 +60,6 @@ class IOSXE(TerminalCommands, CommandGetMethods):
         '''
 
         return self.ios.get_local_users()
-
-    def delete_local_user(self, username):
-
-        raise CustomExceptions.MethodNotImplemented()
-        output = ''
-
-        output += self.transport.config_t()
-
-        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
-
-        self.transport.send_end()
-
-        return output
-
-    def configure_description(self, interface, description):
-
-        output = ''
-
-        output += self.priv_exec()
-
-        output += self.transport.config_t()
-
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-
-        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
-
-        output += self.transport.send_end()
-
-        return output
-
-    def configure_access_vlan(self, interface, vlan):
-        return 'Method not configured for IOSXE, skel code is staged from IOS'
-        '''
-        this method should be used when the user needs to configure an interface as an access port on a specific vlan
-        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
-        :param vlan: Vlan number to configure
-        :return: commands sent to server and their output
-        '''
-        output = ''
-
-        # get the terminal orientated where it needs to be to issue the commands
-        output += self.priv_exec()
-        output += self.config_t()
-
-        # issues commands to configure the interface specified as an access vlan on the vlan specified
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.transport.send_command_expect_same_prompt('switchport mode access')
-        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
-
-        output += self.send_end()
-
-
-        return output
 
     def power_cycle_port(self, interface, delay):
         return self.ios.power_cycle_port(interface, delay)
@@ -281,3 +229,62 @@ class IOSXE(TerminalCommands, CommandGetMethods):
         return self.transport.get_output()
 
     # END Functions used primarily by the User
+
+
+class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
+
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
+
+    def delete_local_user(self, username):
+
+        raise CustomExceptions.MethodNotImplemented()
+        output = ''
+
+        output += self.transport.config_t()
+
+        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
+
+        self.transport.send_end()
+
+        return output
+
+    def configure_description(self, interface, description):
+
+        output = ''
+
+        output += self.priv_exec()
+
+        output += self.transport.config_t()
+
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+
+        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
+
+        output += self.transport.send_end()
+
+        return output
+
+    def configure_access_vlan(self, interface, vlan):
+        return 'Method not configured for IOSXE, skel code is staged from IOS'
+        '''
+        this method should be used when the user needs to configure an interface as an access port on a specific vlan
+        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
+        :param vlan: Vlan number to configure
+        :return: commands sent to server and their output
+        '''
+        output = ''
+
+        # get the terminal orientated where it needs to be to issue the commands
+        output += self.priv_exec()
+        output += self.config_t()
+
+        # issues commands to configure the interface specified as an access vlan on the vlan specified
+        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_expect_same_prompt('switchport mode access')
+        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
+
+        output += self.send_end()
+
+
+        return output

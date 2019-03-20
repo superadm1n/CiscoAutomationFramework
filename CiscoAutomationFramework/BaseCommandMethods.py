@@ -71,39 +71,10 @@ class CommandGetMethods:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def delete_local_user(self, username):
-        '''Method to delete the specified local user
-
-        :param username: User to delete
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
     def show_run_interface(self, interface):
         '''Gathers the running configuration for a specific interface on the remote device.
 
         :param interface: Interface to gather the running config for
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
-    def configure_description(self, interface, description):
-        '''Configures a description on a specific interface.
-
-        :param interface: Interface to configure the description on
-        :param description: Description to add
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
-    def configure_access_vlan(self, interface, vlan):
-        '''Configues a specific interface as an access vlan on
-        the specified vlan
-
-        :param interface: Interface to configure
-        :type interface: str
-        :param vlan: Vlan to configure
-        :type vlan: str
         :return:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
@@ -355,6 +326,38 @@ class CommandGetMethods:
         '''Method to save the running config into NVRAM on the Cisco device. Example write memory or copy run start on
         an IOS device.
 
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+
+class CommandConfigMethods:
+
+    def configure_description(self, interface, description):
+        '''Configures a description on a specific interface.
+
+        :param interface: Interface to configure the description on
+        :param description: Description to add
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def configure_access_vlan(self, interface, vlan):
+        '''Configues a specific interface as an access vlan on
+        the specified vlan
+
+        :param interface: Interface to configure
+        :type interface: str
+        :param vlan: Vlan to configure
+        :type vlan: str
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    def delete_local_user(self, username):
+        '''Method to delete the specified local user
+
+        :param username: User to delete
         :return:
         '''
         raise MethodNotImplemented('This method has not been implemented!')

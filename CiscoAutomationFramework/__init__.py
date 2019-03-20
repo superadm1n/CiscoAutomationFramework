@@ -19,7 +19,7 @@ limitations under the License.
 '''
 log_level = 10
 from . import Util
-from .TransportEngines import SSHEngine, SerialEngine, TestEngine
+from .TransportEngines import SSHEngine, SerialEngine
 from .CiscoIOSXE import IOSXE
 from .CiscoIOS import IOS
 from .CiscoNXOS import NXOS
