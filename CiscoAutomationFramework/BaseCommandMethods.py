@@ -24,10 +24,18 @@ from .CustomExceptions import MethodNotImplemented
 class CommandMethods:
 
     '''
-    Generic class that all other command classes should inherit from. When a new method
-    is added it should be added here first, documentation for each method should be held here.
+    These are the API calls that will most often be used when gathering data from a Cisco device in an automation script.
+    Each of these calls are abstract ways of sending specific commands to a switch, gathering the output, and parsing
+    that output so that it is in a format that is digestable to the rest of the script. As a network
+    administrator, worry less about what exact command it is sending to the switch and focus more
+    on the data that it is returning to you. These calls are powerfull because of how it parses
+    the CLI commands and presents just the relevant data to you vs the raw data as it is output from
+    the Cisco device.
 
-    A note to any code contributer, Whenever a new method is implemented all reasonable efforts
+    notes to any code contributer:
+    This is the generic class that all other command classes should inherit from. When a new method
+    is added it should be added here first, documentation for each method should be held here.
+    Whenever a new method is implemented all reasonable efforts
     should be attempted to have it return a list of dictionaries as its output if it is gathering data
     and true/false if it is performing an action to keep the data returned from methods as consistent
     as possible for anyone using the package.

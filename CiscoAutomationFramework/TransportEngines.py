@@ -231,7 +231,20 @@ class OutputThread(threading.Thread):
 
 
 class BaseClass:
+    '''
+    This class contains all of the API calls that will be presented to the user and the rest of the package
+    in a standard way. They are the calls that the methods of the rest of the package uses to interact with
+    the switch, for instance the command methods held within CiscoIOS use these calls, and when writing your
+    scripts you can access these methods via the transport variable.
 
+    All of these API calls are responsible for handling the interacting with the Cisco device ex. Opening the
+    connection, closing the connection, sending, and recieving data.
+
+    Note that when receiving data it is the raw data as returned from the switch so you will need to parse it
+    yourself to make it more programmatically meaningful.
+
+
+    '''
 
     def __init__(self):
         self.prompt = ''

@@ -1,9 +1,14 @@
-CiscoAutomationFramework Code Documentation
+CiscoAutomationFramework API
 ===========================================
 
-Framework.py
+Data Gathering API
 ------------
-.. automodule:: CiscoAutomationFramework.Framework
+.. autoclass:: CiscoAutomationFramework.BaseCommandMethods.CommandMethods
+    :members:
+
+Engine API
+----------
+.. autoclass:: CiscoAutomationFramework.TransportEngines.BaseClass
     :members:
 
 Util.py

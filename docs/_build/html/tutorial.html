@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Usage Examples &mdash; Cisco Automation Framework 0.58 documentation</title>
+  <title>Usage Examples &mdash; Cisco Automation Framework 0.5.9+dev documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Cisco Automation Framework 0.58 documentation" href="index.html"/>
+    <link rel="top" title="Cisco Automation Framework 0.5.9+dev documentation" href="index.html"/>
         <link rel="next" title="CiscoAutomationFramework Code Documentation" href="auto_docs.html"/>
         <link rel="prev" title="Install Instructions" href="install_instructions.html"/> 
 
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.58
+                0.5.9+dev
               </div>
             
           
@@ -168,7 +168,7 @@
 <p>Below are some example scripts showing how to use the framework to interact with remote devices</p>
 <div class="section" id="display-running-config-using-ssh">
 <h2>Display running config using SSH<a class="headerlink" href="#display-running-config-using-ssh" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">CAF</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
 
 <span class="c1"># credentials for remote device</span>
 <span class="n">ip</span> <span class="o">=</span> <span class="s1">&#39;192.168.1.1&#39;</span>
@@ -177,7 +177,7 @@
 <span class="n">enable_password</span> <span class="o">=</span> <span class="s1">&#39;myenablePassword1&#39;</span>
 
 <span class="c1"># log into device and capture the running config</span>
-<span class="k">with</span> <span class="n">CAF</span><span class="p">(</span><span class="s1">&#39;ssh&#39;</span> <span class="n">ip</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">enable_password</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">enable_password</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
     <span class="n">running_config</span> <span class="o">=</span> <span class="n">ssh</span><span class="o">.</span><span class="n">show_run</span><span class="p">()</span>
 
 <span class="c1"># print running config</span>
@@ -187,7 +187,7 @@
 </div>
 <div class="section" id="list-the-number-of-ports-on-a-device-using-ssh">
 <h2>List the number of ports on a device using SSH<a class="headerlink" href="#list-the-number-of-ports-on-a-device-using-ssh" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">CAF</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
 
 <span class="c1"># credentials for remote device</span>
 <span class="n">ip</span> <span class="o">=</span> <span class="s1">&#39;192.168.1.1&#39;</span>
@@ -196,7 +196,7 @@
 <span class="n">enable_password</span> <span class="o">=</span> <span class="s1">&#39;myenablePassword1&#39;</span>
 
 <span class="c1"># log into device and capture the running config</span>
-<span class="k">with</span> <span class="n">CAF</span><span class="p">(</span><span class="s1">&#39;ssh&#39;</span> <span class="n">ip</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">enable_password</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">enable_password</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
     <span class="n">hostname</span> <span class="o">=</span> <span class="n">ssh</span><span class="o">.</span><span class="n">hostname</span>
     <span class="n">port_inv</span> <span class="o">=</span> <span class="n">ssh</span><span class="o">.</span><span class="n">physical_port_inventory_longname</span><span class="p">()</span>
 
@@ -207,7 +207,7 @@
 </div>
 <div class="section" id="list-running-config-of-a-device-using-serial-interface">
 <h2>List running config of a device using serial interface<a class="headerlink" href="#list-running-config-of-a-device-using-serial-interface" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">CAF</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_serial</span>
 
 <span class="c1"># credentials for remote device</span>
 <span class="n">interface</span> <span class="o">=</span> <span class="s1">&#39;COM4&#39;</span>
@@ -216,7 +216,7 @@
 <span class="n">enable_password</span> <span class="o">=</span> <span class="s1">&#39;myenablePassword1&#39;</span>
 
 <span class="c1"># log into device and capture the running config</span>
-<span class="k">with</span> <span class="n">CAF</span><span class="p">(</span><span class="s1">&#39;serial&#39;</span> <span class="n">interface</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">enable_password</span><span class="p">)</span> <span class="k">as</span> <span class="n">serial</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">connect_serial</span><span class="p">(</span><span class="n">interface</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">enable_password</span><span class="p">)</span> <span class="k">as</span> <span class="n">serial</span><span class="p">:</span>
     <span class="n">running_config</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">show_run</span><span class="p">()</span>
 
 <span class="c1"># print running config</span>
@@ -270,7 +270,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.58',
+            VERSION:'0.5.9+dev',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
