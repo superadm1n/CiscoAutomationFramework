@@ -33,7 +33,7 @@ class IOSXE(TerminalCommands, CommandGetMethods):
     def __init__(self, transport_object):
         TerminalCommands.__init__(self, transport_object)
         self.transport = transport_object
-        self.config = CommandConfigMethods(transport_object)
+        self.config = IOSXEConfigMethods(transport_object)
 
         self.ios = IOS(transport_object)
 

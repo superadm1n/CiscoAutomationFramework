@@ -68,9 +68,10 @@ class TerminalCommands:
 
 class NXOS(TerminalCommands, CommandGetMethods):
 
-    def __init__(self, ssh_object):
-        TerminalCommands.__init__(self, ssh_object)
-        self.transport = ssh_object
+    def __init__(self, transport_object):
+        TerminalCommands.__init__(self, transport_object)
+        self.config = NXOSConfigMethods(transport_object)
+        self.transport = transport_object
         self.terminal_width(200)
         self.roles = self.get_user_roles()
 
