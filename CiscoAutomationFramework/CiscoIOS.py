@@ -792,6 +792,10 @@ class IOS(TerminalCommands, CommandMethods):
         for line in switch_output:
             if len(line.split()) <= 1:
                 continue
+
+            if 'Duplex' in line and 'Speed' in line:
+                continue
+
             if 'notconnect' in line:
                 data.append({'interface': line.split()[0], 'status': 'notconnected'})
             elif 'disabled' in line:
