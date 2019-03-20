@@ -43,36 +43,10 @@ class TestingSSHEngine(SSHEngine):
     def connect_to_server(self, ip, username, password):
         return None
 
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
+    def send_command(self, command):
+        pass
 
-        response = None
-
-        if self.counter == 0:
-            response = self.response_zero
-        elif self.counter == 1:
-            response = self.response_one
-        elif self.counter == 2:
-            response = self.response_two
-        elif self.counter == 3:
-            response = self.response_three
-        elif self.counter == 4:
-            response = self.response_four
-        elif self.counter == 5:
-            response = self.response_five
-        elif self.counter == 6:
-            response = self.response_six
-        elif self.counter == 7:
-         response = self.response_seven
-        elif self.counter == 8:
-            response = self.response_eight
-        elif self.counter == 9:
-         response = self.response_nine
-
-        self.counter += 1
-
-        return response
-
-    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
         response = None
 
         if self.counter == 0:
@@ -95,6 +69,10 @@ class TestingSSHEngine(SSHEngine):
             response = self.response_eight
         elif self.counter == 9:
             response = self.response_nine
+
         self.counter += 1
+
         return response
+
+
 
