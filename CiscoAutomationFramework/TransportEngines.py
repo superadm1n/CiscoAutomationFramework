@@ -280,6 +280,9 @@ class BaseClass:
         '''Gets the outpu from the device when a different prompt is anticipated. This method will soon be
         depreciated as there is a more robust algorthem used in the get_output method
 
+        .. WARNING::
+            This method has been depreciated and will be removed in the future
+
         :param wait_time:
         :param return_as_list:
         :param buffer_size:
@@ -292,8 +295,9 @@ class BaseClass:
         '''This method gathers the data that is waiting from the Cisco device and then returns it
         for further parsing or directly to the user.
 
-        For Developers: This method should not be overwritten but rather extended via super() as it contains
-        code that regardless of the engine, needs to run.
+        .. note::
+            For Developers: This method should not be overwritten but rather extended via super() as it contains
+            code that regardless of the engine, needs to run.
 
         :param wait_time:
         :param detecting_firmware:
@@ -326,8 +330,11 @@ class BaseClass:
         return output
 
     def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
-        '''This is a high level method that will send a command to the Cisco device and automatically gather the output.
-        This method will soon be depreciated as it calls the legacy expect_different_prompt method to gather its output
+        '''.. WARNING::
+            This method has been depreciated and will be removed in the future
+
+        This is a high level method that will send a command to the Cisco device and automatically gather the output.
+
 
         :param command:
         :param return_as_list:

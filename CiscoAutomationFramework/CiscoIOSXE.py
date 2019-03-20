@@ -18,10 +18,10 @@ limitations under the License.
 import time
 from . import CustomExceptions
 from .CiscoIOS import IOS, TerminalCommands
-from .BaseCommandMethods import CommandMethods
+from .BaseCommandMethods import CommandGetMethods
 
 
-class IOSXE(TerminalCommands, CommandMethods):
+class IOSXE(TerminalCommands, CommandGetMethods):
     '''
     THis class is where the code resides for issuing commands to IOSXE devices. The majority of how you send commands and retrieve data to
     IOSXE and IOS devices are the same so most of the methods contained here simply use the code in the CiscoIOS Module.

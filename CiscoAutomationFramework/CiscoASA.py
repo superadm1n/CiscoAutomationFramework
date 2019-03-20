@@ -21,7 +21,7 @@ This Module contains the code that is specific to issuing commands to ASA's
 
 from .CiscoIOS import *
 from . import CustomExceptions
-from .BaseCommandMethods import CommandMethods
+from .BaseCommandMethods import CommandGetMethods
 import time
 
 
@@ -48,7 +48,7 @@ class ASATerminalCommands(TerminalCommands):
         return self.transport.send_command_expect_same_prompt('terminal pager {}'.format(number))
 
 
-class ASA(ASATerminalCommands, CommandMethods):
+class ASA(ASATerminalCommands, CommandGetMethods):
 
     def __init__(self, transport_object):
         ASATerminalCommands.__init__(self, transport_object)

@@ -16,7 +16,7 @@ limitations under the License.
 
 import time
 from . import CustomExceptions
-from .BaseCommandMethods import CommandMethods
+from .BaseCommandMethods import CommandGetMethods
 
 not_implemented_text = 'This method has not been implemented in the CiscoNXOS module'
 
@@ -66,7 +66,7 @@ class TerminalCommands:
         raise CustomExceptions.MethodNotSupported
 
 
-class NXOS(TerminalCommands, CommandMethods):
+class NXOS(TerminalCommands, CommandGetMethods):
 
     def __init__(self, ssh_object):
         TerminalCommands.__init__(self, ssh_object)

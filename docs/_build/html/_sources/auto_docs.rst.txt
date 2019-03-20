@@ -2,9 +2,11 @@ CiscoAutomationFramework API
 ===========================================
 
 Data Gathering API
-------------
-.. autoclass:: CiscoAutomationFramework.BaseCommandMethods.CommandMethods
+------------------
+.. autoclass:: CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods
     :members:
+
+
 
 Engine API
 ----------

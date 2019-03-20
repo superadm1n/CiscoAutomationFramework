@@ -21,7 +21,7 @@ This Module contains all the logic that pertains to issuing commands to a device
 import time
 import logging
 from .CustomExceptions import *
-from .BaseCommandMethods import CommandMethods
+from .BaseCommandMethods import CommandGetMethods
 from CiscoAutomationFramework import log_level
 
 level = log_level
@@ -182,7 +182,7 @@ class TerminalCommands:
         return self.transport.send_command_expect_different_prompt('end')
 
 
-class IOS(TerminalCommands, CommandMethods):
+class IOS(TerminalCommands, CommandGetMethods):
     '''
     This class contains the code that is responsible for auctualy sending the commands to the remote device, retrieveing, and parsing the output.
 

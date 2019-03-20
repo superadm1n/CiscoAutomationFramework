@@ -21,7 +21,7 @@ interface with when writing their automation scripts
 
 from .CustomExceptions import MethodNotImplemented
 
-class CommandMethods:
+class CommandGetMethods:
 
     '''
     These are the API calls that will most often be used when gathering data from a Cisco device in an automation script.
@@ -42,6 +42,8 @@ class CommandMethods:
     If it is not possible to return the data in that format or is unreasonable to do so, it should be
     clearly documented as to the format and why it is returning that way in the docstring in this class
     of the method.
+
+    :TODO: Break out the methods that modify configuration into a different class from this one
     '''
 
     def get_uptime(self):
