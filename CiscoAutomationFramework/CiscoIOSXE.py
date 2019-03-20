@@ -37,7 +37,7 @@ class IOSXE(TerminalCommands, CommandGetMethods):
         self.ios = IOS(transport_object)
 
     def get_uptime(self):
-        self.ios.get_uptime()
+        return self.ios.get_uptime()
 
     def show_run(self):
         '''
