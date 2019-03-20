@@ -74,7 +74,3 @@ def connect_serial(COM, username, password, enable_password=None):
     ser.enable_password = enable_password
     ser.connect_to_server(COM, username, password)
     return factory(ser)
-
-def connect_test():
-    transport = TestEngine()
-    return factory(transport)
