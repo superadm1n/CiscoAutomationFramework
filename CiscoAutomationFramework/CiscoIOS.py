@@ -819,6 +819,8 @@ class IOS(TerminalCommands, CommandMethods):
 
         for line in self.transport.send_command_expect_same_prompt('show interface description', return_as_list=True, buffer_size=200)[2:][:-1]:
             line = line.split()
+            if len(line) < 3:
+                continue
 
             # If the line is down with no description
             if len(line) == 3:
