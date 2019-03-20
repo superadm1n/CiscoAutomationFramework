@@ -239,7 +239,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         users = []
 
-        running_config = self.transport.show_run()
+        running_config = self.show_run()
 
         # Finds a line that has the string 'username' in it, then splits the line by spaces and if the string 'username' is the
         # string in index 0 it appends index 1 to the output.
