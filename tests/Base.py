@@ -28,6 +28,7 @@ class TestingSSHEngine(SSHEngine):
     def __init__(self):
         super().__init__()
         self.counter = 0
+        self.commands_ran = []
 
         self.response_zero = ''
         self.response_one = ''
@@ -44,7 +45,7 @@ class TestingSSHEngine(SSHEngine):
         return None
 
     def send_command(self, command):
-        pass
+        self.commands_ran.append(command)
 
     def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
         response = None
