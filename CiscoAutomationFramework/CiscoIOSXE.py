@@ -238,14 +238,14 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
 
     def delete_local_user(self, username):
 
-        raise CustomExceptions.MethodNotImplemented()
         output = ''
 
         output += self.config_t()
 
         output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
+        output += self.transport.send_command_expect_same_prompt('')
 
-        self.transport.send_end()
+        self.send_end()
 
         return output
 
@@ -266,13 +266,7 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
         return output
 
     def configure_access_vlan(self, interface, vlan):
-        return 'Method not configured for IOSXE, skel code is staged from IOS'
-        '''
-        this method should be used when the user needs to configure an interface as an access port on a specific vlan
-        :param interface: interface to configure ex. gi1/0/1, fa0/1, etc.
-        :param vlan: Vlan number to configure
-        :return: commands sent to server and their output
-        '''
+
         output = ''
 
         # get the terminal orientated where it needs to be to issue the commands
