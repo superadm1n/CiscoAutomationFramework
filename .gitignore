@@ -5,3 +5,5 @@ __pycache__/
 *.pyc
 *.log
 test*.py
+.coverage
+htmlcov/
