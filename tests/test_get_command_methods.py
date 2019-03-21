@@ -5,7 +5,7 @@ sys.path.append(script_path)
 from Base import TestingSSHEngine, factory
 from unittest import TestCase
 
-from CiscoAutomationFramework import IOS, IOSXE, NXOS, ASA
+from CiscoAutomationFramework import IOS, IOSXE, NXOS, ASA, CustomExceptions
 
 
 class test_get_uptime(TestCase):
@@ -106,10 +106,24 @@ class show_run_interface(TestCase):
         ssh.response_two = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
         ssh_obj = factory(ssh, IOS)
         t = ssh_obj.show_run_interface('fa1/0/1')
-        #print(t)
         self.assertEqual('interface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n', t)
         self.assertEqual(ssh_obj.transport.commands_ran[-1], 'show running-config interface fa1/0/1')
 
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_two = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.show_run_interface('fa1/0/1')
+        self.assertEqual('interface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n', t)
+        self.assertEqual(ssh_obj.transport.commands_ran[-1], 'show running-config interface fa1/0/1')
+
+    def Rest_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh.response_four = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        self.assertEqual(CustomExceptions.MethodNotImplemented, ssh_obj.show_run_interface('fa1/0/1'))
 
 class configure_description(TestCase):
     pass
