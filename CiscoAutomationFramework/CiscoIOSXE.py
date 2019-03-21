@@ -241,7 +241,7 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
         raise CustomExceptions.MethodNotImplemented()
         output = ''
 
-        output += self.transport.config_t()
+        output += self.config_t()
 
         output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
 
@@ -255,13 +255,13 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
 
         output += self.priv_exec()
 
-        output += self.transport.config_t()
+        output += self.config_t()
 
         output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
 
         output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
 
-        output += self.transport.send_end()
+        output += self.send_end()
 
         return output
 
