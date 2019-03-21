@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from distutils.core import setup
+from setuptools import setup
+#from distutils.core import setup
 
 description = '''The CiscoAutomationFramework is designed to be an interface for network engineers to 
 issue commands and retrieve output from Cisco devices regardless of firmware so they can easily build automation 
