@@ -4,6 +4,5 @@ env/
 __pycache__/
 *.pyc
 *.log
-test*.py
 .coverage
 htmlcov/
