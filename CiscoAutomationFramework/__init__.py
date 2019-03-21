@@ -41,7 +41,7 @@ def factory(transport_engine):
     elif firmware == 'NXOS':
         obj = NXOS
     elif firmware == 'ASA':
-        obj = ASA
+        raise CustomExceptions.OSNotSupported('Cisco ASA Operating System is not supported!')
     else:
         raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
 

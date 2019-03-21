@@ -35,6 +35,9 @@ class InvokeShellError(MyException):
 class OsDetectionFailure(MyException):
     pass
 
+class OSNotSupported(MyException):
+    pass
+
 class NoEnablePassword(MyException):
     pass
 
