@@ -117,20 +117,20 @@ class show_run_interface(TestCase):
         self.assertEqual('interface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n', t)
         self.assertEqual(ssh_obj.transport.commands_ran[-1], 'show running-config interface fa1/0/1')
 
-    def Rest_NXOS(self):
+    def test_NXOS(self):
         ssh = TestingSSHEngine()
         ssh.response_four = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
         ssh_obj = factory(ssh, NXOS)
         ssh_obj.roles = 'vdc-admin'
 
-        self.assertEqual(CustomExceptions.MethodNotImplemented, ssh_obj.show_run_interface('fa1/0/1'))
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.show_run_interface('fa1/0/1')
 
-class configure_description(TestCase):
-    pass
 
 
-class configure_access_vlan(TestCase):
-    pass
+
 
 
 class power_cycle_port(TestCase):
@@ -247,4 +247,107 @@ class write_mem(TestCase):
 
 
 class delete_local_user(TestCase):
-    pass
+
+    def test_ios(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.config.delete_local_user('testuser')
+        self.assertEqual('end', ssh_obj.transport.commands_ran[-1])
+        self.assertEqual('no username testuser', ssh_obj.transport.commands_ran[-2])
+        self.assertEqual('configure terminal', ssh_obj.transport.commands_ran[-3])
+
+    def test_iosXE(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.config.delete_local_user('testuser')
+        self.assertEqual('end', ssh_obj.transport.commands_ran[-1])
+        self.assertEqual('', ssh_obj.transport.commands_ran[-2])
+        self.assertEqual('no username testuser', ssh_obj.transport.commands_ran[-3])
+        self.assertEqual('configure terminal', ssh_obj.transport.commands_ran[-4])
+
+    def test_NXOS(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh.response_four = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.config.delete_local_user('testuser')
+
+
+
+class configure_access_vlan(TestCase):
+
+    def test_ios(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.config.configure_access_vlan('fa1/0/1', '400')
+        self.assertEqual('configure terminal', ssh_obj.transport.commands_ran[-5])
+        self.assertEqual('interface fa1/0/1', ssh_obj.transport.commands_ran[-4])
+        self.assertEqual('switchport mode access', ssh_obj.transport.commands_ran[-3])
+        self.assertEqual('switchport access vlan 400', ssh_obj.transport.commands_ran[-2])
+        self.assertEqual('end', ssh_obj.transport.commands_ran[-1])
+
+    def test_iosXE(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.config.configure_access_vlan('fa1/0/1', '400')
+        self.assertEqual('configure terminal', ssh_obj.transport.commands_ran[-5])
+        self.assertEqual('interface fa1/0/1', ssh_obj.transport.commands_ran[-4])
+        self.assertEqual('switchport mode access', ssh_obj.transport.commands_ran[-3])
+        self.assertEqual('switchport access vlan 400', ssh_obj.transport.commands_ran[-2])
+        self.assertEqual('end', ssh_obj.transport.commands_ran[-1])
+
+    def test_NXOS(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh.response_four = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.config.configure_access_vlan('fa1/0/1', '400')
+
+
+
+class configure_description(TestCase):
+
+    def test_ios(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.config.configure_description('fa1/0/1', 'mydescription')
+        self.assertEqual('configure terminal', ssh_obj.transport.commands_ran[-4])
+        self.assertEqual('interface fa1/0/1', ssh_obj.transport.commands_ran[-3])
+        self.assertEqual('description mydescription', ssh_obj.transport.commands_ran[-2])
+        self.assertEqual('end', ssh_obj.transport.commands_ran[-1])
+
+    def test_iosXE(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.config.configure_description('fa1/0/1', 'mydescription')
+        self.assertEqual('configure terminal', ssh_obj.transport.commands_ran[-4])
+        self.assertEqual('interface fa1/0/1', ssh_obj.transport.commands_ran[-3])
+        self.assertEqual('description mydescription', ssh_obj.transport.commands_ran[-2])
+        self.assertEqual('end', ssh_obj.transport.commands_ran[-1])
+
+    def test_NXOS(self):
+        '''Tests that the proper commands are run to configure a description on a specified interface'''
+        ssh = TestingSSHEngine()
+        ssh.response_four = '\n\ninterface FastEthernet 1/0/1\nswitchport mode access\nswitchport access vlan 10\n!\n\n\n'
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.config.configure_description('fa1/0/1', 'mydescription')
