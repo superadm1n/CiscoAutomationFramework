@@ -116,7 +116,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
                     return roles
 
-        print('something failed')
+        return 'something failed'
 
     def get_uptime(self):
         '''
