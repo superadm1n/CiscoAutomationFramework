@@ -19,6 +19,34 @@ paramiko 2.3.1
 pyserial 3.4
 ```
 
+
+
+## Deployment
+
+To leverage the framework for a project or to begin writing scripts using the framework these are the steps to install the framework in a virtual environment
+
+```
+pip install CiscoAutomationFramework
+```
+
+Now you can begin creating your scripts using the framework, to import the framework below is an example of the import statements.
+
+```
+from CiscoAutomationFramework import connect_as_ssh
+```
+
+## Install latest version of the framework
+Note installing directly from the master branch on github is not the ideal solution for a production
+environment as it is has the potential to have bugs that have less of a chance making it to the package
+release on pypi.
+
+That being said if you wish to have the latest features and are willing to live with a potential 
+ for added bugs or help develop the framework, installing from github is where you should do and below
+ is the command to install the package directly from github
+```bash
+git clone https://github.com/superadm1n/CiscoAutomationFramework.git
+```
+
 ### Installing copy to develop
 
 Below are instructions for cloning a copy of the repository, building a virtual environment and setting your environment up to begin testing and developing.
@@ -40,36 +68,6 @@ cd CiscoAutomationFramework
 virtualenv -p python3 env
 env\scripts\activate
 pip install -r requirements.txt
-```
-
-
-## Deployment
-
-To leverage the framework for a project or to begin writing scripts using the framework these are the steps to install the framework in a virtual environment
-
-Linux
-```
-mkdir myproject
-cd myproject
-virtualenv -p python3 env
-source env/bin/activate
-pip install git+https://github.com/superadm1n/CiscoAutomationFramework.git
-```
-
-Windows
-
-```
-mkdir myproject
-cd myproject
-virtualenv -p python3 env
-env\scripts\activate
-pip install git+https://github.com/superadm1n/CiscoAutomationFramework.git
-```
-
-Now you can begin creating your scripts using the framework, to import the framework below is an example of the import statements.
-
-```
-from CiscoAutomationFramework import connect_as_ssh
 ```
 
 ## Built With
