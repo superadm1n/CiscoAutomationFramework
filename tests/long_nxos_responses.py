@@ -171,3 +171,73 @@ G 2222     dddd.dddd.dddd    static       -       F    F  sup-eth1(R)
 * 2499     eeee.eeee.eeee    dynamic   30         F    F  Po11
 
 '''
+
+cdp_neighbor_detail = ''' sh cdp nei  det
+----------------------------------------
+Device ID:dev1
+VTP Management Domain Name: null
+
+Interface address(es):
+    IPv4 Address: 1.1.1.1
+Platform: WS-C4503-E, Capabilities: Router Switch IGMP Filtering
+Interface: mgmt0, Port ID (outgoing port): GigabitEthernet2/47
+Holdtime: 152 sec
+
+Version:
+Cisco IOS Software, Catalyst 4500 L3 Switch Software (cat4500e-UNIVERSALK9-M), Version 15.1(2)SG, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2012 by Cisco Systems, Inc.
+Compiled Wed 05-Dec-12 04:38 by prod_rel_team
+
+Advertisement Version: 2
+
+Native VLAN: 950
+Duplex: full
+Mgmt address(es):
+    IPv4 Address: 1.1.1.1
+----------------------------------------
+Device ID:dev2
+System Name: dev2
+
+Interface address(es):
+    IPv4 Address: 2.2.2.2
+Platform: N7K-C7010, Capabilities: Router Switch IGMP Filtering Supports-STP-Dispute
+Interface: Ethernet1/1, Port ID (outgoing port): Ethernet1/1
+Holdtime: 137 sec
+
+Version:
+Cisco Nexus Operating System (NX-OS) Software, Version 6.1(4)
+
+Advertisement Version: 2
+
+Native VLAN: 3967
+Duplex: full
+
+MTU: 1500
+Physical Location: snmplocation
+Mgmt address(es):
+    IPv4 Address: 2.2.2.2
+    
+switch#
+'''
+
+show_ip_arp = '''sh ip arp
+
+Flags: * - Adjacencies learnt on non-active FHRP router
+       + - Adjacencies synced via CFSoE
+       # - Adjacencies Throttled for Glean
+       D - Static Adjacencies attached to down interface
+
+IP ARP Table for context default
+Total number of entries: 1907
+Address         Age       MAC Address     Interface
+1.1.1.1         00:13:32  aaaa.aaaa.aaaa  Ethernet1/2
+2.2.2.2         00:15:53  bbbb.bbbb.bbbb  Ethernet1/9
+3.3.3.3         00:13:49  cccc.cccc.cccc  Ethernet1/9
+4.4.4.4         00:13:51  dddd.dddd.dddd  Ethernet1/9
+5.5.5.5         00:08:01  eeee.eeee.eeee  Ethernet1/9
+6.6.6.6         00:15:06  ffff.ffff.ffff  Ethernet1/9
+7.7.7.7         00:00:13  gggg.gggg.gggg  Ethernet1/13
+8.8.8.8         00:04:20  hhhh.hhhh.hhhh  Ethernet1/14
+9.9.9.9         00:00:21  iiii.iiii.iiii  Vlan1
+'''

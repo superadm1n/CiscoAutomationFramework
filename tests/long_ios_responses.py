@@ -252,3 +252,69 @@ Vlan    Mac Address       Type        Ports
 Total Mac Addresses for this criterion: 000
 switch#
 '''
+
+cdp_neighbor_detail = '''sh cdp nei detail
+-------------------------
+Device ID: dev1
+Entry address(es):
+  IP address: 1.1.1.1
+Platform: cisco WS-C3750X-48P,  Capabilities: Switch IGMP
+Interface: GigabitEthernet1/1/1,  Port ID (outgoing port): GigabitEthernet1/1/4
+Holdtime : 126 sec
+
+Version :
+Cisco IOS Software, C3750E Software (C3750E-UNIVERSALK9-M), Version 12.2(58)SE2, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2011 by Cisco Systems, Inc.
+Compiled Thu 21-Jul-11 01:23 by prod_rel_team
+
+advertisement version: 2
+Protocol Hello:  OUI=0x00000C, Protocol ID=0x0112; payload len=27, value=00000000FFFFFFFF010225050000000000006400F1560580FF0000
+VTP Management Domain: ''
+Native VLAN: 1
+Duplex: full
+Power Available TLV:
+
+    Power request id: 0, Power management id: 1, Power available: 0, Power management level: -1
+Management address(es):
+  IP address: 1.1.1.1
+
+-------------------------
+Device ID: dev2
+Entry address(es):
+  IP address: 2.2.2.2
+Platform: cisco AIR-AP3802I-B-K9,  Capabilities: Router Trans-Bridge
+Interface: GigabitEthernet1/0/44,  Port ID (outgoing port): GigabitEthernet0
+Holdtime : 151 sec
+
+Version :
+Cisco AP Software, ap3g3-k9w8 Version: 8.3.143.10
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 2014-2015 by Cisco Systems, Inc.
+
+advertisement version: 2
+Duplex: full
+Power drawn: 30.000 Watts
+Power request id: 26928, Power management id: 15
+Power request levels are:30000 15400 0 0 0
+Power Available TLV:
+
+    Power request id: 0, Power management id: 0, Power available: 0, Power management level: 0
+Management address(es):
+  IP address: 2.2.2.2
+
+
+switch#
+'''
+
+show_ip_arp = '''sh ip arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  1.1.1.1                0   Incomplete      ARPA
+Internet  2.2.2.2                99   aaaa.aaaa.aaaa  ARPA   Vlan1
+Internet  3.3.3.3                43   bbbb.bbbb.bbbb  ARPA   Vlan1
+Internet  4.4.4.4                 0   cccc.cccc.cccc  ARPA   Vlan1
+Internet  5.5.5.5                 9   dddd.dddd.dddd  ARPA   Vlan1
+Internet  6.6.6.6               174   eeee.eeee.eeee  ARPA   Vlan1
+Internet  7.7.7.7                 0   ffff.ffff.ffff  ARPA   Vlan1
+switch#
+'''

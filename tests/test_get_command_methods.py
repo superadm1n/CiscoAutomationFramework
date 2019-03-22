@@ -525,12 +525,96 @@ class find_mac_address(TestCase):
 
 
 class cdp_neighbor_table(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_two = long_ios_responses.cdp_neighbor_detail
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.cdp_neighbor_table()
+        self.assertEqual(
+            {'deviceid': 'dev1', 'remoteip': '1.1.1.1', 'remoteinterface': 'GigabitEthernet1/1/4', 'localinterface': 'GigabitEthernet1/1/1',
+             'platform': 'cisco WS-C3750X-48P'}, t[0]
+        )
+        self.assertEqual(
+            {'deviceid': 'dev2', 'remoteip': '2.2.2.2', 'remoteinterface': 'GigabitEthernet0', 'localinterface': 'GigabitEthernet1/0/44',
+             'platform': 'cisco AIR-AP3802I-B-K9'}, t[1]
+        )
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_two = long_iosxe_responses.cdp_neighbor_detail
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.cdp_neighbor_table()
+        self.assertEqual(
+            {'deviceid': 'dev1', 'remoteip': '1.1.1.1', 'remoteinterface': 'GigabitEthernet1/1/4', 'localinterface': 'GigabitEthernet1/1/1',
+             'platform': 'cisco WS-C3750X-48P'}, t[0]
+        )
+        self.assertEqual(
+            {'deviceid': 'dev2', 'remoteip': '2.2.2.2', 'remoteinterface': 'GigabitEthernet0', 'localinterface': 'GigabitEthernet1/0/44',
+             'platform': 'cisco AIR-AP3802I-B-K9'}, t[1]
+        )
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_iosxe_responses.cdp_neighbor_detail
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        t = ssh_obj.cdp_neighbor_table()
+        self.assertEqual(
+            {'remoteinterface': 'GigabitEthernet1/1/4', 'platform': 'cisco WS-C3750X-48P', 'localinterface': 'GigabitEthernet1/1/1',
+             'deviceid': 'dev1'}, t[0]
+        )
+        self.assertEqual(
+            {'remoteinterface': 'GigabitEthernet0', 'platform': 'cisco AIR-AP3802I-B-K9', 'localinterface': 'GigabitEthernet1/0/44',
+             'deviceid': 'dev2'}, t[1]
+        )
 
 
 class arp_table(TestCase):
-    pass
 
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_ip_arp
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.arp_table()
+        self.assertEqual(
+            {'protocol': 'Internet', 'type': 'ARPA', 'age': '99', 'address': '2.2.2.2', 'mac': 'aaaa.aaaa.aaaa', 'interface': 'Vlan1'},
+            t[0]
+        )
+        self.assertEqual(
+            {'protocol': 'Internet', 'type': 'ARPA', 'age': '0', 'address': '7.7.7.7', 'mac': 'ffff.ffff.ffff', 'interface': 'Vlan1'},
+            t[-1]
+        )
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_ip_arp
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.arp_table()
+        self.assertEqual(
+            {'protocol': 'Internet', 'type': 'ARPA', 'age': '99', 'address': '2.2.2.2', 'mac': 'aaaa.aaaa.aaaa', 'interface': 'Vlan1'},
+            t[0]
+        )
+        self.assertEqual(
+            {'protocol': 'Internet', 'type': 'ARPA', 'age': '0', 'address': '7.7.7.7', 'mac': 'ffff.ffff.ffff', 'interface': 'Vlan1'},
+            t[-1]
+        )
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_nxos_responses.show_ip_arp
+        ssh_obj = factory(ssh, NXOS)
+        t = ssh_obj.arp_table()
+        self.assertEqual(
+            {'address': '1.1.1.1', 'mac': 'aaaa.aaaa.aaaa', 'interface': 'Ethernet1/2', 'type': False, 'age': '00:13:32', 'protocol': None},
+            t[0]
+        )
+        self.assertEqual(
+            {'address': '8.8.8.8', 'mac': 'hhhh.hhhh.hhhh', 'interface': 'Ethernet1/14', 'type': False, 'age': '00:04:20', 'protocol': None},
+            t[-1]
+        )
 
 class show_routes(TestCase):
     pass
