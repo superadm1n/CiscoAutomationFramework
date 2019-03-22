@@ -413,6 +413,8 @@ class IOS(TerminalCommands, CommandGetMethods):
         returnable_data = []
         for x in usable_data:
             line = x.split()
+            if len(line) == 0:
+                continue
             if len(line) == 7:
                 returnable_data.append({'interface': line[0], 'admin': line[1], 'oper': line[2], 'watts': line[3], 'device': line[4], 'class': line[5], 'max': line[6]})
             else:
