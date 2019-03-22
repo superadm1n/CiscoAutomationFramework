@@ -446,7 +446,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
     def list_eigrp_configuration(self):
         output = ''
-        running_config = self.transport.show_run()
+        running_config = self.show_run()
         counter = 0
         for line in running_config.splitlines():
 
