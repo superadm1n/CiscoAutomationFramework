@@ -326,19 +326,118 @@ class list_ospf_configuration(TestCase):
 
 
 class list_eigrp_configuration(TestCase):
-    pass
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_two = long_ios_responses.ospf_runing_config
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.list_eigrp_configuration()
+        self.assertIn('router eigrp 1', t)
+        self.assertIn('eigrp stub connected summary', t)
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_two = long_iosxe_responses.ospf_runing_config
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.list_eigrp_configuration()
+        self.assertIn('router eigrp 1', t)
+        self.assertIn('eigrp stub connected summary', t)
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_nxos_responses.ospf_running_config
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        t = ssh_obj.list_eigrp_configuration()
+        self.assertIn('router eigrp 100', t)
+        self.assertIn('distance 100 100', t)
 
 
 class list_down_ports(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_interface_description
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.list_down_ports()
+        ports = ['Gi1/0/2', 'Gi1/0/4', 'Gi1/0/5', 'Gi1/0/6', 'Gi1/0/8', 'Gi1/0/10', 'Gi1/0/12', 'Gi1/0/13', 'Gi1/0/14', 'Gi1/0/16']
+        self.assertEqual(t, ports)
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_interface_description
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.list_down_ports()
+        ports = ['Gi1/0/2', 'Gi1/0/4', 'Gi1/0/5', 'Gi1/0/6', 'Gi1/0/8', 'Gi1/0/10', 'Gi1/0/12', 'Gi1/0/13', 'Gi1/0/14', 'Gi1/0/16']
+        self.assertEqual(t, ports)
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_nxos_responses.show_interface_status
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        t = ssh_obj.list_down_ports()
+        self.assertEqual(['Eth2/17'], t)
 
 
 class last_input_and_output(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_interface_1
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.last_input_and_output('gi1/0/1')
+        self.assertEqual(['gi1/0/1', '00:00:17', '00:00:00'], t)
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_interface_1
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.last_input_and_output('gi1/0/2')
+        self.assertEqual(['gi1/0/2', '00:00:01', 'never'], t)
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.last_input_and_output('gi1/0/2')
+
 
 
 class last_input_and_output_all(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_interfaces
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.last_input_and_output_all()
+        self.assertEqual({'output': '00:00:01', 'input': '00:09:20', 'interface': 'GigabitEthernet1/0/1'}, t[-1])
+        self.assertEqual({'output': '00:00:00', 'input': '00:00:00', 'interface': 'Vlan2100'}, t[0])
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_interfaces
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.last_input_and_output_all()
+        self.assertEqual({'input': '00:00:00', 'output': '00:00:00', 'interface': 'Vlan2100'}, t[0])
+        self.assertEqual({'input': '00:09:20', 'output': '00:00:01', 'interface': 'GigabitEthernet1/0/1'}, t[-1])
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.last_input_and_output_all()
 
 
 class list_configured_vlans(TestCase):

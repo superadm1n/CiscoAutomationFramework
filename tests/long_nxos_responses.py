@@ -98,4 +98,32 @@ router ospf 1
 router eigrp 100
   distance 100 100
 
+
+
+
+'''
+
+
+
+show_interface_status = '''sh int status
+
+--------------------------------------------------------------------------------
+Port          Name               Status    Vlan      Duplex  Speed   Type
+--------------------------------------------------------------------------------
+mgmt0         --                 connected routed    full    1000    --
+Eth1/1        vpc peer link      connected trunk     full    10G     SFP-H10GB-A
+Eth1/2        a descrip          connected routed    full    10G     10Gbase-SR
+Eth1/3        a descrip          connected trunk     full    10G     SFP-H10GB-C
+Eth1/4        --                 sfpAbsent 1         auto    auto    --
+Eth1/5        vpc peer link      connected trunk     full    10G     SFP-H10GB-A
+Eth1/6        --                 sfpAbsent 1         auto    auto    --
+Eth1/7        --                 sfpAbsent 1         auto    auto    --
+Eth1/8        --                 sfpAbsent 1         auto    auto    --
+Eth1/9        a descrip          connected routed    full    10G     10Gbase-LR
+Eth1/10       a descrip          connected trunk     full    10G     SFP-H10GB-C
+Eth1/11       adescrip           connected routed    full    10G     SFP-H10GB-C
+Vlan1         --                 connected routed    auto    auto    --
+Po10          vpc peer link      connected trunk     full    10G     --
+Eth2/17       --                 disabled  1         auto    auto    1000base-T
+switch#
 '''

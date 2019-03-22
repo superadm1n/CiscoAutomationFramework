@@ -158,3 +158,60 @@ ip classless
 no ip http server
 ip http secure-server
 '''
+
+show_interface_description = '''sh int desc
+Interface                      Status         Protocol Description
+Vl1                            admin down     down
+Vl400                          up             up
+Fa0                            admin down     down
+Gi1/0/1                        up             up
+Gi1/0/2                        down           down
+Gi1/0/3                        up             up
+Gi1/0/4                        down           down
+Gi1/0/5                        down           down
+Gi1/0/6                        down           down
+Gi1/0/7                        up             up
+Gi1/0/8                        down           down
+Gi1/0/9                        up             up
+Gi1/0/10                       down           down
+Gi1/0/11                       up             up
+Gi1/0/12                       down           down
+Gi1/0/13                       down           down
+Gi1/0/14                       down           down     exampledescrip
+Gi1/0/15                       up             up
+Gi1/0/16                       down           down
+Gi1/0/17                       up             up
+Gi1/0/18                       up             up       To LIBL-PCT-SW-002
+'''
+
+
+show_interface_1 = '''sh int gi1/0/1
+GigabitEthernet1/0/1 is up, line protocol is up (connected)
+  Hardware is Gigabit Ethernet, address is c471.fe17.1581 (bia c471.fe17.1581)
+  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec,
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  Keepalive set (10 sec)
+  Full-duplex, 1000Mb/s, media type is 10/100/1000BaseTX
+  input flow-control is off, output flow-control is unsupported
+  ARP type: ARPA, ARP Timeout 04:00:00
+  Last input 00:00:17, output 00:00:00, output hang never
+  Last clearing of "show interface" counters never
+  Input queue: 0/75/0/0 (size/max/drops/flushes); Total output drops: 0
+  Queueing strategy: fifo
+  Output queue: 0/40 (size/max)
+  5 minute input rate 1000 bits/sec, 2 packets/sec
+  5 minute output rate 29000 bits/sec, 15 packets/sec
+     258142894 packets input, 68640893535 bytes, 0 no buffer
+     Received 4032578 broadcasts (3676864 multicasts)
+     0 runts, 0 giants, 0 throttles
+     0 input errors, 0 CRC, 0 frame, 0 overrun, 0 ignored
+     0 watchdog, 3676864 multicast, 0 pause input
+     0 input packets with dribble condition detected
+     1939339422 packets output, 677867998121 bytes, 0 underruns
+     0 output errors, 0 collisions, 1 interface resets
+     0 unknown protocol drops
+     0 babbles, 0 late collision, 0 deferred
+     0 lost carrier, 0 no carrier, 0 pause output
+     0 output buffer failures, 0 output buffers swapped out
+'''
