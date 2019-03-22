@@ -441,19 +441,87 @@ class last_input_and_output_all(TestCase):
 
 
 class list_configured_vlans(TestCase):
-    pass
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_vlan_brief
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.list_configured_vlans()
+        expectedOutput = ['1', '400', '410', '600', '601', '912', '950', '1002', '1003', '1004', '1005']
+        self.assertEqual(expectedOutput, t)
 
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_vlan_brief
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.list_configured_vlans()
+        expectedOutput = ['1', '400', '410', '600', '601', '912', '950', '1002', '1003', '1004', '1005']
+        self.assertEqual(expectedOutput, t)
 
-class global_last_input_and_output(TestCase):
-    pass
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        ssh.response_four = long_nxos_responses.show_vlan_brief
+        t = ssh_obj.list_configured_vlans()
+        expectedOutput = ['1', '16', '25']
+        self.assertEqual(expectedOutput, t)
 
 
 class mac_address_table(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.mac_address_table
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.mac_address_table()
+        self.assertEqual({'vlan': 'All', 'type': 'STATIC', 'ports': 'CPU', 'mac': 'aaaa.aaaa.aaaa'}, t[0])
+        self.assertEqual({'mac': 'iiii.iiii.iiii', 'ports': 'Po1', 'type': 'DYNAMIC', 'vlan': '1'}, t[-1])
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.mac_address_table
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.mac_address_table()
+        self.assertEqual({'vlan': 'All', 'type': 'STATIC', 'ports': 'CPU', 'mac': 'aaaa.aaaa.aaaa'}, t[0])
+        self.assertEqual({'mac': 'iiii.iiii.iiii', 'ports': 'Po1', 'type': 'DYNAMIC', 'vlan': '1'}, t[-1])
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        ssh.response_four = long_nxos_responses.mac_address_table
+        t = ssh_obj.mac_address_table()
+        self.assertEqual({'mac': 'aaaa.aaaa.aaaa', 'vlan': '1', 'type': 'static', 'ports': 'sup-eth1(R)'}, t[0])
+        self.assertEqual({'mac': 'eeee.eeee.eeee', 'vlan': '2499', 'type': 'dynamic', 'ports': 'Po11'}, t[-1])
 
 
 class find_mac_address(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.mac_address_table
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.find_mac_address('aaaa.aaaa.aaaa')
+        self.assertEqual([{'type': 'STATIC', 'vlan': 'All', 'mac': 'aaaa.aaaa.aaaa', 'ports': 'CPU'}], t)
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.mac_address_table
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.find_mac_address('aaaa.aaaa.aaaa')
+        self.assertEqual([{'type': 'STATIC', 'vlan': 'All', 'mac': 'aaaa.aaaa.aaaa', 'ports': 'CPU'}], t)
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        ssh.response_four = long_nxos_responses.mac_address_table
+        t = ssh_obj.find_mac_address('aaaa.aaaa.aaaa')
+        self.assertEqual([{'mac': 'aaaa.aaaa.aaaa', 'vlan': '1', 'type': 'static', 'ports': 'sup-eth1(R)'}], t)
+
 
 
 class cdp_neighbor_table(TestCase):

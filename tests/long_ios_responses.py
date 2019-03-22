@@ -215,3 +215,40 @@ GigabitEthernet1/0/1 is up, line protocol is up (connected)
      0 lost carrier, 0 no carrier, 0 pause output
      0 output buffer failures, 0 output buffers swapped out
 '''
+
+show_vlan_brief = '''sh vl br
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi0/10
+400  vlan400descrip                   active
+410  vlandescrip                      active
+600  VLAN0600                         active
+601  first_network                    active    Gi0/1, Gi0/2, Gi0/3, Gi0/4, Gi0/5, Gi0/6, Gi0/7, Gi0/8
+912  anothernetwork                   active
+950  Isolated VLAN                    active
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup
+switch#
+'''
+
+mac_address_table = '''sh mac add
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+ All    aaaa.aaaa.aaaa    STATIC      CPU
+ All    bbbb.bbbb.bbbb    STATIC      CPU
+ All    cccc.cccc.cccc    STATIC      CPU
+ All    dddd.dddd.dddd    STATIC      CPU
+ All    eeee.eeee.eeee    STATIC      CPU
+ All    ffff.ffff.ffff    STATIC      CPU
+   1    gggg.gggg.gggg    DYNAMIC     Gi1/0/18
+   1    hhhh.hhhh.hhhh    DYNAMIC     Gi2/0/19
+   1    iiii.iiii.iiii    DYNAMIC     Po1
+Total Mac Addresses for this criterion: 000
+switch#
+'''

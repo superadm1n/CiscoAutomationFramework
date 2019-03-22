@@ -127,3 +127,47 @@ Po10          vpc peer link      connected trunk     full    10G     --
 Eth2/17       --                 disabled  1         auto    auto    1000base-T
 switch#
 '''
+
+
+show_vlan_brief = '''sh vl br
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Po10, Po11, Po13, Po14, Eth1/1
+                                                Eth1/3, Eth1/4, Eth1/5, Eth1/6
+                                                Eth1/7, Eth1/8, Eth1/10, Eth1/12
+                                                Eth1/15, Eth1/16, Eth1/18
+                                                Eth1/19, Eth1/20, Eth1/21
+                                                Eth1/22, Eth1/23, Eth1/24
+                                                Eth1/25, Eth1/26, Eth1/27
+                                                Eth1/28, Eth1/29, Eth1/30
+                                                Eth1/31, Eth1/32, Eth2/1, Eth2/2
+                                                Eth2/3, Eth2/4, Eth2/5, Eth2/6
+                                                Eth2/7, Eth2/8, Eth2/9, Eth2/10
+                                                Eth2/12, Eth2/13, Eth2/14
+                                                Eth2/15, Eth2/16, Eth2/17
+                                                Eth2/18, Eth2/19, Eth2/20
+                                                Eth2/21, Eth2/22, Eth2/23
+                                                Eth2/24, Eth2/25, Eth2/26
+                                                Eth2/27, Eth2/28, Eth2/29
+                                                Eth2/30, Eth2/31, Eth2/32
+16   mynet                            active    Po10, Po11, Eth1/1, Eth1/3
+                                                Eth1/5, Eth2/1, Eth2/3, Eth2/5
+25   yournet_descrip                  active    Po10, Po11, Eth1/1, Eth1/3
+switch#
+'''
+
+mac_address_table = ''' sh mac add
+Legend:
+        * - primary entry, G - Gateway MAC, (R) - Routed MAC, O - Overlay MAC
+        age - seconds since last seen,+ - primary entry using vPC Peer-Link,
+        (T) - True, (F) - False
+   VLAN     MAC Address      Type      age     Secure NTFY Ports/SWID.SSID.LID
+---------+-----------------+--------+---------+------+----+------------------
+G 1        aaaa.aaaa.aaaa    static       -       F    F  sup-eth1(R)
+G 101      bbbb.bbbb.bbbb    static       -       F    F  sup-eth1(R)
+G 172      cccc.cccc.cccc    static       -       F    F  sup-eth1(R)
+G 2222     dddd.dddd.dddd    static       -       F    F  sup-eth1(R)
+* 2499     eeee.eeee.eeee    dynamic   30         F    F  Po11
+
+'''
