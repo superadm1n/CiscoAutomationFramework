@@ -207,8 +207,8 @@ class NXOS(TerminalCommands, CommandGetMethods):
     def port_status(self):
         return super().port_status()
 
-    def power_inline(self, summary):
-        return super().power_inline(summary)
+    def power_inline(self):
+        return super().power_inline()
 
     def list_ospf_configuration(self):
 
