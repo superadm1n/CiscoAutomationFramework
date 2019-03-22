@@ -3,6 +3,7 @@ import sys
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_path)
 from Base import TestingSSHEngine, factory
+import long_nxos_responses, long_ios_responses, long_iosxe_responses
 from unittest import TestCase
 
 from CiscoAutomationFramework import IOS, IOSXE, NXOS, ASA, CustomExceptions
@@ -95,9 +96,6 @@ class get_local_users(TestCase):
         t = ssh_obj.get_local_users()
         self.assertEqual([], t)
 
-
-
-
 class show_run_interface(TestCase):
 
     def test_ios(self):
@@ -130,23 +128,91 @@ class show_run_interface(TestCase):
 
 
 
-
-
-
 class power_cycle_port(TestCase):
     pass
 
 
-class configure_router_lan_subint(TestCase):
-    pass
+
 
 
 class physical_port_inventory(TestCase):
-    pass
+
+    def test_ios(self):
+        '''Tests that the proper data is returned from the function and that the proper command is ran on the device'''
+        ssh = TestingSSHEngine()
+        ssh.response_one = '''show int desc
+        Interface                      Status         Protocol Description
+        Vl1                            admin down     down
+        Vl2100                         up             up
+        Fa0                            admin down     down
+        Gi1/0/1                        up             up   
+        Gi1/0/2                        up             up   
+        Gi1/0/3                        up             up
+        Gi1/0/4                        down           down 
+        Gi1/0/5                        down           down
+        \n\n\n\n'''
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.physical_port_inventory()
+        self.assertEqual(['Fa0', 'Gi1/0/1', 'Gi1/0/2', 'Gi1/0/3', 'Gi1/0/4', 'Gi1/0/5'], t)
+        self.assertEqual(ssh_obj.transport.commands_ran, ['terminal length 0', 'show interface description'])
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = '''show int desc
+        Interface                      Status         Protocol Description
+        Vl1                            admin down     down
+        Vl2100                         up             up
+        Fa0                            admin down     down
+        Gi1/0/1                        up             up   
+        Gi1/0/2                        up             up   
+        Gi1/0/3                        up             up
+        Gi1/0/4                        down           down 
+        Gi1/0/5                        down           down
+        \n\n\n\n'''
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.physical_port_inventory()
+        self.assertEqual(['Fa0', 'Gi1/0/1', 'Gi1/0/2', 'Gi1/0/3', 'Gi1/0/4', 'Gi1/0/5'], t)
+        self.assertEqual(ssh_obj.transport.commands_ran, ['terminal length 0', 'show interface description'])
+
+
+    def test_NXOS(self):
+        '''Tests that port channel and vlans are excluded but it still includes the physical interfaces'''
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_nxos_responses.show_interfaces
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        t = ssh_obj.physical_port_inventory()
+        self.assertEqual(['Eth1/48'], t)
+
+
 
 
 class physical_port_inventory_longname(TestCase):
-    pass
+
+    def test_ios(self):
+        '''Tests that the proper data is returned from the function and that the proper command is ran on the device'''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_interfaces
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.physical_port_inventory_longname()
+        self.assertEqual(['FastEthernet0', 'GigabitEthernet1/0/1'], t)
+        #self.assertEqual(ssh_obj.transport.commands_ran, ['terminal length 0', 'show interface description'])
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_interfaces
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.physical_port_inventory_longname()
+        self.assertEqual(['FastEthernet0', 'GigabitEthernet1/0/1'], t)
+
+    def test_NXOS(self):
+        '''Tests that port channel and vlans are excluded but it still includes the physical interfaces'''
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_nxos_responses.show_interfaces
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        t = ssh_obj.physical_port_inventory_longname()
+        self.assertEqual(['Ethernet1/48'], t)
 
 
 class port_status(TestCase):
@@ -245,6 +311,8 @@ class write_mem(TestCase):
     pass
 
 
+class configure_router_lan_subint(TestCase):
+    pass
 
 class delete_local_user(TestCase):
 

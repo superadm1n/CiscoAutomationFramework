@@ -70,8 +70,10 @@ class TestingSSHEngine(SSHEngine):
             response = self.response_eight
         elif self.counter == 9:
             response = self.response_nine
-
         self.counter += 1
+
+        if return_as_list is True:
+            return response.splitlines()
 
         return response
 
