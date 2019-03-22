@@ -367,7 +367,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
             if '-----' in line:
                 data.append(tmp)
                 tmp = {}
-
+        data.append(tmp)
         return data
 
     def arp_table(self):
