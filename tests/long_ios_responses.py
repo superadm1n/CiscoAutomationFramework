@@ -75,4 +75,54 @@ GigabitEthernet1/0/1 is up, line protocol is up (connected)
      0 babbles, 0 late collision, 0 deferred
      0 lost carrier, 0 no carrier, 0 PAUSE output
      0 output buffer failures, 0 output buffers swapped out
+switch#
 '''
+
+
+show_interface_status = '''sh int status
+
+Port      Name               Status       Vlan       Duplex  Speed Type
+Gi1/0/1                      connected    400        a-full a-1000 10/100/1000BaseTX
+Gi1/0/2   exampledescrip     notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/3                      connected    400        a-full a-1000 10/100/1000BaseTX
+Gi1/0/4                      notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/5                      notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/6                      notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/7                      connected    400        a-full a-1000 10/100/1000BaseTX
+Gi1/0/8                      notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/9                      connected    400        a-full a-1000 10/100/1000BaseTX
+Gi1/0/10                     notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/11                     connected    400        a-full a-1000 10/100/1000BaseTX
+Gi1/0/12                     notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/13                     notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/14                     notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/15                     connected    400        a-full  a-100 10/100/1000BaseTX
+Gi1/0/16                     notconnect   400          auto   auto 10/100/1000BaseTX
+Gi1/0/17                     connected    400        a-full a-1000 10/100/1000BaseTX
+Gi1/0/18  To switch          connected    trunk      a-full  a-100 10/100/1000BaseTX
+switch#
+'''
+
+show_power_inline = '''sh power in
+
+Module   Available     Used     Remaining
+          (Watts)     (Watts)    (Watts)
+------   ---------   --------   ---------
+1          1170.0      240.4       929.6
+2          1170.0      113.0      1057.0
+3          1170.0       34.4      1135.6
+4          1170.0       60.0      1110.0
+Interface Admin  Oper       Power   Device              Class Max
+                            (Watts)
+--------- ------ ---------- ------- ------------------- ----- ----
+Gi1/0/1   auto   on         4.0     Ieee PD             1     30.0
+Gi1/0/41  auto   on         4.0     Ieee PD             1     30.0
+Gi1/0/42  auto   off        0.0     n/a                 n/a   30.0
+Gi1/0/43  auto   on         30.0    AIR-AP3802I-B-K9    4     30.0
+Gi1/0/44  auto   on         30.0    AIR-AP3802I-B-K9    4     30.0
+Gi1/0/45  auto   on         30.0    AIR-AP3802I-B-K9    4     30.0
+Gi1/0/46  auto   on         30.0    AIR-AP3802I-B-K9    4     30.0
+Gi1/0/47  auto   on         15.4    AIR-CAP2602I-A-K9   3     30.0
+Gi2/0/48  auto   on         4.0     Ieee PD             1     30.0
+
+Switch#'''
