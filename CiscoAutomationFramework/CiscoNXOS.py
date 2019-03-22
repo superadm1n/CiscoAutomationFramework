@@ -315,9 +315,9 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
     def last_input_and_output_all(self):
 
-        return super().global_last_input_and_output()
+        return super().last_input_and_output_all()
 
-    def find_mac_address(self, mac_address, mac_table):
+    def find_mac_address(self, mac_address, mac_table=None):
         if not mac_table:
             mac_table = self.mac_address_table()
 

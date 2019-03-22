@@ -186,13 +186,6 @@ class CommandGetMethods:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def global_last_input_and_output(self):
-        '''
-
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
     def mac_address_table(self):
         '''Method to return the data of the MAC address table on the Cisco device.
 
@@ -201,7 +194,7 @@ class CommandGetMethods:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def find_mac_address(self, mac_address, mac_table):
+    def find_mac_address(self, mac_address, mac_table=None):
         '''
 
         :param mac_address:

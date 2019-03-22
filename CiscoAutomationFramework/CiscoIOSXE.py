@@ -180,7 +180,7 @@ class IOSXE(TerminalCommands, CommandGetMethods):
 
         return self.ios.last_input_and_output_all()
 
-    def find_mac_address(self, mac_address):
+    def find_mac_address(self, mac_address, mac_table=None):
 
         return self.ios.find_mac_address(mac_address)
 

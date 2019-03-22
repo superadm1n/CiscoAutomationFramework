@@ -594,7 +594,7 @@ class IOS(TerminalCommands, CommandGetMethods):
                     )
                     #mac_table_list.append(line.split())
 
-            if len(line.split()) >= 1:
+            if len(line.split()) > 1:
                 if '--' in line.split()[0]:
                     flag = 1
 
