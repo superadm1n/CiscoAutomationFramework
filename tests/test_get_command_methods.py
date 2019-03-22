@@ -292,7 +292,37 @@ class power_inline(TestCase):
 
 
 class list_ospf_configuration(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_two = long_ios_responses.ospf_runing_config
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.list_ospf_configuration()
+        self.assertIn('network 2.2.2.2 0.0.0.0 area 25', t)
+        self.assertIn('router ospf 2', t)
+        self.assertIn('router ospf 1', t)
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_two = long_iosxe_responses.ospf_runing_config
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.list_ospf_configuration()
+        self.assertIn('network 2.2.2.2 0.0.0.0 area 25', t)
+        self.assertIn('router ospf 2', t)
+        self.assertIn('router ospf 1', t)
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh.response_four = long_nxos_responses.ospf_running_config
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+        t = ssh_obj.list_ospf_configuration()
+        self.assertIn('router ospf 1', t)
+        self.assertIn('router-id 10.255.242.4', t)
+        self.assertIn('network 10.1.10.0/23 area 0.0.0.0', t)
+        self.assertNotIn('router eigrp 100', t)
+
 
 
 class list_eigrp_configuration(TestCase):

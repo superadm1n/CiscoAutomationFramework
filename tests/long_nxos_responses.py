@@ -77,3 +77,25 @@ port-channel10 is up
     0 Tx pause
   3 interface resets
  '''
+
+ospf_running_config = '''
+
+
+
+
+
+interface Ethernet2/3
+  description mydesc
+  switchport mode trunk
+  switchport trunk native vlan 1000
+  mtu 9216
+  channel-group 11 mode active
+  no shutdown
+router ospf 1
+  router-id 10.255.242.4
+  network 10.1.0.0/23 area 0.0.0.0
+  network 10.1.10.0/23 area 0.0.0.0
+router eigrp 100
+  distance 100 100
+
+'''

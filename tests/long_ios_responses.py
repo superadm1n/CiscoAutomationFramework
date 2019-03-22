@@ -126,3 +126,35 @@ Gi1/0/47  auto   on         15.4    AIR-CAP2602I-A-K9   3     30.0
 Gi2/0/48  auto   on         4.0     Ieee PD             1     30.0
 
 Switch#'''
+
+
+ospf_runing_config = '''interface Vlan1234
+ description should not show up
+ ip address 10.10.10.10 255.255.255.255
+ ip directed-broadcast
+!
+!
+router eigrp 1
+ network 9.9.9.9 0.0.0.0
+ eigrp stub connected summary
+!
+router ospf 1
+ router-id 1.1.1.1
+ log-adjacency-changes
+ network 2.2.2.2 0.0.0.0 area 25
+ network 3.3.3.3 0.0.0.0 area 25
+ network 4.4.4.4 0.0.0.0 area 25
+ network 5.5.5.5 0.0.0.0 area 25
+ network 6.6.6.6 0.0.0.0 area 25
+ default-information originate metric 2000
+ distance 109
+!
+router ospf 2
+ log-adjacency-changes
+ network 7.7.7.7 0.0.0.0 area 25
+ default-information originate metric 2000
+!
+ip classless
+no ip http server
+ip http secure-server
+'''
