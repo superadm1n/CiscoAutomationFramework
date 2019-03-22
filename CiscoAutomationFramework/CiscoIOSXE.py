@@ -176,9 +176,9 @@ class IOSXE(TerminalCommands, CommandGetMethods):
         return self.ios.list_configured_vlans()
 
 
-    def global_last_input_and_output(self):
+    def last_input_and_output_all(self):
 
-        return self.ios.global_last_input_and_output()
+        return self.ios.last_input_and_output_all()
 
     def find_mac_address(self, mac_address):
 
