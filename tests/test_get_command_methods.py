@@ -616,16 +616,67 @@ class arp_table(TestCase):
             t[-1]
         )
 
-class show_routes(TestCase):
-    pass
+
 
 
 class show_interface_status(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_interface_status
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.show_interface_status()
+        self.assertEqual(len(t), 18)
+        self.assertEqual({'status': 'notconnected', 'interface': 'Gi1/0/2'}, t[1])
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_interface_status
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.show_interface_status()
+        self.assertEqual(len(t), 18)
+        self.assertEqual({'status': 'notconnected', 'interface': 'Gi1/0/2'}, t[1])
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.show_interface_status()
 
 
 class show_interface_description(TestCase):
-    pass
+
+    def test_ios(self):
+        ''''''
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_ios_responses.show_interface_description
+        ssh_obj = factory(ssh, IOS)
+        t = ssh_obj.show_interface_description()
+        self.assertEqual(['Gi1/0/18', 'up', 'up', 'To LIBL-PCT-SW-002'], t[-1])
+        self.assertEqual(['Gi1/0/14', 'down', 'down', 'exampledescrip'], t[-5])
+
+    def test_iosXE(self):
+        ssh = TestingSSHEngine()
+        ssh.response_one = long_iosxe_responses.show_interface_description
+        ssh_obj = factory(ssh, IOSXE)
+        t = ssh_obj.show_interface_description()
+        self.assertEqual(['Gi1/0/18', 'up', 'up', 'To LIBL-PCT-SW-002'], t[-1])
+        self.assertEqual(['Gi1/0/14', 'down', 'down', 'exampledescrip'], t[-5])
+
+    def test_NXOS(self):
+        ssh = TestingSSHEngine()
+        ssh_obj = factory(ssh, NXOS)
+        ssh_obj.roles = 'vdc-admin'
+
+        # To catch the exception properly it needs to be contained in a wrapper, explained at the link below
+        # https://ongspxm.github.io/blog/2016/11/assertraises-testing-for-errors-in-unittest/
+        with self.assertRaises(CustomExceptions.MethodNotImplemented):
+            ssh_obj.show_interface_description()
 
 
 class show_configured_syslog_server(TestCase):
@@ -659,6 +710,9 @@ class show_hsrp_info(TestCase):
 class write_mem(TestCase):
     pass
 
+
+class show_routes(TestCase):
+    pass
 
 class configure_router_lan_subint(TestCase):
     pass

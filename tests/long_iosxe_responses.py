@@ -279,6 +279,7 @@ Gi1/0/15                       up             up
 Gi1/0/16                       down           down
 Gi1/0/17                       up             up
 Gi1/0/18                       up             up       To LIBL-PCT-SW-002
+switch#
 '''
 
 
