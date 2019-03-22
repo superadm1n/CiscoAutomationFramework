@@ -15,7 +15,7 @@ setup(
     license='Apache 2.0',
     author='Kyle Kowalczyk',
     author_email='kowalkyl@gmail.com',
-    description='Framework for issuing commands on Cisco devices',
+    description='Framework for issuing commands and retrieving consistent data on Cisco devices',
     long_description=description,
     install_requires=['paramiko', 'pyserial==3.4'],
     classifiers=[
