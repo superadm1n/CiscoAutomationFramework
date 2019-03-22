@@ -6,6 +6,18 @@ The CiscoAutomationFramework is a framework that is built on top of paramiko and
 
 The goal of this project is to allow a Network Administrator to write scripts to gather data or modify configuration and be able to  run it against any Cisco device, regardless of hardware or firmware version and have the command sequence and syntax be correct while returning a consistent output.
 
+## Currently supported Cisco operating systems
+
+- IOS
+- IOSXE
+- NXOS
+
+Previously I did attempt to support Cisco ASA's but found that more often than not to get the same
+information for the parser methods I needed to hack together several commands to get the data
+I needed and some methods I was unable to get the data I needed. The ASA's are something that I
+would be open to supporting in the future if myself or someone is able to get them up to the same
+level of support as IOS, IOSXE, and NXOS but is not on the roadmap currently.
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
