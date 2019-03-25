@@ -23,6 +23,7 @@ import logging
 from .CustomExceptions import *
 from .BaseCommandMethods import CommandGetMethods, CommandConfigMethods
 from CiscoAutomationFramework import log_level
+from CiscoAutomationFramework import Util
 
 level = log_level
 logFile = 'CiscoAutomationFramework.log'
@@ -804,6 +805,8 @@ class IOS(TerminalCommands, CommandGetMethods):
         for line in runningConfig.splitlines():
             if len(line.split()) > 0:
                 if line.split()[0] == 'logging' and line.split()[1] == 'host':
+                    servers.append(line.split()[-1:][0])
+                elif line.split()[0] == 'logging' and Util.PingTest.validateIPaddress(line.split()[1]):
                     servers.append(line.split()[-1:][0])
 
         return servers
