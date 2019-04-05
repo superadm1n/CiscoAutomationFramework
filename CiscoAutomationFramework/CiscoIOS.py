@@ -482,7 +482,7 @@ class IOS(TerminalCommands, CommandGetMethods):
             elif 'po' in interface[0].lower():  # removes port chanel interfaces from output
                 pass
             else:
-                if interface[1].lower() == 'down':
+                if interface[1].lower() == 'down' or interface[1].lower() == 'admin down':
                     output.append(interface[0])
 
         return output
