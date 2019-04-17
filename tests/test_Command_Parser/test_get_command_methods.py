@@ -361,7 +361,7 @@ class list_down_ports(TestCase):
         ssh.response_one = long_ios_responses.show_interface_description
         ssh_obj = factory(ssh, IOS)
         t = ssh_obj.list_down_ports()
-        ports = ['Gi1/0/2', 'Gi1/0/4', 'Gi1/0/5', 'Gi1/0/6', 'Gi1/0/8', 'Gi1/0/10', 'Gi1/0/12', 'Gi1/0/13', 'Gi1/0/14', 'Gi1/0/16']
+        ports = ['Fa0', 'Gi1/0/2', 'Gi1/0/4', 'Gi1/0/5', 'Gi1/0/6', 'Gi1/0/8', 'Gi1/0/10', 'Gi1/0/12', 'Gi1/0/13', 'Gi1/0/14', 'Gi1/0/16']
         self.assertEqual(t, ports)
 
     def test_iosXE(self):
@@ -369,7 +369,7 @@ class list_down_ports(TestCase):
         ssh.response_one = long_iosxe_responses.show_interface_description
         ssh_obj = factory(ssh, IOSXE)
         t = ssh_obj.list_down_ports()
-        ports = ['Gi1/0/2', 'Gi1/0/4', 'Gi1/0/5', 'Gi1/0/6', 'Gi1/0/8', 'Gi1/0/10', 'Gi1/0/12', 'Gi1/0/13', 'Gi1/0/14', 'Gi1/0/16']
+        ports = ['Fa0', 'Gi1/0/2', 'Gi1/0/4', 'Gi1/0/5', 'Gi1/0/6', 'Gi1/0/8', 'Gi1/0/10', 'Gi1/0/12', 'Gi1/0/13', 'Gi1/0/14', 'Gi1/0/16']
         self.assertEqual(t, ports)
 
     def test_NXOS(self):
