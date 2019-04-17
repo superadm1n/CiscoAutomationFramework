@@ -1,6 +1,6 @@
 .idea/
 virt_env/
-env/
+env*/
 __pycache__/
 *.pyc
 *.log
