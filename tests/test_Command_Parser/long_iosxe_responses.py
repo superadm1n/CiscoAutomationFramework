@@ -334,7 +334,7 @@ switch#
 
 mac_address_table = '''sh mac add
           Mac Address Table
--------------------------------------------
+
 
 Vlan    Mac Address       Type        Ports
 ----    -----------       --------    -----

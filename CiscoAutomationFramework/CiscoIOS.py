@@ -586,6 +586,7 @@ class IOS(TerminalCommands, CommandGetMethods):
                     device_output = self.transport.send_command_expect_same_prompt('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
                     break
         flag = 0
+
         for line in device_output[:-1]:
             if len(line.split()) >= 4:
                 if flag == 1:
@@ -595,7 +596,7 @@ class IOS(TerminalCommands, CommandGetMethods):
                     )
                     #mac_table_list.append(line.split())
 
-            if len(line.split()) > 1:
+            if len(line) > 1:
                 if '--' in line.split()[0]:
                     flag = 1
 
