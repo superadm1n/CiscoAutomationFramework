@@ -156,10 +156,10 @@ def parallel_process(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_
     You can also pass in a data_handler so you can handle each of the processes data as it is returned vs
     waiting til they all return
 
-    :param list_of_jobs:
-    :param num_processes:
-    :param num_threads_per_proc:
-    :param data_handler:
+    :param list_of_jobs: List of unexecuted functions that are to be carried out by the worker processes
+    :param num_processes: Total number of worker process to run, this should most often be left at default (total cpu count - 1)
+    :param num_threads_per_proc: Number of threads each process should spin up to share the processing power of that core
+    :param data_handler: Unexecuted function that is a callback to handle the data as it is returned from each process
     :return:
     '''
     workers = init_workers(list_of_jobs, num_processes, num_threads_per_proc)
