@@ -29,17 +29,21 @@ from . import CustomExceptions
 def factory(transport_engine):
 
     # detect the firmware
-    firmware = Util.detect_firmware(transport_engine)
+    sh_ver_output, firmware = Util.detect_firmware(transport_engine)
+    detected_firmware_version_number = None
 
     # determine parent object based on firmware
     obj = None
     versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS, 'ASA': ASA}
     if firmware == 'IOS':
         obj = IOS
+        detected_firmware_version_number = Util.extract_version_number_ios(sh_ver_output)
     elif firmware == 'IOSXE':
         obj = IOSXE
+        detected_firmware_version_number = Util.extract_version_number_iosxe(sh_ver_output)
     elif firmware == 'NXOS':
         obj = NXOS
+        detected_firmware_version_number = Util.extract_version_number_nxos(sh_ver_output)
     elif firmware == 'ASA':
         raise CustomExceptions.OSNotSupported('Cisco ASA Operating System is not supported!')
     else:
@@ -51,6 +55,7 @@ def factory(transport_engine):
             self.transport = transport
             self.firmware = firmware
             self.hostname = transport.hostname
+            self.detected_firmware_version = detected_firmware_version_number
             super().__init__(transport)
 
         def __enter__(self):
