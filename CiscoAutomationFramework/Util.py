@@ -283,10 +283,10 @@ def detect_firmware(transport):
 
 
 def extract_version_number_ios(sh_ver_output):
-    '''
+    '''Extracts the version number out of the show version command
 
-    :param sh_ver_output:
-    :return:
+    :param sh_ver_output: Full output of show version command
+    :return: version number string
     '''
     version_line = [line for line in sh_ver_output[1:] if 'version' in line.lower() and 'boot' not in line.lower()][0]
     version_keyword = version_line.split(',')[-2].strip()
@@ -294,10 +294,10 @@ def extract_version_number_ios(sh_ver_output):
 
 
 def extract_version_number_iosxe(sh_ver_output):
-    '''
+    '''Extracts the version number out of the show version command
 
-    :param sh_ver_output:
-    :return:
+    :param sh_ver_output: Full output of show version command
+    :return: version number string
     '''
     version_line = [line for line in sh_ver_output[1:] if 'version' in line.lower() and 'boot' not in line.lower()][0]
     version_keyword = version_line.split(',')[-1].strip()
@@ -305,10 +305,10 @@ def extract_version_number_iosxe(sh_ver_output):
 
 
 def extract_version_number_nxos(sh_ver_output):
-    '''
+    '''Extracts the version number out of the show version command
 
-    :param sh_ver_output:
-    :return:
+    :param sh_ver_output: Full output of show version command
+    :return: version number string
     '''
     version_line = [line for line in sh_ver_output if 'system:' in line.lower()][0].split(':')[-1].strip()
     return version_line.split()[-1]
