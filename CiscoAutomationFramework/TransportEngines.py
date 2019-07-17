@@ -29,7 +29,7 @@ import time
 import threading
 import logging
 from . import CustomExceptions
-from CiscoAutomationFramework import log_level
+from CiscoAutomationFramework import log_level, log_to_console
 from .CustomExceptions import MethodNotImplemented
 
 level = log_level
@@ -39,54 +39,23 @@ logger = logging.getLogger(__name__)
 logger.setLevel(level)
 logger.propagate = False
 
+file_handler = logging.FileHandler(logFile)
+file_handler.setLevel(log_level)
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(log_level)
+
 logFormatter = logging.Formatter('%(name)s:%(levelname)s:%(asctime)s:%(message)s')
 
-if level <= 50:
-    try:
+file_handler.setFormatter(logFormatter)
+stream_handler.setFormatter(logFormatter)
 
-        # file handler for debug logs
-        if level <= 10:
-            debug_handler = logging.FileHandler(logFile)
-            debug_handler.setFormatter(logFormatter)
-            debug_handler.setLevel(logging.DEBUG)
-            logger.addHandler(debug_handler)
-
-        # file handler for info logs
-        if level <= 20:
-            info_handler = logging.FileHandler(logFile)
-            info_handler.setFormatter(logFormatter)
-            info_handler.setLevel(logging.DEBUG)
-            logger.addHandler(info_handler)
-
-        # file handler for warning logs
-        if level <= 30:
-            warning_handler = logging.FileHandler(logFile)
-            warning_handler.setFormatter(logFormatter)
-            warning_handler.setLevel(logging.WARNING)
-            logger.addHandler(warning_handler)
-
-        # file handler for error logs
-        if level <= 40:
-            error_handler = logging.FileHandler(logFile)
-            error_handler.setFormatter(logFormatter)
-            error_handler.setLevel(logging.ERROR)
-            logger.addHandler(error_handler)
-
-        # file handler for critical logs
-        if level <= 50:
-            critical_handler = logging.FileHandler(logFile)
-            critical_handler.setFormatter(logFormatter)
-            critical_handler.setLevel(logging.CRITICAL)
-            logger.addHandler(critical_handler)
-
-    except PermissionError as E:
-        print(E)
-        print('CiscoAutomationFramework does not have permission to write log file, disabling logging')
-        logger.disabled = True
-
-    except:
-        print('Unknown error occured when trying to setup logging, disabling logging!')
-        logger.disabled = True
+try:
+    logger.addHandler(file_handler)
+    if log_to_console:
+        logger.addHandler(stream_handler)
+except PermissionError:
+    print('Permission denied when attempting to write log file, disabling logging')
+    logger.disabled = True
 
 
 class BaseClass:
@@ -115,6 +84,17 @@ class BaseClass:
         self.terminal_width_value = None
 
         self._output = ''
+
+    def _pre_parser(self, output):
+        '''Basic pre parser that will process the output from the device prior to passing it up to the user.
+        Right now it simply checks for an error and logs it in the log file.
+
+        :param output: Output from the device in a list
+        :return: Nothing
+        '''
+        for line in output:
+            if line.startswith('%'):
+                logger.error('Error detected! - {}'.format(line))
 
     def connect_to_server(self):
         '''High level function that will call all the engine specific methods to connect to the server.
@@ -174,7 +154,7 @@ class BaseClass:
             # and throw them away this  will only run if this method is run with the 'detecting_firmware' flag set to 'True'
             # to prevent necessary data from being thrown away.
             self.total_discarded_buffer_bytes += self.throw_away_buffer_data()
-
+        self._pre_parser(output)
         self.prompt = output[-1]
 
         if return_as_list is False:

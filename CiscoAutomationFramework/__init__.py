@@ -18,6 +18,7 @@ limitations under the License.
 
 '''
 log_level = 10
+log_to_console = True
 from . import Util
 from .TransportEngines import SSHEngine, SerialEngine
 from .CiscoIOSXE import IOSXE
