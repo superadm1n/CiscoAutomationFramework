@@ -279,4 +279,36 @@ def detect_firmware(transport):
     firmware_version = max(results, key=results.get)
 
     # returns variable (Firmware version) from the function
-    return firmware_version
+    return output, firmware_version
+
+
+def extract_version_number_ios(sh_ver_output):
+    '''Extracts the version number out of the show version command
+
+    :param sh_ver_output: Full output of show version command
+    :return: version number string
+    '''
+    version_line = [line for line in sh_ver_output[1:] if 'version' in line.lower() and 'boot' not in line.lower()][0]
+    version_keyword = version_line.split(',')[-2].strip()
+    return version_keyword.split()[-1]
+
+
+def extract_version_number_iosxe(sh_ver_output):
+    '''Extracts the version number out of the show version command
+
+    :param sh_ver_output: Full output of show version command
+    :return: version number string
+    '''
+    version_line = [line for line in sh_ver_output[1:] if 'version' in line.lower() and 'boot' not in line.lower()][0]
+    version_keyword = version_line.split(',')[-1].strip()
+    return version_keyword.split()[-1]
+
+
+def extract_version_number_nxos(sh_ver_output):
+    '''Extracts the version number out of the show version command
+
+    :param sh_ver_output: Full output of show version command
+    :return: version number string
+    '''
+    version_line = [line for line in sh_ver_output if 'system:' in line.lower()][0].split(':')[-1].strip()
+    return version_line.split()[-1]

@@ -54,10 +54,9 @@ class CommandGetMethods:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def show_run(self, timeout=15):
+    def show_run(self):
         '''Returns the running config of the remote device
 
-        :param timeout:
         :return:
         :rtype: str
         '''

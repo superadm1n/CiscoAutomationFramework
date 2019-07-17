@@ -89,147 +89,6 @@ if level <= 50:
         logger.disabled = True
 
 
-class OutputThread(threading.Thread):
-
-    '''
-    This class is responsible for handling the returning of data from the remote device.
-    It runs as a thread so we can have a timeout feature. When the thread completes succesfully
-    the output from the remote device will be stored in the instance variable self.output.
-    '''
-
-    def __init__(self, output, shell, buffersize, prompt, engine, expectsamePrompt=True):
-        threading.Thread.__init__(self)
-
-        self.recievedData = False
-
-        self.engine = engine
-        self.shell = shell
-        self.output = output
-        self.expectsamePrompt = expectsamePrompt
-        self.buffersize = buffersize
-        self.prompt = prompt
-        self.killflag = False
-
-    def run(self):
-
-        '''This method determins if we are expecting the same prompt back or not and handles accordingly
-
-        :return:
-        '''
-
-        if self.engine == 'ssh':
-
-            if self.expectsamePrompt is True:
-                output = self._ssh_get_output_same_prompt_loop()
-                self.output += output
-            else:
-                output = self._ssh_get_output_different_prompt_loop()
-                self.output += output
-
-        elif self.engine == 'serial':
-
-            if self.expectsamePrompt is True:
-                output = self._serial_get_output_same_prompt_loop()
-                self.output = output
-            else:
-                output = self._serial_get_output_different_prompt_loop()
-                self.output = output
-
-
-    def _ssh_get_output_same_prompt_loop(self):
-
-        output = '\n\n'
-
-        while output.splitlines()[-1] != self.prompt:
-            output += bytes.decode(self.shell.recv(self.buffersize))
-            self.recievedData = True
-            if not self.shell.recv_ready():
-                time.sleep(.5)
-
-        return output[2:]
-
-    def _ssh_get_output_different_prompt_loop(self):
-
-        output = '\n\n'
-
-        # This will loop until a > or # is in the output
-        while True:
-
-            if self.shell.recv_ready():
-                output += bytes.decode(self.shell.recv(self.buffersize))
-                self.recievedData = True
-
-            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1]:
-                break
-
-        return output[2:]
-
-    def _serial_get_output_same_prompt_loop(self):
-
-
-        output = ['\n', '\n']
-
-
-        bitsRcvd = 0
-
-        while output[-1] != self.prompt:
-            for line in self.shell.readlines():
-                fromDevice = line.decode().strip('\r\n')
-                output.append(fromDevice)
-                bitsRcvd += len(fromDevice)
-                if len(fromDevice) > 0:
-                    logger.debug('Recieved {} bits from device'.format(len(fromDevice)))
-
-
-            if bitsRcvd > 0:
-                self.recievedData = True
-
-
-            if bitsRcvd == 0:
-                pass
-
-            bitsRcvd = 0
-
-        logger.debug('Returning data from serial get output same prompt thread, total of {} bytes'.format(len(output)))
-        return output[2:]
-
-    def _serial_get_output_different_prompt_loop(self):
-
-        output = ['\n', '\n']
-
-        while True:
-            if self._check_for_kill() is True:
-                break
-            time.sleep(1)
-
-            bitsRcvd = 0
-
-            if self.shell.in_waiting:
-                logging.debug('data waiting on serial')
-                for line in self.shell.readlines():
-                    fromDevice = line.decode().strip('\r\n')
-                    output.append(fromDevice)
-                    bitsRcvd += len(fromDevice)
-
-                if bitsRcvd > 0:
-                    self.recievedData = True
-
-            if '>' in output[-1] or '#' in output[-1]:
-                logging.debug('End of output from device')
-                break
-
-            bitsRcvd = 0
-
-        return output[2:]
-
-    def _check_for_kill(self):
-
-        if self.killflag == False:
-            return False
-        else:
-            return True
-
-
 class BaseClass:
     '''
     This class contains all of the API calls that will be presented to the user and the rest of the package
@@ -329,6 +188,20 @@ class BaseClass:
 
         return output
 
+    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
+        '''Sends command and returns the output to the Cisco device. This method returns the raw data
+        .. NOTE::
+          This will soon be replace the send_command_expect_different_prompt and
+          send_command_expect_same_prompt methods.
+
+        :param command: Command to send to the device
+        :param return_as_list: Set to True to return the output as a list
+        :param buffer_size: Number of bytes to return at a time
+        :param timeout:
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
     def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
         '''.. WARNING::
             This method has been depreciated and will be removed in the future
@@ -345,7 +218,9 @@ class BaseClass:
         raise MethodNotImplemented('This method has not been implemented!')
 
     def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        '''High level method to send a command to a Cisco device and automatically gather the output. This is the method that should be used
+        '''.. WARNING::
+            This method has been depreciated and will be removed in the future
+        High level method to send a command to a Cisco device and automatically gather the output. This is the method that should be used
         each time you need to send a command and grab the output from a Cisco device
 
         :param command:
@@ -415,6 +290,10 @@ class SSHEngine(BaseClass):
 
         self.close_connection()
 
+    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
+        self.send_command(command)
+        return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
+
     def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
         '''
         High level method for sending a command when expecting the prompt to return differently. This uses the
@@ -432,7 +311,7 @@ class SSHEngine(BaseClass):
 
         self.send_command(command)
 
-        return self.get_output_different_prompt(
+        return self.get_output(
             return_as_list=return_as_list,
             buffer_size=buffer_size,
             timeout=timeout
@@ -513,13 +392,13 @@ class SSHEngine(BaseClass):
         :return: Output from device
         '''
 
-        output = self.get_output_different_prompt(.5)
+        output = self.get_output(wait_time=.5)
 
         # At times the server will return the data in the 1st line, and others the second line, this try except block handles that
         try:
             # Sends return key and grabs the prompt that is returned, subtracting 1 character to give the hostname
             self.send_command('')
-            output = self.get_output_different_prompt(return_as_list=True)
+            output = self.get_output(return_as_list=True)
             for line in output:
                 if line is not '' and line is not ' ':
                     self.hostname = line[:-1]
@@ -616,11 +495,9 @@ class SerialEngine(BaseClass, serial.Serial):
         self.location = None
 
     def __enter__(self):
-
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-
         self.close_connection()
 
     def connect_to_server(self, serial_interface, username=None, password=None):
@@ -696,24 +573,17 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
+    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
+        self.send_command(command)
+        return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
+
     def send_command_expect_different_prompt(self, command, timeout=10, return_as_list=False, buffer_size=10, pause=1):
         '''
-        High level method for sending a command when expecting the prompt to return differently. This uses the
-        SSHEngine methods of send_command and get_output_different_prompt
-
-        :param command: command to issue on the server as typed directly from command line
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: output from command in either string or list format
-
-        Note: The Purpose of this method is to provide an interface to type commands that are
-        not otherwise satisfied in another method. Make all attempts to not use this method if possible
-        as you will have to integrate more error checking and contingency planning in the main body of
-        the code when it should be handled in the class
         '''
 
         self.send_command(command)
 
-        return self.get_output_different_prompt(
+        return self.get_output(
             return_as_list=return_as_list,
             buffer_size=buffer_size,
             timeout=timeout
@@ -752,7 +622,7 @@ class SerialEngine(BaseClass, serial.Serial):
 
         time.sleep(1)
 
-        output = self.get_output_different_prompt(10, return_as_list=True)
+        output = self.get_output(return_as_list=True)
 
         #output = self.send_command_expect_different_prompt(command=' ', return_as_list=True, timeout=10)
 
@@ -825,104 +695,9 @@ class SerialEngine(BaseClass, serial.Serial):
 
         return super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
 
-
     def get_output_different_prompt(self, timeout=10, wait_time=.2, return_as_list=False, buffer_size=1):
 
-        return self.get_output(timeout, wait_time, return_as_list=return_as_list, buffer_size=buffer_size)
-
-        '''
-        Gets outut when a different prompt is expected to be returned
-
-        :param wait_time: Time to wait before retrieving output from buffer
-        :type wait_time: float
-        :param return_as_list: When set to True will return output as list, when set to False will return output as string
-        :type return_as_list: bool
-        :param buffer_size: Not used but kept for compatibility
-        :type buffer_size: int
-        :return:
-        '''
-        #TODO: convert this method to have a timeout and use a thread
-
-        logging.debug('Serial engine starting to get output different prompt from device')
-
-
-        time.sleep(wait_time)
-
-        output = ['\n', '\n']
-
-        while True:
-
-            time.sleep(1)
-
-            bitsRcvd = 0
-
-            if self.ser.in_waiting:
-                logging.debug('data waiting on serial')
-                for line in self.ser.readlines():
-                    fromDevice = line.decode().strip('\r\n')
-                    output.append(fromDevice)
-                    bitsRcvd += len(fromDevice)
-
-                if bitsRcvd > 0:
-                    self.recievedData = True
-
-            if '>' in output[-1] or '#' in output[-1]:
-                logging.debug('End of output from device')
-                break
-
-
-        if len(output) > 0:
-            self.prompt = output[-1].strip()
-
-        if return_as_list is False:
-            logging.debug('Serial engine completed getting output different prompt from device')
-            return '\n'.join(output)
-        else:
-            logging.debug('Serial engine completed getting output different prompt from device')
-            return output
-
-    def _serthread_handler(self, thread, timeout):
-
-        '''
-
-        :param thread: Thread that is going to be watched
-        :param timeout: the time we are going to watch the thread before we throw and IOError
-        :return: data that was collected from the server
-        '''
-
-
-        counter = 0
-        while True:
-
-            if thread.is_alive():
-                logger.debug('Serial thread is alive')
-
-                if thread.recievedData is True:
-                    thread.recievedData = False
-                    counter = 0
-
-            else:
-                logger.debug('Thread is dead returning data')
-                output = thread.output
-                break
-
-            time.sleep(1)
-            counter += 1
-
-            # if the timeout has been reached
-            if counter == timeout:
-
-                logger.debug('Serial thread handler killing thread')
-                thread.killflag = True
-
-                while thread.is_alive():
-                    # loops until the thread is confirmed dead
-                    pass
-                raise IOError('Server did not return all expected data within the timeout of {}'.format(timeout))
-
-                #return thread.output
-
-        return output
+        return self.get_output(timeout=timeout, wait_time=wait_time, return_as_list=return_as_list, buffer_size=buffer_size)
 
     def close_connection(self):
         '''
