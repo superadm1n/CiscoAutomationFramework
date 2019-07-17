@@ -179,13 +179,8 @@ class BaseClass:
 
         if return_as_list is False:
             # Formats the output as a string and returns it
-            cleanoutput = ''
-
-            for line in output:
-                cleanoutput += '{}\n'.format(line)
-
-            return cleanoutput
-
+            return '\n'.join(output)
+        # return output as a list
         return output
 
     def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
