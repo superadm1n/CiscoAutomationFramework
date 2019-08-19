@@ -228,7 +228,8 @@ class IOSXE(TerminalCommands, CommandGetMethods):
 
         return self.transport.get_output()
 
-    # END Functions used primarily by the User
+    def show_vlan(self):
+        return self.ios.show_vlan()
 
 
 class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
@@ -282,3 +283,4 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
 
 
         return output
+
