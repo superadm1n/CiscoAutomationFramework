@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/ciscoautomationframework/badge/?version=latest)](https://ciscoautomationframework.readthedocs.io/en/latest/?badge=latest)
+
 # CiscoAutomationFramework
 
 The CiscoAutomationFramework is a framework that is built on top of paramiko and pyserial that is designed to detect the type of Cisco device you connect to and issue commands based on the firmware its running and return consistent output. The goal is to give a network engineer an easy way to write automation scripts for Cisco devices.
