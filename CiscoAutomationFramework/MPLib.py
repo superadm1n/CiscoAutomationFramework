@@ -1,6 +1,7 @@
 from multiprocessing import cpu_count, Process, Queue, Event
 from threading import Thread
 from time import sleep
+from datetime import datetime, timedelta
 
 
 class NetThread(Thread):
@@ -14,6 +15,7 @@ class NetThread(Thread):
         self.job = job
         self.job_args = job_args
         self.output = None
+        self.start_time = datetime.now()
 
     def run(self):
         self.output = self.job(*self.job_args)
@@ -39,12 +41,13 @@ class WorkerProcess(Process):
     '''General Purpose Process that is able to take a function + arguments
     as its input, explode that function, and put its output in an output buffer'''
 
-    def __init__(self, num_of_threads=10, *args, **kwargs):
+    def __init__(self, worker_thread_timeout, num_of_threads=10, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.job_queue = Queue()
         self.output_buffer = Queue()
         self.running_jobs = []
         self.num_of_threads = num_of_threads
+        self.worker_thread_timeout = worker_thread_timeout
 
         self.exit = Event()
 
@@ -98,6 +101,11 @@ class WorkerProcess(Process):
                 self.output_buffer.put(thd['job'])
                 self.running_jobs.remove(thd)
 
+            # If the thread has been running longer than expected. Kill it off
+            if (datetime.now() - thd['thread'].start_time) > timedelta(seconds=self.worker_thread_timeout):
+                thd['thread'].kill()
+                self.running_jobs.remove(thd)
+
     def run(self):
 
         while not self.exit.is_set():
@@ -117,7 +125,7 @@ class WorkerProcess(Process):
             sleep(.01)
 
 
-def init_workers(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_per_proc=20):
+def init_workers(list_of_jobs, worker_thread_timeout, num_processes=(cpu_count() - 1), num_threads_per_proc=20):
     '''Starts the worker processes and loads the jobs into them.
 
     :param list_of_jobs: List of job objects
@@ -129,7 +137,7 @@ def init_workers(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_per_
     # Start worker processes
     workers = []
     for x in range(num_processes):
-        wkr = WorkerProcess(num_of_threads=num_threads_per_proc)
+        wkr = WorkerProcess(num_of_threads=num_threads_per_proc, worker_thread_timeout=worker_thread_timeout)
         wkr.start()
         workers.append(wkr)
 
@@ -149,7 +157,7 @@ def init_workers(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_per_
     return workers
 
 
-def parallel_process(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_per_proc=20, data_handler=None):
+def parallel_process(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_per_proc=20, data_handler=None, worker_thread_timeout=60):
     '''Accepts a list of job objects, starts the worker processes, load them with the jobs and handles gathering
     the data from each of those jobs.
 
@@ -162,7 +170,7 @@ def parallel_process(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_
     :param data_handler: Unexecuted function that is a callback to handle the data as it is returned from each process
     :return:
     '''
-    workers = init_workers(list_of_jobs, num_processes, num_threads_per_proc)
+    workers = init_workers(list_of_jobs, worker_thread_timeout, num_processes, num_threads_per_proc)
     data_to_return = []
     while True:
         if len(workers) == 0:
