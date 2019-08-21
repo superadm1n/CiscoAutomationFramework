@@ -38,7 +38,7 @@ class TerminalCommands:
 
         self.transport.terminal_length_value = str(number)
 
-        return self.transport.send_command_expect_same_prompt('terminal length {}'.format(number))
+        return self.transport.send_command_get_output('terminal length {}'.format(number))
 
     def terminal_width(self, number=511):
         '''
@@ -60,7 +60,7 @@ class TerminalCommands:
 
         self.transport.terminal_width_value = str(number)
 
-        return self.transport.send_command_expect_same_prompt('terminal width {}'.format(number))
+        return self.transport.send_command_get_output('terminal width {}'.format(number))
 
     def priv_exec(self):
         raise CustomExceptions.MethodNotSupported
@@ -86,7 +86,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
         '''
         :return: Username of current user logged in
         '''
-        output = self.transport.send_command_expect_same_prompt('show users')
+        output = self.transport.send_command_get_output('show users')
 
         for line in output.splitlines():
             if '*' in line:
@@ -100,7 +100,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        output = self.transport.send_command_expect_same_prompt('show user-account')
+        output = self.transport.send_command_get_output('show user-account')
 
         flag = 0
         for line in output.splitlines():
@@ -127,7 +127,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        device_output = self.transport.send_command_expect_same_prompt('show version')
+        device_output = self.transport.send_command_get_output('show version')
 
         for line in device_output.splitlines():
 
@@ -143,7 +143,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        device_output = self.transport.send_command_expect_same_prompt('show running-config').splitlines()
+        device_output = self.transport.send_command_get_output('show running-config').splitlines()
 
         output = ''
         for line in device_output[3:][:-2]:
@@ -193,7 +193,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         interfaces = []
 
-        for line in self.transport.send_command_expect_same_prompt('show interface', buffer_size=200, return_as_list=True)[1:][:-1]:
+        for line in self.transport.send_command_get_output('show interface', buffer_size=200, return_as_list=True)[1:][:-1]:
             if len(line) < 1:
                 continue
 
@@ -270,7 +270,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         output = []
 
-        for line in self.transport.send_command_expect_same_prompt('show interface status', return_as_list=True, buffer_size=100):
+        for line in self.transport.send_command_get_output('show interface status', return_as_list=True, buffer_size=100):
             if len(line.split()) < 1:
                 continue
             if 'Vlan' in line.split()[0]:
@@ -292,7 +292,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
         output = []
         startflag = False
-        for line in self.transport.send_command_expect_same_prompt('show vlan brief', return_as_list=True):
+        for line in self.transport.send_command_get_output('show vlan brief', return_as_list=True):
 
 
             # captures the line of output only after there has been a line of dashes
@@ -327,7 +327,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
     def mac_address_table(self):
 
         self.terminal_length()
-        data = self.transport.send_command_expect_different_prompt('show mac address-table', return_as_list=True, buffer_size=200)[:-1]
+        data = self.transport.send_command_get_output('show mac address-table', return_as_list=True, buffer_size=200)[:-1]
 
         clean_data = []
         capture_flag = False
@@ -345,7 +345,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
 
     def cdp_neighbor_table(self):
         self.terminal_length()
-        cdp_output = self.transport.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
+        cdp_output = self.transport.send_command_get_output('show cdp neighbors detail', return_as_list=True, buffer_size=200)
         data = []
         tmp = {}
         for line in cdp_output[2:]:
@@ -377,7 +377,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
         data = []
 
         flag = False
-        output = self.transport.send_command_expect_same_prompt('show ip arp', buffer_size=200, return_as_list=True)
+        output = self.transport.send_command_get_output('show ip arp', buffer_size=200, return_as_list=True)
         for line in output[:-1]:
             if 'mac address' in line.lower():
                 flag = True
@@ -426,7 +426,7 @@ class NXOS(TerminalCommands, CommandGetMethods):
         if self.check_admin_role() is False:
             return 'VDC-Admin role required'
         # sends the command to copy run start and grabs the output from that command
-        output = self.transport.send_command_expect_same_prompt('copy running-config startup-config')
+        output = self.transport.send_command_get_output('copy running-config startup-config')
 
         # Parses the output and checks for the line that will say 'copy complete' if the copy was successful
         # and returns a friendly success message to the user

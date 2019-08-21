@@ -78,16 +78,16 @@ class IOSXE(TerminalCommands, CommandGetMethods):
 
         self.transport.config_t()
 
-        output += self.transport.send_command_expect_different_prompt('interface {}.{}\n'.format(physical_interface, vlan_number))
-        output += self.transport.send_command_expect_same_prompt('encapsulation dot1Q {}\n'.format(vlan_number))
-        output += self.transport.send_command_expect_same_prompt('ip address {} {}'.format(ip_address, subnet_mask))
+        output += self.transport.send_command_get_output('interface {}.{}\n'.format(physical_interface, vlan_number))
+        output += self.transport.send_command_get_output('encapsulation dot1Q {}\n'.format(vlan_number))
+        output += self.transport.send_command_get_output('ip address {} {}'.format(ip_address, subnet_mask))
 
         if len(dhcp_servers_ip_addresses) > 0:
             for ip in dhcp_servers_ip_addresses:
-                output += self.transport.send_command_expect_same_prompt('ip helper-address {}\n'.format(ip))
+                output += self.transport.send_command_get_output('ip helper-address {}\n'.format(ip))
                 #output += self.transport.get_output()
 
-        output += self.transport.send_command_expect_same_prompt('ip directed-broadcast\n')
+        output += self.transport.send_command_get_output('ip directed-broadcast\n')
 
         self.transport.send_end()
 
@@ -116,7 +116,7 @@ class IOSXE(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        data_from_device = self.transport.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
+        data_from_device = self.transport.send_command_get_output('show power inline', return_as_list=True)[3:][:-1]
 
         interface_data = []
 
@@ -243,8 +243,8 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
 
         output += self.config_t()
 
-        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
-        output += self.transport.send_command_expect_same_prompt('')
+        output += self.transport.send_command_get_output('no username {}'.format(username))
+        output += self.transport.send_command_get_output('')
 
         self.send_end()
 
@@ -258,9 +258,9 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
 
         output += self.config_t()
 
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_get_output('interface {}'.format(interface))
 
-        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
+        output += self.transport.send_command_get_output('description {}'.format(description))
 
         output += self.send_end()
 
@@ -275,9 +275,9 @@ class IOSXEConfigMethods(CommandConfigMethods, TerminalCommands):
         output += self.config_t()
 
         # issues commands to configure the interface specified as an access vlan on the vlan specified
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.transport.send_command_expect_same_prompt('switchport mode access')
-        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
+        output += self.transport.send_command_get_output('interface {}'.format(interface))
+        output += self.transport.send_command_get_output('switchport mode access')
+        output += self.transport.send_command_get_output('switchport access vlan {}'.format(vlan))
 
         output += self.send_end()
 

@@ -248,7 +248,7 @@ def detect_firmware(transport):
         transport.send_command(' ')
         time.sleep(.1)
 
-    output = transport.send_command_expect_same_prompt(' ', detecting_firmware=True, return_as_list=True,
+    output = transport.send_command_get_output(' ', detecting_firmware=True, return_as_list=True,
                                                             timeout=10)
 
     # defines counter variable to keep track of the number of times a string is found

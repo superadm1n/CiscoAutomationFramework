@@ -107,7 +107,7 @@ class TerminalCommands:
 
         self.transport.terminal_length_value = str(number)
 
-        return self.transport.send_command_expect_same_prompt('terminal length {}'.format(number))
+        return self.transport.send_command_get_output('terminal length {}'.format(number))
 
     def terminal_width(self, number='0'):
         '''
@@ -121,7 +121,7 @@ class TerminalCommands:
 
         self.transport.terminal_width_value = str(number)
 
-        return self.transport.send_command_expect_same_prompt('terminal width {}'.format(number))
+        return self.transport.send_command_get_output('terminal width {}'.format(number))
 
     def priv_exec(self):
         '''
@@ -140,7 +140,7 @@ class TerminalCommands:
             logger.debug('sending enable command')
             self.transport.send_command('enable')
             time.sleep(.5)
-            return self.transport.send_command_expect_different_prompt(self.enable_password)
+            return self.transport.send_command_get_output(self.enable_password)
 
         elif '(config' in self.transport.prompt:
             return self.send_end()
@@ -163,7 +163,7 @@ class TerminalCommands:
 
         if '(config' not in self.transport.prompt:
             logger.debug('sending configure terminal command')
-            output += self.transport.send_command_expect_different_prompt('configure terminal')
+            output += self.transport.send_command_get_output('configure terminal')
 
             return output
         else:
@@ -181,7 +181,7 @@ class TerminalCommands:
 
     def send_end(self):
 
-        return self.transport.send_command_expect_different_prompt('end')
+        return self.transport.send_command_get_output('end')
 
 
 class IOS(TerminalCommands, CommandGetMethods):
@@ -202,7 +202,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         output = ''
 
         self.terminal_length()
-        device_output = self.transport.send_command_expect_same_prompt('show version')
+        device_output = self.transport.send_command_get_output('show version')
 
         for line in device_output.splitlines():
 
@@ -227,7 +227,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         self.terminal_length()
 
         logger.debug('Sending show run command, expecting same prompt')
-        output = self.transport.send_command_expect_same_prompt('show running-config', buffer_size=50, timeout=timeout)
+        output = self.transport.send_command_get_output('show running-config', buffer_size=50, timeout=timeout)
         logger.debug('Output function returned.')
 
         return output
@@ -261,7 +261,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         # sets terminal length to infinite so all the output is captured
         self.terminal_length()
 
-        device_output = self.transport.send_command_expect_same_prompt('show running-config interface {}'.format(interface))
+        device_output = self.transport.send_command_get_output('show running-config interface {}'.format(interface))
 
         cleanoutput = ''
 
@@ -276,10 +276,10 @@ class IOS(TerminalCommands, CommandGetMethods):
         self.config_t()
         output = ''
 
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.transport.send_command_expect_same_prompt('shutdown')
+        output += self.transport.send_command_get_output('interface {}'.format(interface))
+        output += self.transport.send_command_get_output('shutdown')
         time.sleep(delay)
-        output += self.transport.send_command_expect_same_prompt('no shutdown')
+        output += self.transport.send_command_get_output('no shutdown')
 
         self.send_end()
 
@@ -298,16 +298,16 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.config_t()
 
-        output += self.transport.send_command_expect_different_prompt('interface {}.{}\n'.format(physical_interface, vlan_number))
-        output += self.transport.send_command_expect_same_prompt('encapsulation dot1Q {}\n'.format(vlan_number))
-        output += self.transport.send_command_expect_same_prompt('ip address {} {}'.format(ip_address, subnet_mask))
+        output += self.transport.send_command_get_output('interface {}.{}\n'.format(physical_interface, vlan_number))
+        output += self.transport.send_command_get_output('encapsulation dot1Q {}\n'.format(vlan_number))
+        output += self.transport.send_command_get_output('ip address {} {}'.format(ip_address, subnet_mask))
 
         if len(dhcp_servers_ip_addresses) > 0:
             for ip in dhcp_servers_ip_addresses:
-                output += self.transport.send_command_expect_same_prompt('ip helper-address {}\n'.format(ip))
+                output += self.transport.send_command_get_output('ip helper-address {}\n'.format(ip))
                 #output += self.transport.get_output()
 
-        output += self.transport.send_command_expect_same_prompt('ip directed-broadcast\n')
+        output += self.transport.send_command_get_output('ip directed-broadcast\n')
 
         self.send_end()
 
@@ -340,7 +340,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         self.terminal_length()
 
         # issues 'show interfaces' command on device
-        for line in self.transport.send_command_expect_same_prompt('show interfaces', return_as_list=True, buffer_size=200)[1:][:-1]:
+        for line in self.transport.send_command_get_output('show interfaces', return_as_list=True, buffer_size=200)[1:][:-1]:
 
             if line[0] is not ' ':
 
@@ -355,7 +355,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
     def port_status(self):
         self.terminal_length()
-        switch_data = self.transport.send_command_expect_same_prompt('show interfaces status', return_as_list=True)
+        switch_data = self.transport.send_command_get_output('show interfaces status', return_as_list=True)
 
         flag = False
         usable_data = []
@@ -397,7 +397,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        data = self.transport.send_command_expect_same_prompt('show power inline', return_as_list=True)[3:][:-1]
+        data = self.transport.send_command_get_output('show power inline', return_as_list=True)[3:][:-1]
 
         trigger_seperators = determine_flag(data)
 
@@ -498,7 +498,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        sw_output = self.transport.send_command_expect_same_prompt('show interface {}'.format(interface), buffer_size=200, return_as_list=True)
+        sw_output = self.transport.send_command_get_output('show interface {}'.format(interface), buffer_size=200, return_as_list=True)
 
 
 
@@ -524,7 +524,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         '''Very similar to the last input output method, but instead returns all interfaces in a matter of seconds
         in a list of dictionaries'''
         self.terminal_length()
-        sw_output = self.transport.send_command_expect_same_prompt('show interfaces', buffer_size=200, return_as_list=True)
+        sw_output = self.transport.send_command_get_output('show interfaces', buffer_size=200, return_as_list=True)
 
 
         data = []
@@ -546,7 +546,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         initial_term_width = self.transport.terminal_width_value
         self.terminal_width()  # sets terminal width to infinite
 
-        commandOutput = self.transport.send_command_expect_same_prompt('show vlan brief', return_as_list=True)[:-1]
+        commandOutput = self.transport.send_command_get_output('show vlan brief', return_as_list=True)[:-1]
 
 
         # The reason this for loop is here is because instead of slicing off a predermined number of lines in output
@@ -575,7 +575,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        device_output = self.transport.send_command_expect_same_prompt('show mac address-table', buffer_size=200).splitlines()[1:][:-1]
+        device_output = self.transport.send_command_get_output('show mac address-table', buffer_size=200).splitlines()[1:][:-1]
 
         # This is needed as routers with a wic card require you to issue the command in priv exec mode with a dash in between
         # the words 'mac' and 'address'
@@ -583,7 +583,7 @@ class IOS(TerminalCommands, CommandGetMethods):
             if len(line) >= 1:
                 if line[0] == '%':
                     self.priv_exec()
-                    device_output = self.transport.send_command_expect_same_prompt('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
+                    device_output = self.transport.send_command_get_output('show mac-address-table', buffer_size=200).splitlines()[1:][:-1]
                     break
         flag = 0
 
@@ -619,7 +619,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.priv_exec()
 
-        cdp_output = self.transport.send_command_expect_same_prompt('show cdp neighbors detail', return_as_list=True, buffer_size=200)
+        cdp_output = self.transport.send_command_get_output('show cdp neighbors detail', return_as_list=True, buffer_size=200)
         data = []
         tmp = {}
         for line in cdp_output[2:]:
@@ -651,7 +651,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         output = []
         header = []
         flag = 0
-        for line in self.transport.send_command_expect_same_prompt('show ip arp', return_as_list=True, buffer_size=40):
+        for line in self.transport.send_command_get_output('show ip arp', return_as_list=True, buffer_size=40):
             if 'protocol' in line.lower() and 'address' in line.lower():
                 header = line.split()
                 flag += 1
@@ -675,7 +675,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        routing_table = self.transport.send_command_expect_same_prompt('show ip route', return_as_list=True)
+        routing_table = self.transport.send_command_get_output('show ip route', return_as_list=True)
         flag = 0
         fixed_ouput = []
         tmp = ''
@@ -738,7 +738,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        switch_output = self.transport.send_command_expect_same_prompt('show interfaces status', return_as_list=True)[1:]
+        switch_output = self.transport.send_command_get_output('show interfaces status', return_as_list=True)[1:]
         data = []
         for line in switch_output:
             if len(line.split()) <= 1:
@@ -767,7 +767,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         masterlist = []
 
-        for line in self.transport.send_command_expect_same_prompt('show interface description', return_as_list=True, buffer_size=200)[2:][:-1]:
+        for line in self.transport.send_command_get_output('show interface description', return_as_list=True, buffer_size=200)[2:][:-1]:
             line = line.split()
             if len(line) < 3:
                 continue
@@ -833,7 +833,7 @@ class IOS(TerminalCommands, CommandGetMethods):
         self.terminal_width()
 
         # grabs output of show vlan command
-        data = self.transport.send_command_expect_same_prompt('show vlan', return_as_list=True, buffer_size=200)[2:][:-1]
+        data = self.transport.send_command_get_output('show vlan', return_as_list=True, buffer_size=200)[2:][:-1]
         flag = 0
         returnable_data = []
 
@@ -857,29 +857,29 @@ class IOS(TerminalCommands, CommandGetMethods):
 
     def shutdown_interface(self, interface):
         self.config_t()
-        self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        self.transport.send_command_expect_same_prompt('shutdown')
-        self.transport.send_command_expect_different_prompt('exit')
+        self.transport.send_command_get_output('interface {}'.format(interface))
+        self.transport.send_command_get_output('shutdown')
+        self.transport.send_command_get_output('exit')
 
     def no_shutdown_interface(self, interface):
         self.config_t()
-        self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        self.transport.send_command_expect_same_prompt('no shutdown')
-        self.transport.send_command_expect_different_prompt('exit')
+        self.transport.send_command_get_output('interface {}'.format(interface))
+        self.transport.send_command_get_output('no shutdown')
+        self.transport.send_command_get_output('exit')
 
     def set_access_vlan_on_interface(self, interface, vlan_number):
         configured_vlans = [x['vlan'] for x in self.show_vlan()]
         if vlan_number not in configured_vlans:
             raise AttributeError('Vlan {} is not configured on the switch!'.format(vlan_number))
         self.config_t()
-        self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan_number))
-        self.transport.send_command_expect_different_prompt('exit')
+        self.transport.send_command_get_output('interface {}'.format(interface))
+        self.transport.send_command_get_output('switchport access vlan {}'.format(vlan_number))
+        self.transport.send_command_get_output('exit')
 
     def show_inventory_data(self):
         self.terminal_width()
         self.terminal_length()
-        output = self.transport.send_command_expect_same_prompt('show inventory raw', return_as_list=True)
+        output = self.transport.send_command_get_output('show inventory raw', return_as_list=True)
 
         data = []
         tmp = ''
@@ -906,7 +906,7 @@ class IOS(TerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        data = self.transport.send_command_expect_same_prompt('show standby brief', return_as_list=True)
+        data = self.transport.send_command_get_output('show standby brief', return_as_list=True)
         if len(data) == 2:
             raise NotConfigured('HSRP has not been configured! on the device!')
         user_data = []
@@ -958,9 +958,9 @@ class IOSConfigMethods(CommandConfigMethods, TerminalCommands):
 
         output += self.config_t()
 
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
+        output += self.transport.send_command_get_output('interface {}'.format(interface))
 
-        output += self.transport.send_command_expect_same_prompt('description {}'.format(description))
+        output += self.transport.send_command_get_output('description {}'.format(description))
 
         output += self.send_end()
 
@@ -980,9 +980,9 @@ class IOSConfigMethods(CommandConfigMethods, TerminalCommands):
         output += self.config_t()
 
         # issues commands to configure the interface specified as an access vlan on the vlan specified
-        output += self.transport.send_command_expect_different_prompt('interface {}'.format(interface))
-        output += self.transport.send_command_expect_same_prompt('switchport mode access')
-        output += self.transport.send_command_expect_same_prompt('switchport access vlan {}'.format(vlan))
+        output += self.transport.send_command_get_output('interface {}'.format(interface))
+        output += self.transport.send_command_get_output('switchport mode access')
+        output += self.transport.send_command_get_output('switchport access vlan {}'.format(vlan))
 
         output += self.send_end()
 
@@ -994,7 +994,7 @@ class IOSConfigMethods(CommandConfigMethods, TerminalCommands):
 
         output += self.config_t()
 
-        output += self.transport.send_command_expect_same_prompt('no username {}'.format(username))
+        output += self.transport.send_command_get_output('no username {}'.format(username))
 
         self.send_end()
 

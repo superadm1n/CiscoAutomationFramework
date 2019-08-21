@@ -45,7 +45,7 @@ class ASATerminalCommands(TerminalCommands):
 
         self.transport.terminal_length_value = str(number)
 
-        return self.transport.send_command_expect_same_prompt('terminal pager {}'.format(number))
+        return self.transport.send_command_get_output('terminal pager {}'.format(number))
 
 
 class ASA(ASATerminalCommands, CommandGetMethods):
@@ -59,7 +59,7 @@ class ASA(ASATerminalCommands, CommandGetMethods):
         output = ''
 
         self.terminal_length()
-        device_output = self.transport.send_command_expect_same_prompt('show version')
+        device_output = self.transport.send_command_get_output('show version')
 
         for line in device_output.splitlines():
 
@@ -108,7 +108,7 @@ class ASA(ASATerminalCommands, CommandGetMethods):
         self.terminal_length()
 
         # issues 'show interfaces' command on device
-        for line in self.transport.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
+        for line in self.transport.send_command_get_output('show interface').splitlines()[1:][:-1]:
             # Only uses lines that begin with an f, g, t, or e for ten gig, gig, fast and eth interfaces and appends
             # the first column to a list
             if len(line) >= 1:
@@ -133,7 +133,7 @@ class ASA(ASATerminalCommands, CommandGetMethods):
         output = ''
 
         # issues 'show interfaces' command on device
-        for line in self.transport.send_command_expect_same_prompt('show interface').splitlines()[1:][:-1]:
+        for line in self.transport.send_command_get_output('show interface').splitlines()[1:][:-1]:
             # Only uses lines that begin with an f, g, t, or e for ten gig, gig, fast and eth interfaces and appends
             # the first column to a list
             if len(line) >= 1:
@@ -179,7 +179,7 @@ class ASA(ASATerminalCommands, CommandGetMethods):
 
         self.terminal_length()  # sets the length of the terminal to infinite
 
-        commandOutput = self.transport.send_command_expect_same_prompt('show switch vlan', return_as_list=True)[:-1]
+        commandOutput = self.transport.send_command_get_output('show switch vlan', return_as_list=True)[:-1]
 
         sanitizedOutput = []
         startflag = False
@@ -215,7 +215,7 @@ class ASA(ASATerminalCommands, CommandGetMethods):
 
         self.terminal_length()
 
-        device_output = self.transport.send_command_expect_same_prompt('show switch mac-address-table').splitlines()[1:][:-1]
+        device_output = self.transport.send_command_get_output('show switch mac-address-table').splitlines()[1:][:-1]
 
         flag = 0
         for line in device_output:
@@ -299,7 +299,7 @@ class ASA(ASATerminalCommands, CommandGetMethods):
         for int in self.physical_port_inventory_longname():
             interface_list = []
 
-            data = self.transport.send_command_expect_same_prompt('show interface {}'.format(int)).splitlines()[1:][:-2]
+            data = self.transport.send_command_get_output('show interface {}'.format(int)).splitlines()[1:][:-2]
 
             line = data[0].split(',')
 

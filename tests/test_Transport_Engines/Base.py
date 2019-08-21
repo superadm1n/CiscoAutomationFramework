@@ -66,10 +66,7 @@ class TestableSSHEngine(SSHEngine):
         self.client = MyParamikoSSHClient(canned_response)
         self.all_output_recieved = []
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
-        data = super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
-        print(data)
-        return data
+
 
 
 

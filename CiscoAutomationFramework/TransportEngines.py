@@ -26,7 +26,6 @@ on what parameter is passed the interface will chose the correct engine to use t
 import serial
 import paramiko
 import time
-import threading
 import logging
 from . import CustomExceptions
 from CiscoAutomationFramework import log_level, log_to_console
@@ -115,21 +114,6 @@ class BaseClass:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
-        '''Gets the outpu from the device when a different prompt is anticipated. This method will soon be
-        depreciated as there is a more robust algorthem used in the get_output method
-
-        .. WARNING::
-            This method has been depreciated and will be removed in the future
-
-        :param wait_time:
-        :param return_as_list:
-        :param buffer_size:
-        :param timeout:
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
     def get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
         '''This method gathers the data that is waiting from the Cisco device and then returns it
         for further parsing or directly to the user.
@@ -173,36 +157,6 @@ class BaseClass:
         :param return_as_list: Set to True to return the output as a list
         :param buffer_size: Number of bytes to return at a time
         :param timeout:
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
-        '''.. WARNING::
-            This method has been depreciated and will be removed in the future
-
-        This is a high level method that will send a command to the Cisco device and automatically gather the output.
-
-
-        :param command:
-        :param return_as_list:
-        :param buffer_size:
-        :param timeout:
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
-    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        '''.. WARNING::
-            This method has been depreciated and will be removed in the future
-        High level method to send a command to a Cisco device and automatically gather the output. This is the method that should be used
-        each time you need to send a command and grab the output from a Cisco device
-
-        :param command:
-        :param timeout:
-        :param detecting_firmware:
-        :param return_as_list:
-        :param buffer_size:
         :return:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
@@ -268,49 +222,6 @@ class SSHEngine(BaseClass):
     def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
         self.send_command(command)
         return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
-
-    def send_command_expect_different_prompt(self, command, return_as_list=False, buffer_size=1, timeout=10):
-        '''
-        High level method for sending a command when expecting the prompt to return differently. This uses the
-        SSHEngine methods of send_command and get_output_different_prompt
-
-        :param command: command to issue on the server as typed directly from command line
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: output from command in either string or list format
-
-        Note: The Purpose of this method is to provide an interface to type commands that are
-        not otherwise satisfied in another method. Make all attempts to not use this method if possible
-        as you will have to integrate more error checking and contingency planning in the main body of
-        the code when it should be handled in the class
-        '''
-
-        self.send_command(command)
-
-        return self.get_output(
-            return_as_list=return_as_list,
-            buffer_size=buffer_size,
-            timeout=timeout
-        )
-
-    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=1):
-        '''
-        Sends commands and gathers the output in a way that expects the same prompt to be returned
-        DO NOT use this method if you are not SURE that the prompt returned will be the same
-
-        :param command: Command to issue to device
-        :param detecting_firmware: set to true if you want to throw away buffer data for detecting firmware
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: Output from command in either string or list format
-        '''
-
-        self.send_command(command)
-
-        return self.get_output(
-            detecting_firmware=detecting_firmware,
-            return_as_list=return_as_list,
-            buffer_size=buffer_size,
-            timeout=timeout
-        )
 
     def connect_to_server(self, ip, username, password):
         '''
@@ -398,10 +309,6 @@ class SSHEngine(BaseClass):
         '''
 
         self.shell.send('{}\n'.format(command))
-
-    def get_output_different_prompt(self, wait_time=.2, return_as_list=False, buffer_size=1, timeout=10):
-        return self.get_output(wait_time = wait_time, return_as_list=return_as_list, buffer_size=buffer_size,
-                               timeout=timeout, detecting_firmware=False)
 
     def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
 
@@ -552,38 +459,6 @@ class SerialEngine(BaseClass, serial.Serial):
         self.send_command(command)
         return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
 
-    def send_command_expect_different_prompt(self, command, timeout=10, return_as_list=False, buffer_size=10, pause=1):
-        '''
-        '''
-
-        self.send_command(command)
-
-        return self.get_output(
-            return_as_list=return_as_list,
-            buffer_size=buffer_size,
-            timeout=timeout
-        )
-
-    def send_command_expect_same_prompt(self, command, timeout=10, detecting_firmware=False, return_as_list=False, buffer_size=10):
-        '''
-        Sends commands and gathers the output in a way that expects the same prompt to be returned
-        DO NOT use this method if you are not SURE that the prompt returned will be the same
-
-        :param command: Command to issue to device
-        :param detecting_firmware: set to true if you want to throw away buffer data for detecting firmware
-        :param return_as_list: returns the output as a list vs a string, string is default
-        :return: Output from command in either string or list format
-        '''
-
-        self.send_command(command)
-
-        return self.get_output(
-            detecting_firmware=detecting_firmware,
-            return_as_list=return_as_list,
-            buffer_size=buffer_size,
-            timeout=timeout
-        )
-
     def get_initial_prompt(self, login_output=None):
         '''
         Gets the initial prompt and hostname of the device and sets the corresponding class variables
@@ -669,10 +544,6 @@ class SerialEngine(BaseClass, serial.Serial):
                 break
 
         return super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
-
-    def get_output_different_prompt(self, timeout=10, wait_time=.2, return_as_list=False, buffer_size=1):
-
-        return self.get_output(timeout=timeout, wait_time=wait_time, return_as_list=return_as_list, buffer_size=buffer_size)
 
     def close_connection(self):
         '''
