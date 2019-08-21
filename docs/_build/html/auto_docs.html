@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CiscoAutomationFramework API &mdash; Cisco Automation Framework 0.5.9+dev documentation</title>
+  <title>CiscoAutomationFramework API &mdash; Cisco Automation Framework 0.7.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Cisco Automation Framework 0.5.9+dev documentation" href="index.html"/>
+    <link rel="top" title="Cisco Automation Framework 0.7.0 documentation" href="index.html"/>
         <link rel="prev" title="Usage Examples" href="tutorial.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.5.9+dev
+                0.7.0
               </div>
             
           
@@ -229,49 +229,6 @@ of the method.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.configure_access_vlan">
-<code class="descname">configure_access_vlan</code><span class="sig-paren">(</span><em>interface</em>, <em>vlan</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.configure_access_vlan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configues a specific interface as an access vlan on
-the specified vlan</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>interface</strong> (<em>str</em>) – Interface to configure</li>
-<li><strong>vlan</strong> (<em>str</em>) – Vlan to configure</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.configure_description">
-<code class="descname">configure_description</code><span class="sig-paren">(</span><em>interface</em>, <em>description</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.configure_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configures a description on a specific interface.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>interface</strong> – Interface to configure the description on</li>
-<li><strong>description</strong> – Description to add</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.configure_router_lan_subinterface">
 <code class="descname">configure_router_lan_subinterface</code><span class="sig-paren">(</span><em>physical_interface</em>, <em>vlan_number</em>, <em>ip_address</em>, <em>subnet_mask</em>, <em>dhcp_servers_ip_addresses</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.configure_router_lan_subinterface" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to configure a sub interface on a Cisco router</p>
@@ -297,24 +254,8 @@ the specified vlan</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.delete_local_user">
-<code class="descname">delete_local_user</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.delete_local_user" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to delete the specified local user</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – User to delete</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.find_mac_address">
-<code class="descname">find_mac_address</code><span class="sig-paren">(</span><em>mac_address</em>, <em>mac_table</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.find_mac_address" title="Permalink to this definition">¶</a></dt>
+<code class="descname">find_mac_address</code><span class="sig-paren">(</span><em>mac_address</em>, <em>mac_table=None</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.find_mac_address" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -359,19 +300,6 @@ the specified vlan</p>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Uptime of device.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.global_last_input_and_output">
-<code class="descname">global_last_input_and_output</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.global_last_input_and_output" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
@@ -702,17 +630,15 @@ get information about HSRP such as the interfaces, group numbers, priority, stat
 
 <dl class="method">
 <dt id="CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.show_run">
-<code class="descname">show_run</code><span class="sig-paren">(</span><em>timeout=15</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.show_run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">show_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.BaseCommandMethods.CommandGetMethods.show_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the running config of the remote device</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
 </tr>
 </tbody>
 </table>
@@ -839,8 +765,7 @@ in the serial engine class</p>
 for further parsing or directly to the user.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">For Developers
-For Developers: This method should not be overwritten but rather extended via super() as it contains
+<p class="last">For Developers: This method should not be overwritten but rather extended via super() as it contains
 code that regardless of the engine, needs to run.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -850,34 +775,6 @@ code that regardless of the engine, needs to run.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>wait_time</strong> – </li>
 <li><strong>detecting_firmware</strong> – </li>
-<li><strong>return_as_list</strong> – </li>
-<li><strong>buffer_size</strong> – </li>
-<li><strong>timeout</strong> – </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.TransportEngines.BaseClass.get_output_different_prompt">
-<code class="descname">get_output_different_prompt</code><span class="sig-paren">(</span><em>wait_time=0.2</em>, <em>return_as_list=False</em>, <em>buffer_size=1</em>, <em>timeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.TransportEngines.BaseClass.get_output_different_prompt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the outpu from the device when a different prompt is anticipated. This method will soon be
-depreciated as there is a more robust algorthem used in the get_output method</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This method has been depreciated and will be removed in the future</p>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>wait_time</strong> – </li>
 <li><strong>return_as_list</strong> – </li>
 <li><strong>buffer_size</strong> – </li>
 <li><strong>timeout</strong> – </li>
@@ -909,47 +806,23 @@ so there is no need to put that in the command</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="CiscoAutomationFramework.TransportEngines.BaseClass.send_command_expect_different_prompt">
-<code class="descname">send_command_expect_different_prompt</code><span class="sig-paren">(</span><em>command</em>, <em>return_as_list=False</em>, <em>buffer_size=1</em>, <em>timeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.TransportEngines.BaseClass.send_command_expect_different_prompt" title="Permalink to this definition">¶</a></dt>
-<dd><div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This method has been depreciated and will be removed in the future</p>
+<dt id="CiscoAutomationFramework.TransportEngines.BaseClass.send_command_get_output">
+<code class="descname">send_command_get_output</code><span class="sig-paren">(</span><em>command</em>, <em>return_as_list=False</em>, <em>buffer_size=1</em>, <em>timeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.TransportEngines.BaseClass.send_command_get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends command and returns the output to the Cisco device. This method returns the raw data
+.. NOTE:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="n">will</span> <span class="n">soon</span> <span class="n">be</span> <span class="n">replace</span> <span class="n">the</span> <span class="n">send_command_expect_different_prompt</span> <span class="ow">and</span>
+<span class="n">send_command_expect_same_prompt</span> <span class="n">methods</span><span class="o">.</span>
+</pre></div>
 </div>
-<p>This is a high level method that will send a command to the Cisco device and automatically gather the output.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>command</strong> – </li>
-<li><strong>return_as_list</strong> – </li>
-<li><strong>buffer_size</strong> – </li>
+<li><strong>command</strong> – Command to send to the device</li>
+<li><strong>return_as_list</strong> – Set to True to return the output as a list</li>
+<li><strong>buffer_size</strong> – Number of bytes to return at a time</li>
 <li><strong>timeout</strong> – </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="CiscoAutomationFramework.TransportEngines.BaseClass.send_command_expect_same_prompt">
-<code class="descname">send_command_expect_same_prompt</code><span class="sig-paren">(</span><em>command</em>, <em>timeout=10</em>, <em>detecting_firmware=False</em>, <em>return_as_list=False</em>, <em>buffer_size=1</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.TransportEngines.BaseClass.send_command_expect_same_prompt" title="Permalink to this definition">¶</a></dt>
-<dd><p>High level method to send a command to a Cisco device and automatically gather the output. This is the method that should be used
-each time you need to send a command and grab the output from a Cisco device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>command</strong> – </li>
-<li><strong>timeout</strong> – </li>
-<li><strong>detecting_firmware</strong> – </li>
-<li><strong>return_as_list</strong> – </li>
-<li><strong>buffer_size</strong> – </li>
 </ul>
 </td>
 </tr>
@@ -1032,6 +905,54 @@ called out in the ‘show version’ command and tallies them up and returns the
 </dd></dl>
 
 <dl class="function">
+<dt id="CiscoAutomationFramework.Util.extract_version_number_ios">
+<code class="descclassname">CiscoAutomationFramework.Util.</code><code class="descname">extract_version_number_ios</code><span class="sig-paren">(</span><em>sh_ver_output</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.extract_version_number_ios" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the version number out of the show version command</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sh_ver_output</strong> – Full output of show version command</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">version number string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="CiscoAutomationFramework.Util.extract_version_number_iosxe">
+<code class="descclassname">CiscoAutomationFramework.Util.</code><code class="descname">extract_version_number_iosxe</code><span class="sig-paren">(</span><em>sh_ver_output</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.extract_version_number_iosxe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the version number out of the show version command</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sh_ver_output</strong> – Full output of show version command</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">version number string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="CiscoAutomationFramework.Util.extract_version_number_nxos">
+<code class="descclassname">CiscoAutomationFramework.Util.</code><code class="descname">extract_version_number_nxos</code><span class="sig-paren">(</span><em>sh_ver_output</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.extract_version_number_nxos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the version number out of the show version command</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sh_ver_output</strong> – Full output of show version command</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">version number string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="CiscoAutomationFramework.Util.gather_enable">
 <code class="descclassname">CiscoAutomationFramework.Util.</code><code class="descname">gather_enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Util.gather_enable" title="Permalink to this definition">¶</a></dt>
 <dd><p>CLI method to gather an enable password</p>
@@ -1108,7 +1029,7 @@ called out in the ‘show version’ command and tallies them up and returns the
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.5.9+dev',
+            VERSION:'0.7.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

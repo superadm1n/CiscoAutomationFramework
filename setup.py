@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup
-#from distutils.core import setup
+from CiscoAutomationFramework import __version__
 
 description = '''The CiscoAutomationFramework is designed to be an interface for network engineers to 
 issue commands and retrieve output from Cisco devices regardless of firmware so they can easily build automation 
@@ -8,7 +8,7 @@ scripts atop the framework and dont have to worry about the nuances of CLI scrap
 
 setup(
     name='CiscoAutomationFramework',
-    version='0.6.1',
+    version=__version__,
     packages=['CiscoAutomationFramework'],
     keywords='cisco automation framework network',
     url='https://github.com/superadm1n/CiscoAutomationFramework',

@@ -27,6 +27,8 @@ from .CiscoNXOS import NXOS
 from .CiscoASA import ASA
 from . import CustomExceptions
 
+__version__ = '0.7.0'
+
 def factory(transport_engine):
 
     # detect the firmware
