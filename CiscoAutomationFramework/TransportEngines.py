@@ -147,7 +147,7 @@ class BaseClass:
         # return output as a list
         return output
 
-    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
+    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10, detecting_firmware=False):
         '''Sends command and returns the output to the Cisco device. This method returns the raw data
         .. NOTE::
           This will soon be replace the send_command_expect_different_prompt and
@@ -219,9 +219,9 @@ class SSHEngine(BaseClass):
 
         self.close_connection()
 
-    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
+    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10, detecting_firmware=False):
         self.send_command(command)
-        return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
+        return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout, detecting_firmware=detecting_firmware)
 
     def connect_to_server(self, ip, username, password):
         '''
@@ -455,7 +455,7 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
-    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10):
+    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10, detecting_firmware=False):
         self.send_command(command)
         return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
 
