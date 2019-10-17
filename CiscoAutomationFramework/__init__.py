@@ -27,7 +27,7 @@ from .CiscoNXOS import NXOS
 from .CiscoASA import ASA
 from . import CustomExceptions
 
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 
 def factory(transport_engine):
 
