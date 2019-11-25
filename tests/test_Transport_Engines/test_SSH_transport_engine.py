@@ -7,7 +7,6 @@ from unittest import TestCase
 
 resp1 = '''
 *********************
-Bellin Health Systems
 *********************
 WARNING:  This system is for the use of authorized clients only.
 Individuals using the computer network system without authorization,
@@ -23,7 +22,6 @@ evidence of such activity to law enforcement officer.
 Access is restricted to authorized users only.  Unauthorized access
 is a violation of state and federal, civil and criminal laws.
 ===========================================
-Bellin Health IT Service Desk: 920-436-8600
 ===========================================
 
 BMH-ED-SW2#
