@@ -2,7 +2,11 @@ from multiprocessing import cpu_count, Process, Queue, Event
 from threading import Thread
 from time import sleep
 from datetime import datetime, timedelta
+from inspect import signature
+from types import FunctionType
 
+class ParameterError(Exception):
+    pass
 
 class NetThread(Thread):
     '''
@@ -170,6 +174,13 @@ def parallel_process(list_of_jobs, num_processes=(cpu_count() - 1), num_threads_
     :param data_handler: Unexecuted function that is a callback to handle the data as it is returned from each process
     :return:
     '''
+
+    if data_handler:
+        if type(data_handler) != FunctionType:
+            raise TypeError('Data handler must be a function')
+        if len(signature(data_handler).parameters) != 1:
+            raise ParameterError('Data Handler Must accept 1 parameter')
+
     workers = init_workers(list_of_jobs, worker_thread_timeout, num_processes, num_threads_per_proc)
     data_to_return = []
     while True:
