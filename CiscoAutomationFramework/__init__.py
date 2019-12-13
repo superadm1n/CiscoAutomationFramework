@@ -63,7 +63,6 @@ def factory(transport_engine):
         def __init__(self, transport):
             self.transport = transport
             self.firmware = firmware
-            self.hostname = transport.hostname
             self.detected_firmware_version = detected_firmware_version_number
             super().__init__(transport)
 
@@ -72,6 +71,21 @@ def factory(transport_engine):
 
         def __exit__(self, exc_type, exc_val, exc_tb):
             self.transport.close_connection()
+
+        @property
+        def prompt(self):
+            return self.transport.prompt
+
+        @property
+        def hostname(self):
+            return self.transport.hostname
+
+        @property
+        def last_issued_command(self):
+            return self.transport.last_issued_command
+
+        def send_command_get_output(self, command, *args, **kwargs):
+            return self.transport.send_command_get_output(command, *args, **kwargs)
 
     return CAF(transport_engine)
 
