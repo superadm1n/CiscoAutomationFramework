@@ -74,6 +74,7 @@ class BaseClass(ABC):
     '''
 
     def __init__(self, error_handler=None):
+        super().__init__()
         self.prompt = ''
         self.hostname = ''
         self.shell = None
