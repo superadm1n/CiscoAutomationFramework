@@ -108,6 +108,26 @@ class BaseClass(ABC):
 
         self.close_connection()
 
+    @abstractmethod
+    def close_connection(self):
+        '''Closes the connection to the Cisco device
+
+        :return:
+        '''
+        raise MethodNotImplemented('This method has not been implemented!')
+
+    @abstractmethod
+    def _send_command(self, command):
+        pass
+
+    @abstractmethod
+    def _get_output(self, wait_time, detecting_firmware, buffer_size, timeout):
+        pass
+
+    @abstractmethod
+    def connect_to_server(self):
+        pass
+
     def _pre_parser(self, output):
         '''Pre parser that will process the output from the device prior to passing it up to the user.
 
@@ -120,20 +140,6 @@ class BaseClass(ABC):
             if line.startswith('%') and self.error_handler:
                 self.error_handler(line, self.last_issued_command)
 
-    def connect_to_server(self):
-        '''High level function that will call all the engine specific methods to connect to the server.
-        For instance if it is connecting via ssh it will call whatever private methods it needs to so it
-        has access to the console, for serial it will end up at the console but call different private methods
-        in the serial engine class
-
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
-
-    @abstractmethod
-    def _send_command(self, command):
-        pass
-
     def send_command(self, command):
         '''Method to send command to the device. This method will automatically send the return character
         so there is no need to put that in the command
@@ -143,10 +149,6 @@ class BaseClass(ABC):
         '''
         self.last_issued_command = command
         return self._send_command(command)
-
-    @abstractmethod
-    def _get_output(self, wait_time, detecting_firmware, buffer_size, timeout):
-        pass
 
     def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=True, buffer_size=1, timeout=10):
         '''This method gathers the data that is waiting from the Cisco device and then returns it
@@ -189,14 +191,6 @@ class BaseClass(ABC):
         self.send_command(command)
         return self.get_output(detecting_firmware=detecting_firmware, return_as_list=return_as_list,
                             buffer_size=buffer_size, timeout=timeout, wait_time=.1)
-
-    @abstractmethod
-    def close_connection(self):
-        '''Closes the connection to the Cisco device
-
-        :return:
-        '''
-        raise MethodNotImplemented('This method has not been implemented!')
 
     def throw_away_buffer_data(self):
         '''Method to gather data from a Cisco device and throw away the output. This method
@@ -371,6 +365,7 @@ class SSHEngine(BaseClass):
 
 
 class SerialEngine(BaseClass, serial.Serial):
+
     def __init__(self, error_handler=None):
         BaseClass.__init__(self, error_handler)
         serial.Serial.__init__(self)
@@ -383,7 +378,6 @@ class SerialEngine(BaseClass, serial.Serial):
     def connect_to_server(self, serial_interface, username=None, password=None):
 
         self.ser = serial.Serial(serial_interface, baudrate=self.baud, timeout=self.timeout)
-
         self.location = self._determine_location()
 
         if self.location == 'LOGIN':
@@ -462,14 +456,9 @@ class SerialEngine(BaseClass, serial.Serial):
         '''
 
         self.hostname = self.prompt[:-1]
-
         self.send_command(' ')
-
         time.sleep(1)
-
         output = self.get_output(return_as_list=True)
-
-        #output = self.send_command_expect_different_prompt(command=' ', return_as_list=True, timeout=10)
 
     def _send_command(self, command):
         '''
@@ -498,7 +487,6 @@ class SerialEngine(BaseClass, serial.Serial):
             for line in self.ser.readlines():
                 fromDevice = line.decode().strip('\r\n')
                 bytes_discarded += len(fromDevice)
-                # output.append(fromDevice
 
             if bytes_discarded == 0:
                 break
