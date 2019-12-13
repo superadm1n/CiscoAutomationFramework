@@ -39,6 +39,7 @@ def factory(transport_engine):
     # detect the firmware
     sh_ver_output, firmware = Util.detect_firmware(transport_engine)
     detected_firmware_version_number = None
+    sh_ver_output = sh_ver_output
 
     # determine parent object based on firmware
     obj = None
@@ -80,10 +81,12 @@ def _inspect_error_handler(error_handler):
     It checks that it is a function and also checks that it accepts 1 parameter if both of those conditions
     are not met it will raise an appropriate error.
     """
+    num_accepted_parameters = 2
+
     if type(error_handler) != FunctionType:
         raise TypeError('Data handler must be a function')
-    if len(signature(error_handler).parameters) != 1:
-        raise ParameterError('Data Handler Must accept 1 parameter')
+    if len(signature(error_handler).parameters) != num_accepted_parameters:
+        raise ParameterError('Data Handler Must accept {} parameter'.format(num_accepted_parameters))
 
 
 def connect_ssh(ip, username, password, enable_password=None, error_handler=None):

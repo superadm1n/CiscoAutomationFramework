@@ -82,6 +82,7 @@ class BaseClass(ABC):
         self.terminal_length_value = None
         self.terminal_width_value = None
         self.error_handler = error_handler
+        self.last_issued_command = None
 
         self._output = ''
 
@@ -108,16 +109,16 @@ class BaseClass(ABC):
         self.close_connection()
 
     def _pre_parser(self, output):
-        '''Basic pre parser that will process the output from the device prior to passing it up to the user.
-        Right now it simply checks for an error and logs it in the log file.
+        '''Pre parser that will process the output from the device prior to passing it up to the user.
 
         :param output: Output from the device in a list
         :return: Nothing
         '''
+        if type(output) is not list:
+            output = output.splitlines()
         for line in output:
             if line.startswith('%') and self.error_handler:
-                self.error_handler(line)
-                #logger.error('Error detected! - {}'.format(line))
+                self.error_handler(line, self.last_issued_command)
 
     def connect_to_server(self):
         '''High level function that will call all the engine specific methods to connect to the server.
@@ -140,10 +141,11 @@ class BaseClass(ABC):
         :param command: Command to send
         :return: Nothing
         '''
+        self.last_issued_command = command
         return self._send_command(command)
 
     @abstractmethod
-    def _get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+    def _get_output(self, wait_time, detecting_firmware, buffer_size, timeout):
         pass
 
     def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=True, buffer_size=1, timeout=10):
@@ -158,7 +160,7 @@ class BaseClass(ABC):
         :return:
         '''
 
-        output = self._get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)[2:]
+        output = self._get_output(wait_time, detecting_firmware, buffer_size, timeout)[2:]
 
         if detecting_firmware is True:
             # This is needed because of the way CAF detects firmware, it will leave extra lines of the prompt in the buffer
@@ -312,7 +314,7 @@ class SSHEngine(BaseClass):
 
         self.shell.send('{}\n'.format(command))
 
-    def _get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
+    def _get_output(self, wait_time=.2, detecting_firmware=False, buffer_size=1, timeout=10):
 
         '''
         .. warning:: Only use this method if you are sure the last line of output of the server will be the
@@ -348,7 +350,7 @@ class SSHEngine(BaseClass):
             if not self.shell.recv_ready():
                 time.sleep(.5)
 
-        return output
+        return output.splitlines()
 
     def close_connection(self):
         '''
@@ -508,7 +510,7 @@ class SerialEngine(BaseClass, serial.Serial):
 
         return total_bytes_discarded
 
-    def _get_output(self, timeout=10, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def _get_output(self, timeout=10, wait_time=.2, detecting_firmware=False, buffer_size=1):
 
         '''
         Gets output when the same prompt is expected to be returned
