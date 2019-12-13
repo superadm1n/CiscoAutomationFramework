@@ -17,7 +17,7 @@ limitations under the License.
 
 
 '''
-log_level = 10
+log_level = 60
 log_to_console = True
 from . import Util
 from .TransportEngines import SSHEngine, SerialEngine
@@ -29,7 +29,7 @@ from . import CustomExceptions
 from inspect import signature
 from types import FunctionType
 
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 
 class ParameterError(Exception):
     pass
