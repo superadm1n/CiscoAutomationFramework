@@ -26,8 +26,13 @@ from .CiscoIOS import IOS
 from .CiscoNXOS import NXOS
 from .CiscoASA import ASA
 from . import CustomExceptions
+from inspect import signature
+from types import FunctionType
 
 __version__ = '0.7.1'
+
+class ParameterError(Exception):
+    pass
 
 def factory(transport_engine):
 
@@ -69,16 +74,33 @@ def factory(transport_engine):
 
     return CAF(transport_engine)
 
+def _inspect_error_handler(error_handler):
+    """
+    Method to inspect the error handler method that is intended to be passed into connect_ssh or connect_serial
+    It checks that it is a function and also checks that it accepts 1 parameter if both of those conditions
+    are not met it will raise an appropriate error.
+    """
+    if type(error_handler) != FunctionType:
+        raise TypeError('Data handler must be a function')
+    if len(signature(error_handler).parameters) != 1:
+        raise ParameterError('Data Handler Must accept 1 parameter')
 
-def connect_ssh(ip, username, password, enable_password=None):
-    ssh = SSHEngine()
+
+def connect_ssh(ip, username, password, enable_password=None, error_handler=None):
+    if error_handler:
+        _inspect_error_handler(error_handler)
+
+    ssh = SSHEngine(error_handler=error_handler)
     ssh.enable_password = enable_password
     ssh.connect_to_server(ip, username, password)
     return factory(ssh)
 
 
-def connect_serial(COM, username, password, enable_password=None):
-    ser = SerialEngine()
+def connect_serial(COM, username, password, enable_password=None, error_handler=None):
+    if error_handler:
+        _inspect_error_handler(error_handler)
+
+    ser = SerialEngine(error_handler=error_handler)
     ser.enable_password = enable_password
     ser.connect_to_server(COM, username, password)
     return factory(ser)

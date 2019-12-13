@@ -73,7 +73,7 @@ class BaseClass:
 
     '''
 
-    def __init__(self):
+    def __init__(self, error_handler=None):
         self.prompt = ''
         self.hostname = ''
         self.shell = None
@@ -81,6 +81,7 @@ class BaseClass:
         self.enable_password = ''
         self.terminal_length_value = None
         self.terminal_width_value = None
+        self.error_handler = error_handler
 
         self._output = ''
 
@@ -92,8 +93,9 @@ class BaseClass:
         :return: Nothing
         '''
         for line in output:
-            if line.startswith('%'):
-                logger.error('Error detected! - {}'.format(line))
+            if line.startswith('%') and self.error_handler:
+                self.error_handler(line)
+                #logger.error('Error detected! - {}'.format(line))
 
     def connect_to_server(self):
         '''High level function that will call all the engine specific methods to connect to the server.
@@ -190,8 +192,8 @@ class BaseClass:
 
 
 class SSHEngine(BaseClass):
-    def __init__(self):
-        BaseClass.__init__(self)
+    def __init__(self, error_handler=None):
+        BaseClass.__init__(self, error_handler)
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -368,8 +370,8 @@ class SSHEngine(BaseClass):
 
 
 class SerialEngine(BaseClass, serial.Serial):
-    def __init__(self):
-        BaseClass.__init__(self)
+    def __init__(self, error_handler=None):
+        BaseClass.__init__(self, error_handler)
         serial.Serial.__init__(self)
         self.baud = 9600
         self.timeout = 1
