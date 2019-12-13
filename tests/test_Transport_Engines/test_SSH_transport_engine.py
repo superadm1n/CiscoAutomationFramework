@@ -28,21 +28,21 @@ BMH-ED-SW2#
 '''
 resp2 = ['welcome to the switch', 'you are in', 'switch#']
 
-class TestConnectToServer(TestCase):
-
-    def test_successful_connection(self):
-        ssh = TestableSSHEngine(resp1)
-        t = ssh.connect_to_server('192.168.10.1', 'user', 'password')
-        self.assertEqual('Connection Successful', t)
-
-
-    def test_successful_connection_2(self):
-        ssh = TestableSSHEngine(['1#', '2#'])
-        t = ssh.connect_to_server('192.168.10.1', 'user', 'password')
-        self.assertEqual('Connection Successful', t)
-
-    def test_send_command(self):
-        ssh = TestableSSHEngine(['%'])
-        t = ssh.send_command('my bad command')
-        print(t)
+# class TestConnectToServer(TestCase):
+#
+#     def test_successful_connection(self):
+#         ssh = TestableSSHEngine(resp1)
+#         t = ssh.connect_to_server('192.168.10.1', 'user', 'password')
+#         self.assertEqual('Connection Successful', t)
+#
+#
+#     def test_successful_connection_2(self):
+#         ssh = TestableSSHEngine(['1#', '2#'])
+#         t = ssh.connect_to_server('192.168.10.1', 'user', 'password')
+#         self.assertEqual('Connection Successful', t)
+#
+#     def test_send_command(self):
+#         ssh = TestableSSHEngine(['%'])
+#         t = ssh.send_command('my bad command')
+#         print(t)
 
