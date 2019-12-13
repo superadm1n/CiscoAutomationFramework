@@ -21,6 +21,9 @@ class NetThread(Thread):
         self.output = None
         self.start_time = datetime.now()
 
+    def kill(self):
+        pass
+
     def run(self):
         self.output = self.job(*self.job_args)
 
