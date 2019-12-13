@@ -22,7 +22,7 @@ on what parameter is passed the interface will chose the correct engine to use t
 
 '''
 
-
+from abc import ABC, abstractmethod
 import serial
 import paramiko
 import time
@@ -57,7 +57,7 @@ except PermissionError:
     logger.disabled = True
 
 
-class BaseClass:
+class BaseClass(ABC):
     '''
     This class contains all of the API calls that will be presented to the user and the rest of the package
     in a standard way. They are the calls that the methods of the rest of the package uses to interact with
@@ -85,6 +85,28 @@ class BaseClass:
 
         self._output = ''
 
+    def __enter__(self):
+        '''
+        Required to allow the class to be used inside a 'with' statement (with Ciscossh() as ssh:)
+
+        :return: self object
+        '''
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        '''
+        Required to allow the class to be used inside a 'with' statement (with Ciscossh() as ssh:) THis function is
+        called when the 'with' statement is exited.
+
+        :param exc_type:
+        :param exc_val:
+        :param exc_tb:
+        :return: Nothing
+        '''
+
+        self.close_connection()
+
     def _pre_parser(self, output):
         '''Basic pre parser that will process the output from the device prior to passing it up to the user.
         Right now it simply checks for an error and logs it in the log file.
@@ -107,6 +129,10 @@ class BaseClass:
         '''
         raise MethodNotImplemented('This method has not been implemented!')
 
+    @abstractmethod
+    def _send_command(self, command):
+        pass
+
     def send_command(self, command):
         '''Method to send command to the device. This method will automatically send the return character
         so there is no need to put that in the command
@@ -114,15 +140,15 @@ class BaseClass:
         :param command: Command to send
         :return: Nothing
         '''
-        raise MethodNotImplemented('This method has not been implemented!')
+        return self._send_command(command)
 
-    def get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+    @abstractmethod
+    def _get_output(self, wait_time, detecting_firmware, return_as_list, buffer_size, timeout):
+        pass
+
+    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=True, buffer_size=1, timeout=10):
         '''This method gathers the data that is waiting from the Cisco device and then returns it
         for further parsing or directly to the user.
-
-        .. note::
-            For Developers: This method should not be overwritten but rather extended via super() as it contains
-            code that regardless of the engine, needs to run.
 
         :param wait_time:
         :param detecting_firmware:
@@ -132,7 +158,7 @@ class BaseClass:
         :return:
         '''
 
-        output = self._output.splitlines()[2:]
+        output = self._get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)[2:]
 
         if detecting_firmware is True:
             # This is needed because of the way CAF detects firmware, it will leave extra lines of the prompt in the buffer
@@ -151,9 +177,6 @@ class BaseClass:
 
     def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10, detecting_firmware=False):
         '''Sends command and returns the output to the Cisco device. This method returns the raw data
-        .. NOTE::
-          This will soon be replace the send_command_expect_different_prompt and
-          send_command_expect_same_prompt methods.
 
         :param command: Command to send to the device
         :param return_as_list: Set to True to return the output as a list
@@ -161,8 +184,11 @@ class BaseClass:
         :param timeout:
         :return:
         '''
-        raise MethodNotImplemented('This method has not been implemented!')
+        self.send_command(command)
+        return self.get_output(detecting_firmware=detecting_firmware, return_as_list=return_as_list,
+                            buffer_size=buffer_size, timeout=timeout, wait_time=.1)
 
+    @abstractmethod
     def close_connection(self):
         '''Closes the connection to the Cisco device
 
@@ -198,32 +224,6 @@ class SSHEngine(BaseClass):
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         self.sshPort = 22
-
-    def __enter__(self):
-        '''
-        Required to allow the class to be used inside a 'with' statement (with Ciscossh() as ssh:)
-
-        :return: self object
-        '''
-
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        '''
-        Required to allow the class to be used inside a 'with' statement (with Ciscossh() as ssh:) THis function is
-        called when the 'with' statement is exited.
-
-        :param exc_type:
-        :param exc_val:
-        :param exc_tb:
-        :return: Nothing
-        '''
-
-        self.close_connection()
-
-    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10, detecting_firmware=False):
-        self.send_command(command)
-        return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout, detecting_firmware=detecting_firmware)
 
     def connect_to_server(self, ip, username, password):
         '''
@@ -280,7 +280,7 @@ class SSHEngine(BaseClass):
         :return: Output from device
         '''
 
-        output = self.get_output(wait_time=.5)
+        output = self.get_output(wait_time=.5, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10)
 
         # At times the server will return the data in the 1st line, and others the second line, this try except block handles that
         try:
@@ -301,7 +301,7 @@ class SSHEngine(BaseClass):
 
         return output
 
-    def send_command(self, command):
+    def _send_command(self, command):
 
         '''
         Method for sending a command to the remote device
@@ -312,7 +312,7 @@ class SSHEngine(BaseClass):
 
         self.shell.send('{}\n'.format(command))
 
-    def get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
+    def _get_output(self, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1, timeout=10):
 
         '''
         .. warning:: Only use this method if you are sure the last line of output of the server will be the
@@ -338,18 +338,17 @@ class SSHEngine(BaseClass):
         '''
 
         time.sleep(wait_time)
-        self._output = '\n\n'
-        #output = '\n\n'
+        output = '\n\n'
 
         while True:
-            self._output += bytes.decode(self.shell.recv(buffer_size))
+            output += bytes.decode(self.shell.recv(buffer_size))
             self.recievedData = True
-            if '>' in self._output.splitlines()[-1] or '#' in self._output.splitlines()[-1] and not self.shell.recv_ready():
+            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1] and not self.shell.recv_ready():
                 break
             if not self.shell.recv_ready():
                 time.sleep(.5)
 
-        return super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
+        return output
 
     def close_connection(self):
         '''
@@ -378,11 +377,6 @@ class SerialEngine(BaseClass, serial.Serial):
         self.ser = None
         self.location = None
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close_connection()
 
     def connect_to_server(self, serial_interface, username=None, password=None):
 
@@ -457,9 +451,6 @@ class SerialEngine(BaseClass, serial.Serial):
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
 
-    def send_command_get_output(self, command, return_as_list=False, buffer_size=1, timeout=10, detecting_firmware=False):
-        self.send_command(command)
-        return self.get_output(return_as_list=return_as_list, buffer_size=buffer_size, timeout=timeout)
 
     def get_initial_prompt(self, login_output=None):
         '''
@@ -478,7 +469,7 @@ class SerialEngine(BaseClass, serial.Serial):
 
         #output = self.send_command_expect_different_prompt(command=' ', return_as_list=True, timeout=10)
 
-    def send_command(self, command):
+    def _send_command(self, command):
         '''
         Method to send a command out the serial interface to the server
 
@@ -517,7 +508,7 @@ class SerialEngine(BaseClass, serial.Serial):
 
         return total_bytes_discarded
 
-    def get_output(self, timeout=10, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
+    def _get_output(self, timeout=10, wait_time=.2, detecting_firmware=False, return_as_list=False, buffer_size=1):
 
         '''
         Gets output when the same prompt is expected to be returned
@@ -534,18 +525,18 @@ class SerialEngine(BaseClass, serial.Serial):
         # TODO: convert this method to have a timeout and use a thread
 
         logging.debug('Serial engine starting to get output from device')
-        self._output = '\n\n'
+        output = '\n\n'
 
         time.sleep(.1)
         count = 0
         while True:
             if self.ser.in_waiting > 0:
-                self._output += self.ser.read(self.ser.in_waiting).decode()
+                output += self.ser.read(self.ser.in_waiting).decode()
             count += 1
-            if '>' in self._output.splitlines()[-1] or '#' in self._output.splitlines()[-1] and self.ser.in_waiting == 0:
+            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1] and self.ser.in_waiting == 0:
                 break
 
-        return super().get_output(wait_time, detecting_firmware, return_as_list, buffer_size, timeout)
+        return output
 
     def close_connection(self):
         '''
