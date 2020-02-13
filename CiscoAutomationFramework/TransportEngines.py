@@ -375,7 +375,6 @@ class SerialEngine(BaseClass, serial.Serial):
         self.ser = None
         self.location = None
 
-
     def connect_to_server(self, serial_interface, username=None, password=None):
 
         self.ser = serial.Serial(serial_interface, baudrate=self.baud, timeout=self.timeout)
@@ -447,7 +446,6 @@ class SerialEngine(BaseClass, serial.Serial):
                 raise CustomExceptions.UnableToDetermineLocation(
                     'Serial Engine is unable to determine if the shell is requiring '
                     'login or already logged in ')
-
 
     def get_initial_prompt(self, login_output=None):
         '''
