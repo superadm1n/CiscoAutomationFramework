@@ -29,14 +29,20 @@ import socket
 import time
 
 
+ctrl_c = chr(3)
+
+
 class NoIPAvailable(Exception):
     pass
+
 
 class ListOfIPsNotProvided(Exception):
     pass
 
+
 class IPAddressNotValid(Exception):
     pass
+
 
 class PingTest:
     '''
