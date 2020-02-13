@@ -31,8 +31,10 @@ from types import FunctionType
 
 __version__ = '0.7.4'
 
+
 class ParameterError(Exception):
     pass
+
 
 def factory(transport_engine):
 
@@ -86,10 +88,17 @@ def factory(transport_engine):
         def send_command_get_output(self, command, *args, **kwargs):
             return self.transport.send_command_get_output(command, *args, **kwargs)
 
+        def send_command(self, command):
+            return self.transport.send_command(command)
+
+        def get_output(self, *args, **kwargs):
+            return self.transport.get_output(*args, **kwargs)
+
         def close_connection(self):
             return self.transport.close_connection()
 
     return CAF(transport_engine)
+
 
 def _inspect_error_handler(error_handler):
     """
