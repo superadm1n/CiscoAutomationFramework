@@ -29,7 +29,7 @@ from . import CustomExceptions
 from inspect import signature
 from types import FunctionType
 
-__version__ = '0.7.3'
+__version__ = '0.7.4'
 
 class ParameterError(Exception):
     pass
@@ -39,7 +39,6 @@ def factory(transport_engine):
     # detect the firmware
     sh_ver_output, firmware = Util.detect_firmware(transport_engine)
     detected_firmware_version_number = None
-    sh_ver_output = sh_ver_output
 
     # determine parent object based on firmware
     obj = None
@@ -86,6 +85,9 @@ def factory(transport_engine):
 
         def send_command_get_output(self, command, *args, **kwargs):
             return self.transport.send_command_get_output(command, *args, **kwargs)
+
+        def close_connection(self):
+            return self.transport.close_connection()
 
     return CAF(transport_engine)
 
