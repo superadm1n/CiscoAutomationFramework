@@ -45,18 +45,11 @@ def factory(transport_engine):
     # determine parent object based on firmware
     obj = None
     versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS, 'ASA': ASA}
-    if firmware == 'IOS':
-        obj = IOS
-        detected_firmware_version_number = Util.extract_version_number_ios(sh_ver_output)
-    elif firmware == 'IOSXE':
-        obj = IOSXE
-        detected_firmware_version_number = Util.extract_version_number_iosxe(sh_ver_output)
-    elif firmware == 'NXOS':
-        obj = NXOS
-        detected_firmware_version_number = Util.extract_version_number_nxos(sh_ver_output)
-    elif firmware == 'ASA':
+    obj = versions.get(firmware)
+
+    if firmware == 'ASA':
         raise CustomExceptions.OSNotSupported('Cisco ASA Operating System is not supported!')
-    else:
+    if not obj:
         raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
 
     # Build Interface Class
