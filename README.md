@@ -100,10 +100,10 @@ We use [SemVer](http://semver.org/) for versioning.
 
 ## Authors
 
-* **Kyle Kowalczyk** - *Initial work* - Github: [superadm1n](https://github.com/superadm1n) Personal Website: [SmallGuysIT](https://smallguysit.com)
+* **Kyle Kowalczyk** - *Initial work* - Github: [superadm1n](https://github.com/superadm1n) Personal Website: [KyleTK.com](https://kyletk.com)
 
 ## Code Documentation
-[CiscoAutomationFramework Code Documentation](http://git.smallguysit.com/)
+[CiscoAutomationFramework Code Documentation](https://ciscoautomationframework.readthedocs.io/en/latest/)
 
 ## License
 
