@@ -36,28 +36,31 @@ en_password = getpass('Enter Enable Password')
 
 # configures todays date
 date = datetime.datetime.now()
-today_date = '{}-{}-{}'.format(date.month, date.day, date.year)
+today_date = f'{date.month}-{date.day}-{date.year}'
 
 try:
     # Logs into the device, grabs running config and the hostname
     with connect_ssh(ip, username, password, en_password) as ssh:
         hostname = ssh.hostname
         print('Successfuly Logged into {}, grabbing running config.'.format(hostname))
-        running_config = ssh.show_run()
-
-    # Sets up the name of the file
-    filename = '{}-{}.txt'.format(hostname, today_date)
-    # saves file
-    with open(filename, 'w') as file:
-        print('Saving Running config.')
-        try:
-            file.write(running_config)
-            print('Running config saved successfully in file {}!'.format(filename))
-        except:  # TODO Improvement: - Handle Exceptions better
-            print('Running config NOT SAVED!')
-
+        running_config = ssh.running_config
 except:  # TODO Improvement: - Handle Exceptions better
     print('Unable to login to device, configuration not saved!')
+    exit()
+
+# Sets up the name of the file
+filename = f'{hostname}-{today_date}.txt'
+
+# saves file
+try:
+    print('Saving Running config.')
+    with open(filename, 'w') as file:
+        file.write(running_config)
+        print('Running config saved successfully in file {}!'.format(filename))
+except:  # TODO Improvement: - Handle Exceptions better
+    print('Running config NOT SAVED!')
+    exit()
+
 
 # Prints a footer and waits for the user to press enter before exiting
 print('\n---End of Script---')
