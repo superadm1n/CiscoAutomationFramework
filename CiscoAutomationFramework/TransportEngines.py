@@ -31,31 +31,6 @@ from . import CustomExceptions
 from CiscoAutomationFramework import log_level, log_to_console
 from .CustomExceptions import MethodNotImplemented
 
-level = log_level
-logFile = 'CiscoAutomationFramework.log'
-
-logger = logging.getLogger(__name__)
-logger.setLevel(level)
-logger.propagate = False
-
-file_handler = logging.FileHandler(logFile)
-file_handler.setLevel(log_level)
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(log_level)
-
-logFormatter = logging.Formatter('%(name)s:%(levelname)s:%(asctime)s:%(message)s')
-
-file_handler.setFormatter(logFormatter)
-stream_handler.setFormatter(logFormatter)
-
-try:
-    logger.addHandler(file_handler)
-    if log_to_console:
-        logger.addHandler(stream_handler)
-except PermissionError:
-    print('Permission denied when attempting to write log file, disabling logging')
-    logger.disabled = True
-
 
 class BaseClass(ABC):
     '''
@@ -128,6 +103,24 @@ class BaseClass(ABC):
     @abstractmethod
     def connect_to_server(self):
         pass
+
+    @property
+    def in_user_exec_mode(self):
+        if self.prompt.endswith('>'):
+            return True
+        return False
+
+    @property
+    def in_privileged_exec_mode(self):
+        if self.prompt.endswith('#') and not self.prompt.endswith(')#'):
+            return True
+        return False
+
+    @property
+    def in_configuration_mode(self):
+        if self.prompt.endswith(')#'):
+            return True
+        return False
 
     def _pre_parser(self, output):
         '''Pre parser that will process the output from the device prior to passing it up to the user.
@@ -285,7 +278,7 @@ class SSHEngine(BaseClass):
             self.send_command('')
             output = self.get_output(return_as_list=True)
             for line in output:
-                if line is not '' and line is not ' ':
+                if line != '' and line != ' ':
                     self.hostname = line[:-1]
                     break
 

@@ -2,7 +2,7 @@ import os
 import sys
 script_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_path)
-from .Base import TestableSSHEngine
+from tests.test_Transport_Engines.Base import TestableSSHEngine
 from unittest import TestCase
 
 resp1 = '''

@@ -71,3 +71,6 @@ class MethodNotSupported(Exception):
 
 class NotConfigured(Exception):
     pass
+
+class ParserError(Exception):
+    pass

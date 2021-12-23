@@ -87,28 +87,6 @@ class PingTest:
             return False
 
 
-def gather_user_pass():
-    '''
-    CLI method to gather a username and password
-
-    :return: List containing username and password
-    :rtype: list
-    '''
-    username = input('Enter Username: ')
-    password = getpass('Enter Password: ')
-    return [username, password]
-
-def gather_enable():
-    '''
-    CLI method to gather an enable password
-
-    :return: Enable password entered by user
-    :rtype: str
-    '''
-    enable_password = getpass('Enter enable password: ')
-    return enable_password
-
-
 
 class IPaddress:
 

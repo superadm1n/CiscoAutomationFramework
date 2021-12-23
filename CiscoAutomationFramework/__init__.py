@@ -20,77 +20,19 @@ limitations under the License.
 log_level = 60
 log_to_console = True
 from . import Util
-from .TransportEngines import SSHEngine, SerialEngine
-from .CiscoIOSXE import IOSXE
-from .CiscoIOS import IOS
-from .CiscoNXOS import NXOS
-from .CiscoASA import ASA
-from . import CustomExceptions
+from CiscoAutomationFramework.TransportEngines import SSHEngine, SerialEngine
+from CiscoAutomationFramework.IOSXE import IOSXE
+from CiscoAutomationFramework.IOS import IOS
+from CiscoAutomationFramework.NXOS import NXOS
+from CiscoAutomationFramework import CustomExceptions
 from inspect import signature
 from types import FunctionType
 
-__version__ = '0.7.4'
+__version__ = '0.8.0'
 
 
 class ParameterError(Exception):
     pass
-
-
-def factory(transport_engine):
-
-    # detect the firmware
-    sh_ver_output, firmware = Util.detect_firmware(transport_engine)
-    detected_firmware_version_number = None
-
-    # determine parent object based on firmware
-    obj = None
-    versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS, 'ASA': ASA}
-    obj = versions.get(firmware)
-
-    if firmware == 'ASA':
-        raise CustomExceptions.OSNotSupported('Cisco ASA Operating System is not supported!')
-    if not obj:
-        raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
-
-    # Build Interface Class
-    class CAF(obj):
-        def __init__(self, transport):
-            self.transport = transport
-            self.firmware = firmware
-            self.detected_firmware_version = detected_firmware_version_number
-            super().__init__(transport)
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, exc_type, exc_val, exc_tb):
-            self.transport.close_connection()
-
-        @property
-        def prompt(self):
-            return self.transport.prompt
-
-        @property
-        def hostname(self):
-            return self.transport.hostname
-
-        @property
-        def last_issued_command(self):
-            return self.transport.last_issued_command
-
-        def send_command_get_output(self, command, *args, **kwargs):
-            return self.transport.send_command_get_output(command, *args, **kwargs)
-
-        def send_command(self, command):
-            return self.transport.send_command(command)
-
-        def get_output(self, *args, **kwargs):
-            return self.transport.get_output(*args, **kwargs)
-
-        def close_connection(self):
-            return self.transport.close_connection()
-
-    return CAF(transport_engine)
 
 
 def _inspect_error_handler(error_handler):
@@ -111,17 +53,41 @@ def connect_ssh(ip, username, password, enable_password=None, error_handler=None
     if error_handler:
         _inspect_error_handler(error_handler)
 
-    ssh = SSHEngine(error_handler=error_handler)
-    ssh.enable_password = enable_password
-    ssh.connect_to_server(ip, username, password)
-    return factory(ssh)
+    transport_engine = SSHEngine(error_handler=error_handler)
+    transport_engine.enable_password = enable_password
+    transport_engine.connect_to_server(ip, username, password)
+
+    sh_ver_output, firmware = Util.detect_firmware(transport_engine)
+
+    # determine parent object based on firmware
+    versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS}
+    obj = versions.get(firmware)
+
+    if firmware == 'ASA':
+        raise CustomExceptions.OSNotSupported('Cisco ASA Operating System is not supported!')
+    if not obj:
+        raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
+
+    return obj(transport_engine)
 
 
 def connect_serial(COM, username, password, enable_password=None, error_handler=None):
     if error_handler:
         _inspect_error_handler(error_handler)
 
-    ser = SerialEngine(error_handler=error_handler)
-    ser.enable_password = enable_password
-    ser.connect_to_server(COM, username, password)
-    return factory(ser)
+    transport_engine = SerialEngine(error_handler=error_handler)
+    transport_engine.enable_password = enable_password
+    transport_engine.connect_to_server(COM, username, password)
+
+    sh_ver_output, firmware = Util.detect_firmware(transport_engine)
+
+    # determine parent object based on firmware
+    versions = {'IOS': IOS, 'IOSXE': IOSXE, 'NXOS': NXOS}
+    obj = versions.get(firmware)
+
+    if firmware == 'ASA':
+        raise CustomExceptions.OSNotSupported('Cisco ASA Operating System is not supported!')
+    if not obj:
+        raise CustomExceptions.OsDetectionFailure('Unable to detect OS for device')
+
+    return obj(transport_engine)
