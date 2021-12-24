@@ -486,7 +486,7 @@ class SerialEngine(BaseClass, serial.Serial):
                 total_bytes_discarded += bytes_discarded
 
 
-        logger.debug('Discarded a total of {} bytes'.format(total_bytes_discarded))
+        # logger.debug('Discarded a total of {} bytes'.format(total_bytes_discarded))
 
         return total_bytes_discarded
 
