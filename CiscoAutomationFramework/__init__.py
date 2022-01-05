@@ -28,7 +28,7 @@ from CiscoAutomationFramework import CustomExceptions
 from inspect import signature
 from types import FunctionType
 
-__version__ = '0.8.1'
+__version__ = '0.8.2'
 
 
 class ParameterError(Exception):

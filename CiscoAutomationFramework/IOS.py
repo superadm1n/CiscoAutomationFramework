@@ -88,4 +88,5 @@ class IOS(CiscoFirmware):
 
     def save_config(self):
         self.cli_to_privileged_exec_mode()
-        return self.transport.send_command_get_output('copy running-config startup-config')
+        self.transport.send_command('copy running-config startup-config')
+        return self.transport.send_command_get_output('')

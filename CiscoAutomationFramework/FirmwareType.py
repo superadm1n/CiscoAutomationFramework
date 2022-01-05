@@ -23,20 +23,26 @@ class CiscoFirmware(ABC):
         if not isinstance(transport, TransportEngines.BaseClass):
             raise TypeError('transport object MUST be a sub class of CiscoAutomationFramework.TransportEngines.BaseClass')
         self.transport = transport
+        self.terminal_length()
 
     def cli_to_config_mode(self):
         self.cli_to_privileged_exec_mode()
-        self.transport.send_command('config t')
+        self.transport.send_command_get_output('config t')
 
-    def cli_to_privileged_exec_mode(self): # TODO: Get enable password typed in
+    def cli_to_privileged_exec_mode(self):  # TODO: Enable password typing will fail trying to get output. Fix!
         if self.transport.in_privileged_exec_mode:
             return None
         if self.transport.in_configuration_mode:
-            self.transport.send_command('end')
+            self.transport.send_command_get_output('end')
             return self.transport.in_privileged_exec_mode
+
         if self.transport.in_user_exec_mode:
-            self.transport.send_command('enable')
-            self.transport.send_command('')
+            enabling_output = self.transport.send_command_get_output('enable')
+            if self.transport.prompt not in enabling_output:
+                if not self.transport.enable_password:
+                    raise Exception('No enable password provided, network device is asking for one!')
+                self.transport.send_command_get_output(self.transport.enable_password)
+
 
     @property
     def prompt(self):
