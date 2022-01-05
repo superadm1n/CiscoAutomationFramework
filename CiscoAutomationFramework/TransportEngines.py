@@ -333,8 +333,12 @@ class SSHEngine(BaseClass):
         while True:
             output += bytes.decode(self.shell.recv(buffer_size))
             self.recievedData = True
-            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1] and not self.shell.recv_ready():
-                break
+            if '>' in output.splitlines()[-1] or '#' in output.splitlines()[-1] and not self.shell.recv_ready() and output.splitlines()[-1].endswith(('>', '#')):
+                time.sleep(.1)
+                if self.shell.recv_ready():
+                    pass
+                else:
+                    break
             if not self.shell.recv_ready():
                 time.sleep(.5)
 

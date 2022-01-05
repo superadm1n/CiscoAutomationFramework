@@ -90,3 +90,14 @@ class IOS(CiscoFirmware):
         self.cli_to_privileged_exec_mode()
         self.transport.send_command('copy running-config startup-config')
         return self.transport.send_command_get_output('')
+
+    def add_local_user(self, username, password, password_code=0, *args, **kwargs):
+        kwarg_string = ' '.join([f'{key} {value}' for key, value in kwargs.items()])
+        command_string = f'username {username} {" ".join(args)} {kwarg_string} secret {password_code} {password}'
+        self.cli_to_config_mode()
+        return self.transport.send_command_get_output(command_string)
+
+    def delete_local_user(self, username):
+        self.cli_to_config_mode()
+        self.transport.send_command(f'no username {username}')
+        return self.transport.send_command_get_output('')

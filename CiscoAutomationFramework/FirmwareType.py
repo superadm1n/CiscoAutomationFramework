@@ -114,6 +114,16 @@ class CiscoFirmware(ABC):
     def save_config(self):
         pass
 
+    @abstractmethod
+    def add_local_user(self, username, password, password_code=0, *args, **kwargs):
+        """Method here should be generating a string that the network device accepts in the following format
+        'username USERNAME <args> <kwarg key> <kwarg value>  password PASSWORD_CODE PASSWORD'"""
+        pass
+
+    @abstractmethod
+    def delete_local_user(self, username):
+        pass
+
     def __enter__(self):
         return self
 

@@ -91,3 +91,21 @@ class NXOS(CiscoFirmware):
     def save_config(self):
         self.cli_to_privileged_exec_mode()
         return self.transport.send_command_get_output('copy running-config startup-config')
+
+    def add_local_user(self, username, password, password_code=0, *args, **kwargs):
+        if len(password) < 8:
+            raise Exception('Password must be at least 8 characters!')
+        kwarg_string = ' '.join([f'{key} {value}' for key, value in kwargs.items()])
+
+        # if there is a space in the password, wrap it in quotes
+        if ' ' in password:
+            password = f'"{password}"'
+
+        command_string = f'username {username} {" ".join(args)} {kwarg_string} password {password_code} {password}'
+        self.cli_to_config_mode()
+        return self.transport.send_command_get_output(command_string)
+
+    def delete_local_user(self, username):
+        self.cli_to_config_mode()
+        self.transport.send_command(f'no username {username}')
+        return self.transport.send_command_get_output('')
