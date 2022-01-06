@@ -45,28 +45,28 @@ class IOS(CiscoFirmware):
     def mac_address_table(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_mac = self.transport.send_command_get_output('show mac address-table', buffer_size=50, return_as_list=True)
+        raw_mac = self.transport.send_command_get_output('show mac address-table', return_as_list=True)
         return '\n'.join(raw_mac[6:-2])
 
     @property
     def arp_table(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_arp = self.transport.send_command_get_output('show ip arp', buffer_size=50, return_as_list=True)
+        raw_arp = self.transport.send_command_get_output('show ip arp', return_as_list=True)
         return '\n'.join(raw_arp[2:-2])
 
     @property
     def running_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show running-config', buffer_size=50, timeout=15, return_as_list=True)
+        running_config = self.transport.send_command_get_output('show running-config', timeout=8, return_as_list=True)
         return '\n'.join(running_config[2:-2])
 
     @property
     def startup_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show startup-config', buffer_size=50, timeout=15, return_as_list=True)
+        running_config = self.transport.send_command_get_output('show startup-config', timeout=8, return_as_list=True)
         return '\n'.join(running_config[2:-2])
 
     def terminal_length(self, n='0'):

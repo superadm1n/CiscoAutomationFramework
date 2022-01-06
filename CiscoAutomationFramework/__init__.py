@@ -20,7 +20,7 @@ limitations under the License.
 log_level = 60
 log_to_console = True
 from . import Util
-from CiscoAutomationFramework.TransportEngines import SSHEngine, SerialEngine
+from CiscoAutomationFramework.TransportEngines import SSHEngine
 from CiscoAutomationFramework.IOSXE import IOSXE
 from CiscoAutomationFramework.IOS import IOS
 from CiscoAutomationFramework.NXOS import NXOS
@@ -28,7 +28,7 @@ from CiscoAutomationFramework import CustomExceptions
 from inspect import signature
 from types import FunctionType
 
-__version__ = '0.8.7'
+__version__ = '0.8.8'
 
 
 class ParameterError(Exception):

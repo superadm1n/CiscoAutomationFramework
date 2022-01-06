@@ -226,38 +226,29 @@ def detect_firmware(transport):
     :return: str IOSXE, IOS, NXOS, ASA
     '''
 
-    transport.send_command(command='show version')
-    time.sleep(.2)
-    for n in range(1, 4):
-        transport.send_command(' ')
-        time.sleep(.1)
-
-    output = transport.send_command_get_output(' ', detecting_firmware=True, return_as_list=True,
-                                                            timeout=10)
+    transport.send_command_get_output('terminal length 0')
+    output = transport.send_command_get_output('show version', return_as_list=True)
 
     # defines counter variable to keep track of the number of times a string is found
-    iosxe = 0
-    ios = 0
-    nxos = 0
-    asa = 0
+    results = {'IOSXE': 0, 'IOS': 0, 'NXOS': 0, 'ASA': 0}
 
     # parses the first 10 lines looking for 4 specific strings
     for line in output[:10]:
 
         if 'ios-xe' in line.lower() or 'ios xe' in line.lower():
-            iosxe += 1
+            results['IOSXE'] += 1
 
         elif 'ios' in line.lower():
-            ios += 1
+            results['IOS'] += 1
 
         elif 'nx-os' in line.lower():
-            nxos += 1
+            results['NXOS'] += 1
 
         elif 'adaptive security appliance' in line.lower():
-            asa += 1
+            results['ASA'] += 1
 
     # puts the results in a dictionary
-    results = {'IOSXE': iosxe, 'IOS': ios, 'NXOS': nxos, 'ASA': asa}
+
 
     # stores the key with the highest value in a variable
     firmware_version = max(results, key=results.get)
