@@ -13,17 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-from CiscoAutomationFramework import TransportEngines
+from CiscoAutomationFramework.TransportEngines import BaseEngine
 from abc import ABC, abstractmethod
+from inspect import getmodule
 
 
 class CiscoFirmware(ABC):
 
     def __init__(self, transport):
-        if not isinstance(transport, TransportEngines.BaseClass):
-            raise TypeError('transport object MUST be a sub class of CiscoAutomationFramework.TransportEngines.BaseClass')
+        if not isinstance(transport, BaseEngine):
+            raise TypeError(f'transport object MUST be a sub class of {getmodule(BaseEngine).__name__}.{BaseEngine.__name__}')
+        self._terminal_length_value = None
+        self._terminal_width_value = None
         self.transport = transport
-        self.terminal_length()
+        #self.terminal_length()
 
     def cli_to_config_mode(self):
         self.cli_to_privileged_exec_mode()
@@ -52,10 +55,6 @@ class CiscoFirmware(ABC):
     def hostname(self):
         return self.transport.hostname
 
-    @property
-    def last_issued_command(self):
-        return self.transport.last_issued_command
-
     def send_command_get_output(self, command, *args, **kwargs):
         return self.transport.send_command_get_output(command, *args, **kwargs)
 
@@ -67,6 +66,24 @@ class CiscoFirmware(ABC):
 
     def close_connection(self):
         return self.transport.close_connection()
+
+    def terminal_length(self, n='0'):
+        if self._terminal_length_value:
+            if self._terminal_length_value != int(n):
+                self._terminal_length_value = int(n)
+                return self._terminal_length(n)
+        else:
+            self._terminal_length_value = int(n)
+            return self._terminal_length(n)
+
+    def terminal_width(self, n='0'):
+        if self._terminal_width_value:
+            if self._terminal_width_value != int(n):
+                self._terminal_width_value = int(n)
+                return self._terminal_width(n)
+        else:
+            self._terminal_width_value = int(n)
+            return self._terminal_width(n)
 
     # Begin abstract properties
 
@@ -103,11 +120,11 @@ class CiscoFirmware(ABC):
     # Begin abstract methods
 
     @abstractmethod
-    def terminal_length(self, n='0'):
+    def _terminal_length(self, n='0'):
         pass
 
     @abstractmethod
-    def terminal_width(self, n='0'):
+    def _terminal_width(self, n='0'):
         pass
 
     @abstractmethod

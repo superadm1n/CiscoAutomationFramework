@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-from CiscoAutomationFramework.FirmwareType import CiscoFirmware
-from CiscoAutomationFramework.CustomExceptions import ParserError
+from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
+
 
 
 class IOS(CiscoFirmware):
@@ -34,56 +34,47 @@ class IOS(CiscoFirmware):
     def interfaces(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_data = self.transport.send_command_get_output('show interfaces', buffer_size=50, return_as_list=True)
+        raw_data = self.transport.send_command_get_output('show interfaces', buffer_size=50)
         try:
             parsed_data = [x.split()[0] for x in raw_data[2:-2] if not x.startswith(' ')]
         except IndexError as _:
-            raise ParserError('Unexpected data from device, Unable to extract interface names from "show interfaces" command!')
+            raise IndexError('Unexpected data from device, Unable to extract interface names from "show interfaces" command!')
         return parsed_data
 
     @property
     def mac_address_table(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_mac = self.transport.send_command_get_output('show mac address-table', return_as_list=True)
+        raw_mac = self.transport.send_command_get_output('show mac address-table')
         return '\n'.join(raw_mac[6:-2])
 
     @property
     def arp_table(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_arp = self.transport.send_command_get_output('show ip arp', return_as_list=True)
+        raw_arp = self.transport.send_command_get_output('show ip arp')
         return '\n'.join(raw_arp[2:-2])
 
     @property
     def running_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show running-config', timeout=8, return_as_list=True)
+        running_config = self.transport.send_command_get_output('show running-config', buffer_size=100)
         return '\n'.join(running_config[2:-2])
 
     @property
     def startup_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show startup-config', timeout=8, return_as_list=True)
+        running_config = self.transport.send_command_get_output('show startup-config')
         return '\n'.join(running_config[2:-2])
 
-    def terminal_length(self, n='0'):
+    def _terminal_length(self, n='0'):
         self.cli_to_privileged_exec_mode()
-        if self.transport.terminal_length_value == str(n):
-            return
-
-        self.transport.terminal_length_value = str(n)
         return self.transport.send_command_get_output(f'terminal length {n}')
 
-    def terminal_width(self, n='0'):
+    def _terminal_width(self, n='0'):
         self.cli_to_privileged_exec_mode()
-        if self.transport.terminal_width_value == str(n):
-            return 'Terminal width already set to proper value'
-
-        self.transport.terminal_width_value = str(n)
-
         return self.transport.send_command_get_output(f'terminal width {n}')
 
     def save_config(self):
