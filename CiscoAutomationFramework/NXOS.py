@@ -20,6 +20,10 @@ from CiscoAutomationFramework.CustomExceptions import ParserError
 
 class NXOS(CiscoFirmware):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.transport.hostname = self.transport.send_command_get_output('', return_as_list=True)[-1].strip()[:-1]
+
     @property
     def uptime(self):
         self.cli_to_privileged_exec_mode()
