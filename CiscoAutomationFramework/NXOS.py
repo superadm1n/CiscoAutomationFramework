@@ -91,7 +91,7 @@ class NXOS(CiscoFirmware):
         data = self.transport.send_command_get_output('copy running-config startup-config', timeout=15)
         # if the prompt is in the last line of output and there is not a percent sign in any line of output we will
         # interpret that as a succesful save
-        if self.transport.prompt in ''.join(data[-1:]) and not any('%' in line for line in data):
+        if self.transport.prompt in ''.join(data[-1:]) and any('complete' in line for line in data):
             return True
         return False
 
