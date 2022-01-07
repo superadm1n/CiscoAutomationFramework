@@ -88,7 +88,12 @@ class IOS(CiscoFirmware):
     def save_config(self):
         self.cli_to_privileged_exec_mode()
         self.transport.send_command('copy running-config startup-config')
-        return self.transport.send_command_get_output('')
+        data = self.transport.send_command_get_output('', timeout=15)
+        # if the prompt is in the last line of output and there is not a percent sign in any line of output we will
+        # interpret that as a succesful save
+        if self.transport.prompt in ''.join(data[-1:]) and not any('%' in line for line in data):
+            return True
+        return False
 
     def add_local_user(self, username, password, password_code=0, *args, **kwargs):
         kwarg_string = ' '.join([f'{key} {value}' for key, value in kwargs.items()])
