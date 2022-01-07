@@ -13,12 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
+from time import sleep
 
 
 class NXOS(CiscoFirmware):
-
 
     @property
     def uptime(self):
@@ -61,19 +60,22 @@ class NXOS(CiscoFirmware):
     def running_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show running-config', buffer_size=100, timeout=1)
-        return '\n'.join(running_config[2:-2])
+        self.transport.send_command('show running-config')
+        sleep(1.5)
+        config = self.transport.get_output(buffer_size=100)
+        return '\n'.join(config[2:-2])
 
     @property
     def startup_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show startup-config')
-        return '\n'.join(running_config[2:-2])
+        self.transport.send_command('show startup-config')
+        sleep(1.5)
+        config = self.transport.get_output(buffer_size=100)
+        return '\n'.join(config[2:-2])
 
     def _terminal_length(self, n='0'):
         self.cli_to_privileged_exec_mode()
-
         return self.transport.send_command_get_output(f'terminal length {n}')
 
     def _terminal_width(self, n='0'):

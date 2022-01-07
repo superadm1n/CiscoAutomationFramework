@@ -1,3 +1,18 @@
+'''
+Copyright 2021 Kyle Kowalczyk
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+'''
 from paramiko import SSHClient, AutoAddPolicy
 from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
@@ -5,7 +20,7 @@ from time import sleep
 
 default_command_end = '\n'
 default_buffer = 1
-default_timeout = 1
+default_timeout = .1
 
 class BaseEngine(ABC):
 
@@ -19,8 +34,15 @@ class BaseEngine(ABC):
 
     def get_output(self, buffer_size=default_buffer, timeout=default_timeout):
         from_device = self._get_output(buffer_size, timeout)
+
         if type(from_device) is not list:
-            return from_device.splitlines()
+            from_device = from_device.splitlines()
+
+        try:
+            self.prompt = from_device[-1].strip()
+        except KeyboardInterrupt:
+            pass
+
         return from_device
 
     def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer, timeout=default_timeout):
@@ -100,7 +122,6 @@ class SSHEngine(BaseEngine):
         hostname = prompt[:-1]
         return prompt, hostname
 
-
     def _get_output(self, buffer_size, timeout):
         output = ''
 
@@ -113,7 +134,7 @@ class SSHEngine(BaseEngine):
                     data += bytes.decode(self.shell.recv(buffer_size))
                     end = datetime.now() + timedelta(seconds=timeout)  # reset timeout clock
                 else:
-                    sleep(.1)
+                    sleep(.001)
                     if datetime.now() > end:
                         # timeout clock triggered, break out of loop because we must be at a point
                         # in the CLI where it does not return a prompt or is hung
@@ -121,7 +142,6 @@ class SSHEngine(BaseEngine):
             output += data[1:]
 
         return output.splitlines()
-
 
     def _send_command(self, command, end='\n'):
         self.commands_sent_since_last_output_get += 1

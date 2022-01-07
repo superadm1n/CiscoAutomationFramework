@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
+from time import sleep
 
 
 
@@ -53,21 +54,25 @@ class IOS(CiscoFirmware):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
         raw_arp = self.transport.send_command_get_output('show ip arp')
-        return '\n'.join(raw_arp[2:-2])
+        return '\n'.join(raw_arp[2:-1])
 
     @property
     def running_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show running-config', buffer_size=100)
+        self.transport.send_command('show running-config')
+        sleep(1.5)
+        running_config = self.transport.get_output(buffer_size=100)
         return '\n'.join(running_config[2:-2])
 
     @property
     def startup_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        running_config = self.transport.send_command_get_output('show startup-config')
-        return '\n'.join(running_config[2:-2])
+        self.transport.send_command('show startup-config')
+        sleep(1.5)
+        config = self.transport.get_output(buffer_size=100)
+        return '\n'.join(config[2:-2])
 
     def _terminal_length(self, n='0'):
         self.cli_to_privileged_exec_mode()

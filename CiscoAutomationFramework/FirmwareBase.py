@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-from CiscoAutomationFramework.TransportEngines import BaseEngine
+from CiscoAutomationFramework.TransportEngines import BaseEngine, default_buffer, default_timeout, default_command_end
 from abc import ABC, abstractmethod
 from inspect import getmodule
 
@@ -31,6 +31,7 @@ class CiscoFirmware(ABC):
     def cli_to_config_mode(self):
         self.cli_to_privileged_exec_mode()
         self.transport.send_command_get_output('config t')
+        return self.transport.in_configuration_mode
 
     def cli_to_privileged_exec_mode(self):  # TODO: Enable password typing will fail trying to get output. Fix!
         if self.transport.in_privileged_exec_mode:
@@ -45,6 +46,7 @@ class CiscoFirmware(ABC):
                 if not self.transport.enable_password:
                     raise Exception('No enable password provided, network device is asking for one!')
                 self.transport.send_command_get_output(self.transport.enable_password)
+                return self.transport.in_privileged_exec_mode
 
 
     @property
@@ -55,14 +57,14 @@ class CiscoFirmware(ABC):
     def hostname(self):
         return self.transport.hostname
 
-    def send_command_get_output(self, command, *args, **kwargs):
-        return self.transport.send_command_get_output(command, *args, **kwargs)
+    def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer, timeout=default_timeout):
+        return self.transport.send_command_get_output(command, end, buffer_size, timeout)
 
-    def send_command(self, command):
-        return self.transport.send_command(command)
+    def send_command(self, command, end=default_command_end):
+        return self.transport.send_command(command, end)
 
-    def get_output(self, *args, **kwargs):
-        return self.transport.get_output(*args, **kwargs)
+    def get_output(self, buffer_size=default_buffer, timeout=default_timeout):
+        return self.transport.get_output(buffer_size, timeout)
 
     def close_connection(self):
         return self.transport.close_connection()
