@@ -22,6 +22,7 @@ default_command_end = '\n'
 default_buffer = 1
 default_timeout = .1
 
+
 class BaseEngine(ABC):
 
     def __init__(self):

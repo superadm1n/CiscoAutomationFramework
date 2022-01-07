@@ -17,7 +17,6 @@ from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
 from time import sleep
 
 
-
 class IOS(CiscoFirmware):
 
     @property
