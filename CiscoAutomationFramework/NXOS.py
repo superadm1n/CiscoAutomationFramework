@@ -16,7 +16,6 @@ limitations under the License.
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
 from time import sleep
 
-
 class NXOS(CiscoFirmware):
 
     @property
@@ -35,7 +34,7 @@ class NXOS(CiscoFirmware):
         possible_interface_prefixes = ('Eth', 'Po', 'Vl', 'mgm ', 'Gi', 'Te', 'Fo', 'Fa')
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_data = self.transport.send_command_get_output('show interface', buffer_size=50)
+        raw_data = self.transport.send_command_get_output('show interface', buffer_size=500)
         try:
             parsed_data = [x.split()[0] for x in raw_data[2:-2] if len(x) > 1 and x.startswith(possible_interface_prefixes)]
         except IndexError as _:
@@ -61,17 +60,22 @@ class NXOS(CiscoFirmware):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
         self.transport.send_command('show running-config')
-        sleep(1.5)
-        config = self.transport.get_output(buffer_size=100)
-        return '\n'.join(config[2:-2])
+
+        running_config = self.transport.get_output(buffer_size=100)
+        while len(running_config) < 4 and not any([True if self.prompt in x else False for x in reversed(running_config[-4:])]):
+            running_config += self.transport.get_output(buffer_size=100, no_command_sent_previous=True)
+            sleep(.1)
+        return '\n'.join(running_config[2:-2])
 
     @property
     def startup_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        self.transport.send_command('show startup-config')
-        sleep(1.5)
-        config = self.transport.get_output(buffer_size=100)
+
+        config = self.transport.send_command_get_output('show startup-config', buffer_size=100)
+        while len(config) < 4 and not any([True if self.prompt in x else False for x in reversed(config[-4:])]):
+            config += self.transport.get_output(buffer_size=100, no_command_sent_previous=True)
+            sleep(.1)
         return '\n'.join(config[2:-2])
 
     def _terminal_length(self, n='0'):

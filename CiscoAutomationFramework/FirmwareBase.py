@@ -48,7 +48,6 @@ class CiscoFirmware(ABC):
                 self.transport.send_command_get_output(self.transport.enable_password)
                 return self.transport.in_privileged_exec_mode
 
-
     @property
     def prompt(self):
         return self.transport.prompt

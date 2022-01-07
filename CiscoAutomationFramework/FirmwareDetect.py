@@ -18,6 +18,7 @@ from CiscoAutomationFramework.IOS import IOS
 from CiscoAutomationFramework.IOSXE import IOSXE
 from CiscoAutomationFramework.NXOS import NXOS
 from inspect import getmodule
+from time import sleep
 
 
 def detect_firmware(transport):
