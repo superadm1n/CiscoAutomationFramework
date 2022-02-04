@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 from CiscoAutomationFramework.TransportEngines import BaseEngine, default_buffer, default_timeout, default_command_end
+from CiscoAutomationFramework.Exceptions import EnablePasswordError
 from abc import ABC, abstractmethod
 from inspect import getmodule
 
@@ -29,11 +30,18 @@ class CiscoFirmware(ABC):
         #self.terminal_length()
 
     def cli_to_config_mode(self):
+        """
+        Navigates the CLI into config mode regardless of where it is
+        """
         self.cli_to_privileged_exec_mode()
         self.transport.send_command_get_output('config t')
         return self.transport.in_configuration_mode
 
     def cli_to_privileged_exec_mode(self):  # TODO: Enable password typing will fail trying to get output. Fix!
+        """
+        Navigates the CLI into prvileged exec mode regardless of where it is. Will raise an EnablePasswordError
+        if the transport engine does not have an enable password set and the network device asks for one.
+        """
         if self.transport.in_privileged_exec_mode:
             return None
         if self.transport.in_configuration_mode:
@@ -44,31 +52,54 @@ class CiscoFirmware(ABC):
             enabling_output = self.transport.send_command_get_output('enable')
             if self.transport.prompt not in enabling_output:
                 if not self.transport.enable_password:
-                    raise Exception('No enable password provided, network device is asking for one!')
+                    raise EnablePasswordError('No enable password provided, network device is asking for one!')
                 self.transport.send_command_get_output(self.transport.enable_password)
                 return self.transport.in_privileged_exec_mode
 
     @property
     def prompt(self):
+        """
+        Returns the latest prompt that was returned from the device
+        """
         return self.transport.prompt
 
     @property
     def hostname(self):
+        """
+        Returns the hostname
+        """
         return self.transport.hostname
 
+
     def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer, timeout=default_timeout):
+        """
+        Sends a command to the device and returns the output from the device. If there were multiple commands sent
+        this will gather the output from all the commands at once
+        """
         return self.transport.send_command_get_output(command, end, buffer_size, timeout)
 
     def send_command(self, command, end=default_command_end):
+        """
+        Sends command to device, does not get any output
+        """
         return self.transport.send_command(command, end)
 
     def get_output(self, buffer_size=default_buffer, timeout=default_timeout):
+        """
+        Gets output from the device until the prompt is returned or the timeout is reached
+        """
         return self.transport.get_output(buffer_size, timeout)
 
     def close_connection(self):
+        """
+        Closes connection to device
+        """
         return self.transport.close_connection()
 
     def terminal_length(self, n='0'):
+        """
+        Sets terminal length of shell
+        """
         if self._terminal_length_value:
             if self._terminal_length_value != int(n):
                 self._terminal_length_value = int(n)
@@ -78,6 +109,9 @@ class CiscoFirmware(ABC):
             return self._terminal_length(n)
 
     def terminal_width(self, n='0'):
+        """
+        Sets terminal width of shell
+        """
         if self._terminal_width_value:
             if self._terminal_width_value != int(n):
                 self._terminal_width_value = int(n)
@@ -91,32 +125,49 @@ class CiscoFirmware(ABC):
     @property
     @abstractmethod
     def uptime(self):
+        """
+        Returns uptime
+        """
         pass
 
     @property
     @abstractmethod
     def interfaces(self):
+        """
+        Returns interfaces on the device
+        """
         pass
 
     @property
     @abstractmethod
     def mac_address_table(self):
+        """
+        Returns the MAC address table in its raw form
+        """
         pass
 
     @property
     @abstractmethod
     def arp_table(self):
+        """
+        Returns the MAC address table in its raw form
+        """
         pass
 
     @property
     @abstractmethod
     def running_config(self):
+        """
+        Returns running config in its raw form
+        """
         pass
 
     @property
     @abstractmethod
     def startup_config(self):
-        pass
+        """
+        Returns startup config in its raw form
+        """
 
     # Begin abstract methods
 
@@ -130,6 +181,9 @@ class CiscoFirmware(ABC):
 
     @abstractmethod
     def save_config(self):
+        """
+        Saves running config to startup config
+        """
         pass
 
     @abstractmethod
@@ -140,6 +194,9 @@ class CiscoFirmware(ABC):
 
     @abstractmethod
     def delete_local_user(self, username):
+        """
+        Deletes a locally defined user on device
+        """
         pass
 
     def __enter__(self):

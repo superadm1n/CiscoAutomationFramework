@@ -130,9 +130,10 @@ class SSHEngine(BaseEngine):
         self.client = SSHClient()
         self.client.set_missing_host_key_policy(AutoAddPolicy())
         self.shell = None
+        self.timeout = 10
 
     def connect_to_server(self, ip, username, password, port):
-        self.client.connect(hostname=ip, port=port, username=username, password=password)
+        self.client.connect(hostname=ip, port=port, username=username, password=password, timeout=self.timeout)
         self.shell = self.client.invoke_shell()
         self.prompt, self.hostname = self._get_prompt_and_hostname()
 
