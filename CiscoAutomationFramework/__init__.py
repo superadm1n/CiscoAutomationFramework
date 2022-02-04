@@ -16,7 +16,7 @@ limitations under the License.
 from CiscoAutomationFramework.TransportEngines import SSHEngine
 from CiscoAutomationFramework.FirmwareDetect import detect_firmware
 
-__version__ = '0.8.16'
+__version__ = '0.8.17'
 
 
 def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10):
