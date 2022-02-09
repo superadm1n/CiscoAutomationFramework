@@ -13,7 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-from CiscoAutomationFramework.TransportEngines import BaseEngine, default_buffer, default_timeout, default_command_end
+from CiscoAutomationFramework.TransportEngines import BaseEngine, default_buffer, default_timeout, \
+    default_command_end, default_delay
 from CiscoAutomationFramework.Exceptions import EnablePasswordError
 from abc import ABC, abstractmethod
 from inspect import getmodule
@@ -71,12 +72,13 @@ class CiscoFirmware(ABC):
         return self.transport.hostname
 
 
-    def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer, timeout=default_timeout):
+    def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer,
+                                timeout=default_timeout, delay=default_delay):
         """
         Sends a command to the device and returns the output from the device. If there were multiple commands sent
         this will gather the output from all the commands at once
         """
-        return self.transport.send_command_get_output(command, end, buffer_size, timeout)
+        return self.transport.send_command_get_output(command, end, buffer_size, timeout, delay)
 
     def send_command(self, command, end=default_command_end):
         """

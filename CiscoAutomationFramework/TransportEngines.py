@@ -21,6 +21,7 @@ from time import sleep
 default_command_end = '\n'
 default_buffer = 100
 default_timeout = 1
+default_delay = 0
 standard_prompt_endings = ('>', '#', '> ', '# ')
 
 
@@ -32,7 +33,6 @@ class BaseEngine(ABC):
         self.enable_password = None
         self.commands_sent_since_last_output_get = 0
         self.all_commands_sent = []
-
 
     def __enter__(self):
         return self
@@ -82,7 +82,7 @@ class BaseEngine(ABC):
 
         return output
 
-    def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer, timeout=default_timeout, delay=.5):
+    def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer, timeout=default_timeout, delay=default_delay):
         self.send_command(command, end)
         if delay:
             sleep(delay)
