@@ -21,7 +21,7 @@ from time import sleep
 default_command_end = '\n'
 default_buffer = 100
 default_timeout = 1
-default_delay = 0
+default_delay = .2
 standard_prompt_endings = ('>', '#', '> ', '# ')
 
 
