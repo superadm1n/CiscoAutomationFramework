@@ -14,3 +14,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 from CiscoAutomationFramework.Parsers.ConfigParser import ConfigParser
+from CiscoAutomationFramework.Parsers.RoutingTableParser import RoutingTableParser
+from CiscoAutomationFramework.Parsers.CDPparser import CDPparser
