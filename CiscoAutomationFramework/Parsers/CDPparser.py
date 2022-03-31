@@ -1,3 +1,45 @@
+
+class CDPEntry:
+
+    def __init__(self, entry_data):
+        self._data = entry_data
+
+    @property
+    def device_id(self):
+        for line in self._data:
+            if line.lower().startswith('device id'):
+                return line.split(':')[1].strip()
+
+    @property
+    def ip_address(self):
+        for line in self._data:
+            if 'ip' in line.lower() and 'address' in line.lower():
+                return line.split(':')[1].strip()
+
+    @property
+    def platform(self):
+        for line in self._data:
+            if line.lower().startswith('platform'):
+                return line.split(':')[1].split(',')[0].strip()
+
+    @property
+    def local_interface(self):
+        for line in self._data:
+            if line.lower().startswith('interface') and 'address' not in line:
+                return line.split(':')[1].split(',')[0].strip()
+
+    @property
+    def remote_interface(self):
+        for line in self._data:
+            if line.lower().startswith('interface') and 'address' not in line:
+                return line.split(':')[-1].strip()
+
+    @property
+    def version(self):
+        for index, line in enumerate(self._data):
+            if line.lower().startswith('version:'):
+                return self._data[index+1]
+
 class CDPparser:
 
     def __init__(self, raw_cdp_data):
@@ -5,36 +47,7 @@ class CDPparser:
             raw_cdp_data.splitlines()
         self.raw_cdp_data = raw_cdp_data[2:-2]
 
-    def _entry_device_id(self, section_data):
-        for line in section_data:
-            if line.lower().startswith('device id'):
-                return line.split(':')[1].strip()
-
-    def _entry_ip_address(self, section_data):
-        for line in section_data:
-            if 'ip' in line.lower() and 'address' in line.lower():
-                return line.split(':')[1].strip()
-
-    def _entry_platform(self, section_data):
-        for line in section_data:
-            if line.lower().startswith('platform'):
-                return line.split(':')[1].split(',')[0].strip()
-
-    def _entry_local_interface(self, section_data):
-        for line in section_data:
-            if line.lower().startswith('interface') and 'address' not in line:
-                return line.split(':')[1].split(',')[0].strip()
-
-    def _entry_remote_interface(self, section_data):
-        for line in section_data:
-            if line.lower().startswith('interface') and 'address' not in line:
-                return line.split(':')[-1].strip()
-
-    def _entry_version(self, section_data):
-        for index, line in enumerate(section_data):
-            if line.lower().startswith('version:'):
-                return section_data[index+1]
-
+    @property
     def _entries(self):
         all_sections = []
         section = []
@@ -55,9 +68,4 @@ class CDPparser:
 
     @property
     def cdp_entries(self):
-        data = []
-        for sec in self._entries():
-            data.append({'device_id': self._entry_device_id(sec), 'ip_address': self._entry_ip_address(sec),
-                         'platform': self._entry_platform(sec), 'local_interface': self._entry_local_interface(sec),
-                         'remote_interface': self._entry_remote_interface(sec), 'version': self._entry_version(sec)})
-        return data
+        return [CDPEntry(x) for x in self._entries]
