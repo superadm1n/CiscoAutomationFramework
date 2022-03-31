@@ -139,7 +139,7 @@ class IOSRoute(Route):
     def metric(self, hop):
         for line in self.data.split(','):
             if hop in line:
-                return line.split(']')[0].split('/')[1]
+                return line.split(']')[0].split('/')[1].split('[')[-1]
         return ''
 
     def __repr__(self):
@@ -147,14 +147,26 @@ class IOSRoute(Route):
 
 
 class RoutingTableParser:
-    def __init__(self, raw_routing_table, is_nexus=False):
-        if is_nexus:
+    def __init__(self, raw_routing_table):
+        self.unparsed = raw_routing_table
+
+        if self.is_nexus:
             self._raw_data = self._parse_out_header_nexus(raw_routing_table)
         else:
             self._raw_data = self._parse_out_header_ios(raw_routing_table)
-        self._is_nexus = is_nexus
+
+    @property
+    def is_nexus(self):
+        # if all the identifiers are somewhere in the first 5 lines of output, that is an IOS
+        # routing table header
+        identifiers = ['local', 'connected', 'static', 'rip', 'eigrp']
+        if all(x in ' '.join(self.unparsed[:5]).lower() for x in identifiers):
+            return False
+        return True
+
 
     def _parse_out_header_ios(self, data):
+
         return_data = []
         flag = False
         for line in data:
@@ -166,6 +178,8 @@ class RoutingTableParser:
         return return_data
 
     def _parse_out_header_nexus(self, data):
+        if 'ip route' in ' '.join(data[:3]).lower():
+            data = data[3:]
         return_data = []
         flag = False
         for line in data:
@@ -201,7 +215,7 @@ class RoutingTableParser:
 
     @property
     def routes(self):
-        if self._is_nexus:
+        if self.is_nexus:
             return [NexusRoute(x) for x in self.structured_data]
         else:
             return [IOSRoute(x) for x in self.structured_data]
