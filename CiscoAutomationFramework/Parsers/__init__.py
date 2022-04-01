@@ -16,3 +16,5 @@ limitations under the License.
 from CiscoAutomationFramework.Parsers.ConfigParser import ConfigParser
 from CiscoAutomationFramework.Parsers.RoutingTableParser import RoutingTableParser
 from CiscoAutomationFramework.Parsers.CDPparser import CDPparser
+from CiscoAutomationFramework.Parsers.PowerInlineParser import PowerInlineParser
+from CiscoAutomationFramework.Parsers.MacAddressTableParser import MacAddressTableParser
