@@ -20,6 +20,20 @@ __version__ = '0.8.19'
 
 
 def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10):
+    """
+
+    Args:
+        ip (str): IP address or hostname of Cisco device
+        username (str): Username used to login
+        password (str): Password for user
+        port (int): Port to use (default 22)
+        enable_password (str): Enable password to use if the user does not have privileges directly to privilege exec
+        timeout (int):
+
+    Returns: CiscoFirmware
+
+    """
+
     engine = SSHEngine()
     engine.enable_password = enable_password
     engine.timeout = timeout

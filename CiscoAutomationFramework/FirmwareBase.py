@@ -71,7 +71,6 @@ class CiscoFirmware(ABC):
         """
         return self.transport.hostname
 
-
     def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer,
                                 timeout=default_timeout, delay=default_delay):
         """
@@ -91,6 +90,24 @@ class CiscoFirmware(ABC):
         Gets output from the device until the prompt is returned or the timeout is reached
         """
         return self.transport.get_output(buffer_size, timeout)
+
+    def send_question_get_output(self, command):
+        """
+        Special method to get the output from sending a command with a question mark. This will
+        send the command with a trailing '?' get the output from that and then erase the command
+        that is returned on the ending prompt. You should NOT put a space in the command but
+        if you do, it will be removed.
+        """
+        if command.endswith('?'):
+            command = command.replace('?', '')
+        question_output = self.send_command_get_output(command, end=' ?')
+
+        # get rid of command that was sent from the terminal, to do that construct list of backspaces
+        # The question mark is not returned as a part of the next prompt line but the space is, account for that.
+        backspaces = ''.join([chr(8) for _char in range(len(command) + 1)])
+        self.send_command_get_output(backspaces)
+
+        return question_output
 
     def close_connection(self):
         """

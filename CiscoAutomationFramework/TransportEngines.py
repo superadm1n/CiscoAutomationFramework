@@ -28,7 +28,7 @@ standard_prompt_endings = ('>', '#', '> ', '# ')
 class BaseEngine(ABC):
 
     def __init__(self):
-        self.hostname = None
+        self.hostname = ''
         self.prompt = None
         self.enable_password = None
         self.commands_sent_since_last_output_get = 0
@@ -55,8 +55,9 @@ class BaseEngine(ABC):
         for x in range(self.commands_sent_since_last_output_get):
             data = '\n'
             end = datetime.now() + timedelta(seconds=timeout)
-            # while the last line of output doesnt start with the hostname or end with a > or a #
-            while not all([data.splitlines()[-1].startswith(self.hostname), data.splitlines()[-1].endswith(standard_prompt_endings)]):
+
+            # while the last line of output DOES NOT START with the hostname AND DOES NOT CONTAIN a standard prompt ending
+            while not all([data.splitlines()[-1].startswith(self.hostname), any([x in data.splitlines()[-1] for x in standard_prompt_endings])]):
                 from_device = self._get_output(buffer_size)
                 if from_device:
                     data += from_device
