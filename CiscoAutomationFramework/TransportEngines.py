@@ -40,6 +40,21 @@ class BaseEngine(ABC):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close_connection()
 
+    def _extract_prompt(self, output):
+        """
+        Attempts to get last line of output, if successful checks for the standard prompt ending in
+        the last line, if one is found, it splits the line by the prompt ending and sets the prompt to the
+        first element plus the prompt ending and quits checking if any remain
+        """
+        try:
+            last_line_of_output = output[-1].strip()
+        except IndexError:
+            return
+        for prompt_ending in standard_prompt_endings:
+            if prompt_ending in last_line_of_output:
+                self.prompt = f'{last_line_of_output.split(prompt_ending)[0]}{prompt_ending}'
+                return
+
     def send_command(self, command, end=default_command_end):
 
         self.commands_sent_since_last_output_get += 1
@@ -47,6 +62,20 @@ class BaseEngine(ABC):
         return self._send_command(command, end)
 
     def get_output(self, buffer_size=default_buffer, timeout=default_timeout, no_command_sent_previous=False):
+        """
+        Gets the output that is being returned from the network device. It checks how many commands were run
+        since the last time it got output, and will get output until a prompt is encountered. Each command
+        should return the prompt after execution so if the user enters 6 commands, this will loop 6 times
+        to get the output of all 6 commands. It is up to the user to either get data between all 6 commands
+        or parse it out theirselves. If no command is sent, to loop through a single time set the
+        'no_command_sent_previous' flag to True so it auctually attempts to gather output. The reason
+        for manually setting that flag is so that if the user attempts to get output when there is none
+        and has a higher timeout it will not try and gather output and hang. If the user wants to get output
+        without sending a command they should know to expect some output.
+
+        This could run into issues if there is logging enabled on the terminal but that is not something
+        that is being done inside the framework at this time so I dont believe there is a need to change that.
+        """
 
         if no_command_sent_previous:
             self.commands_sent_since_last_output_get += 1
@@ -75,11 +104,7 @@ class BaseEngine(ABC):
         if type(output) != list:
             output = output.splitlines()
 
-        try:
-            if output[-1].strip().endswith(standard_prompt_endings):
-                self.prompt = output[-1].strip()
-        except IndexError:
-            pass
+        self._extract_prompt(output)
 
         return output
 
