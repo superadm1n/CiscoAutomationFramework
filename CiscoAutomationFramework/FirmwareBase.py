@@ -24,7 +24,7 @@ class CiscoFirmware(ABC):
 
     def __init__(self, transport):
         if not isinstance(transport, BaseEngine):
-            raise TypeError(f'transport object MUST be a sub class of {getmodule(BaseEngine).__name__}.{BaseEngine.__name__}')
+            raise TypeError(f'transport object MUST be an instance of {getmodule(BaseEngine).__name__}.{BaseEngine.__name__}')
         self._terminal_length_value = None
         self._terminal_width_value = None
         self.transport = transport
@@ -34,8 +34,12 @@ class CiscoFirmware(ABC):
         """
         Navigates the CLI into config mode regardless of where it is
         """
-        self.cli_to_privileged_exec_mode()
-        self.transport.send_command_get_output('config t')
+        if self.transport.in_user_exec_mode:
+            self.cli_to_privileged_exec_mode()
+
+        if self.transport.in_privileged_exec_mode:
+            self.transport.send_command_get_output('config t')
+
         return self.transport.in_configuration_mode
 
     def cli_to_privileged_exec_mode(self):  # TODO: Enable password typing will fail trying to get output. Fix!
@@ -105,7 +109,7 @@ class CiscoFirmware(ABC):
         # get rid of command that was sent from the terminal, to do that construct list of backspaces
         # The question mark is not returned as a part of the next prompt line but the space is, account for that.
         backspaces = ''.join([chr(8) for _char in range(len(command) + 1)])
-        self.send_command_get_output(backspaces)
+        self.send_command_get_output(backspaces, end='')
 
         return question_output
 

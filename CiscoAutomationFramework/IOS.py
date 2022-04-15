@@ -24,7 +24,7 @@ class IOS(CiscoFirmware):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
         device_output = self.transport.send_command_get_output('show version')
-        for line in device_output.splitlines():
+        for line in device_output:
             if f'{self.transport.hostname.lower()} uptime' in line.lower():
                 return ' '.join(line.split()[3:])
 
