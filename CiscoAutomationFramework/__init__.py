@@ -17,7 +17,6 @@ from CiscoAutomationFramework.TransportEngines import SSHEngine
 from CiscoAutomationFramework.FirmwareDetect import detect_firmware
 
 
-
 def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10):
     """
 
