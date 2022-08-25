@@ -19,6 +19,10 @@ from time import sleep
 class NXOS(CiscoFirmware):
 
     @property
+    def is_nexus(self):
+        return True
+
+    @property
     def uptime(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')

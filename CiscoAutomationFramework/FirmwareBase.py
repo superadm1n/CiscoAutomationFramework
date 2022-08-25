@@ -30,6 +30,11 @@ class CiscoFirmware(ABC):
         self.transport = transport
         #self.terminal_length()
 
+    @property
+    def is_nexus(self):
+        return False
+
+
     def cli_to_config_mode(self):
         """
         Navigates the CLI into config mode regardless of where it is

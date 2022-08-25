@@ -1,5 +1,6 @@
 from CiscoAutomationFramework.TransportEngines import BaseEngine
 
+
 class BaseTestableGetOutput(BaseEngine):
     def __init__(self):
         super().__init__()
@@ -32,7 +33,6 @@ class TestableSendCommand(BaseEngine):
 
     def _get_output(self, buffer_size) -> str:
         pass
-
 
 
 class IdealNoDelayGetOutput(BaseTestableGetOutput):

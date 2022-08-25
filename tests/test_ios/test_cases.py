@@ -56,6 +56,9 @@ class TestInterfaces(TestCase):
     def test_omits_line_before_prompt_in_output(self):
         self.assertNotIn('line4', ''.join(self.ssh.interfaces))
 
+    def test_knows_its_not_nexus(self):
+        self.assertEqual(False, self.ssh.is_nexus)
+
     def test_raises_exception_if_no_enable_password_and_not_in_priv_exec(self):
         engine = IdealNoDelayGetOutput('myhostname', 'myhostname>')
         engine.load_canned_response('terminal length 0\nmyhostname>')

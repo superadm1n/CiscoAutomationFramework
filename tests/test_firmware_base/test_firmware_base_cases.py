@@ -106,8 +106,8 @@ class TestPrompt(BaseTest):
         ssh = IOS(engine)
         self.assertEqual(ssh.transport.prompt, ssh.prompt)
         # change the prompt in the transport engine and retest to confirm
-        ssh.transport.prompt = 'mynewprompt#'
-        self.assertEqual('mynewprompt#', ssh.prompt)
+        ssh.transport.prompt = 'mynewprompt>'
+        self.assertEqual('mynewprompt>', ssh.prompt)
 
 class TestHostname(BaseTest):
     def test_returns_hostname_from_transport_engine(self):
