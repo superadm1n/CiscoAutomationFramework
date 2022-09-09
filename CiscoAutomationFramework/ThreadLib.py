@@ -19,6 +19,7 @@ class SSH(Thread, ABC):
         self.enable_password = enable_password
         self.perform_secondary_action = perform_secondary_action
         self.hostname = ''
+        self.commands_sent = []
         self.is_nexus = False
 
     def during_login(self, ssh):
@@ -39,6 +40,7 @@ class SSH(Thread, ABC):
             if self.perform_secondary_action:
                 self.secondary_action(ssh)
                 self.post_secondary_action(ssh)
+            self.commands_sent = ssh.commands_sent
 
 
 class SSHSplitDeviceType(SSH):

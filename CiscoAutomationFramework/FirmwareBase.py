@@ -34,6 +34,10 @@ class CiscoFirmware(ABC):
     def is_nexus(self):
         return False
 
+    @property
+    def commands_sent(self):
+        return self.transport.all_commands_sent
+
 
     def cli_to_config_mode(self):
         """
