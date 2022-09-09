@@ -52,6 +52,20 @@ class ConfigParser:
                     section_data = []
         return data
 
+    def get_config_section(self, title_startswith, return_all=True):
+        """
+        Extracts a specific configuration section whos first line starts with your variable.
+        Because we search if the title startswith your variable you could have multiple results
+        so instead of always returning the first one, I give the option to return all
+
+        """
+        for section in self._config_sections:
+            if section[0].startswith(title_startswith):
+                if return_all:
+                    yield section
+                else:
+                    return section
+
     def has_global_config(self, config_string):
         for line in self.running_config:
             if config_string in line and not line.startswith(' '):
