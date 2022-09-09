@@ -22,7 +22,7 @@ setup(
     long_description=description,
     install_requires=['paramiko', 'pyserial==3.4'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3.9'
