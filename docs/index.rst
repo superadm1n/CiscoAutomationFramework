@@ -17,6 +17,16 @@ Welcome to CiscoAutomationFramework's documentation!
 .. autoclass:: CiscoAutomationFramework.FirmwareBase.CiscoFirmware
    :members:
 
+
+.. autoclass:: CiscoAutomationFramework.ThreadLib.SSH
+   :members:
+
+.. autoclass:: CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType
+   :members:
+
+.. automodule:: CiscoAutomationFramework.ThreadLib
+   :members: start_threads
+
 Indices and tables
 ==================
 

@@ -500,6 +500,234 @@ that is not expected</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="CiscoAutomationFramework.ThreadLib.SSH">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.ThreadLib.</code><code class="descname">SSH</code><span class="sig-paren">(</span><em>ip</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em>, <em>perform_secondary_action=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base SSH object that you can inherit from when building a threaded script that will run across the network.</p>
+<p>To build a script you must subclass this object and override the methods that are documented.</p>
+<p>Method Execution Order
+The object logs into the device
+during_login is executed
+if perform_secondary_action is set to True secondary_action is executed and then post_secondary_action</p>
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSH.during_login">
+<code class="descname">during_login</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.during_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every time this object runs against a device this method will be run. Override this method and add logic
+that needs to be run every time your object runs against a device.</p>
+<p>I find I often add logic here that gathers data and does not modify configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action">
+<code class="descname">post_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed.</p>
+<p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSH.secondary_action">
+<code class="descname">secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.secondary_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True.</p>
+<p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
+certain condition is met.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.ThreadLib.</code><code class="descname">SSHSplitDeviceType</code><span class="sig-paren">(</span><em>ip</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em>, <em>perform_secondary_action=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a script by inheriting from this object if you are running the same script against both
+Nexus and IOS devices but the command are different on each platform or the sequence is different.
+Out of the box it will run the functions prepended with ios on ios and iosxe devices and functions
+prepended with nexus on nxos devices. Because it is implied that this script will be run against a mix
+of nexus and ios you must define the functions regardless if they will be used or not when inheriting from
+this object</p>
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login">
+<code class="descname">ios_during_login</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every time this object runs against a device that is detected to be NOT Nexus this method
+will be run. Override this method and add logic that needs to be run every time your object runs against a
+device.</p>
+<p>Must be overridden when inheriting from this object regardless if your script will run against this device
+type</p>
+<p>I find I often add logic here that gathers data and does not modify configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action">
+<code class="descname">ios_post_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed
+and the device is detected to be NOT Nexus.</p>
+<p>Must be overridden when inheriting from this object regardless if your script will run against this device
+type.</p>
+<p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action">
+<code class="descname">ios_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True and the device is detected as not Nexus.</p>
+<p>Must be overridden when inheriting from this object regardless if your script will run against this device
+type</p>
+<p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
+certain condition is met.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login">
+<code class="descname">nexus_during_login</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Every time this object runs against a device that is detected to be running Nexus this method
+will be run. Override this method and add logic that needs to be run every time your object runs against a
+device.</p>
+<p>Must be overridden when inheriting from this object regardless if your script will run against this device
+type</p>
+<p>I find I often add logic here that gathers data and does not modify configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action">
+<code class="descname">nexus_post_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed
+and the device is detected to be Nexus.</p>
+<p>Must be overridden when inheriting from this object regardless if your script will run against this device
+type.</p>
+<p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action">
+<code class="descname">nexus_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True and the device is detected Nexus.</p>
+<p>Must be overridden when inheriting from this object regardless if your script will run against this device
+type.</p>
+<p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
+certain condition is met.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-CiscoAutomationFramework.ThreadLib"></span><dl class="function">
+<dt id="CiscoAutomationFramework.ThreadLib.start_threads">
+<code class="descclassname">CiscoAutomationFramework.ThreadLib.</code><code class="descname">start_threads</code><span class="sig-paren">(</span><em>object</em>, <em>ips</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em>, <em>perform_secondary_action=False</em>, <em>wait_for_threads=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.start_threads" title="Permalink to this definition">¶</a></dt>
+<dd><p>This helper function is a quick and easy way to start your threads. Gives you an option for waiting for threads
+to complete also.
+It will return the thread objects from the function for further processing by the main thread.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>object</strong> (<em>[</em><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH" title="CiscoAutomationFramework.ThreadLib.SSH"><em>SSH</em></a><em>, </em><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType"><em>SSHSplitDeviceType</em></a><em>]</em>) – Object you have written to perform your task. Must be inherted from SSH or SSHSplitDeviceType</li>
+<li><strong>ips</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – List of IP addresses or hostnames to run your worker object against</li>
+<li><strong>username</strong> (<em>str</em>) – Username to login with</li>
+<li><strong>password</strong> (<em>str</em>) – Password for user</li>
+<li><strong>enable_password</strong> (<em>str</em>) – Enable password if user does not have rights to privilege exec mode without enable password</li>
+<li><strong>perform_secondary_action</strong> (<em>bool</em>) – True if you want to run the secondary_action method against device</li>
+<li><strong>wait_for_threads</strong> (<em>bool</em>) – Wait for all threads to complete before returning</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of threads either running or completed depending on if wait_for_threads is True/False</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list[object]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
