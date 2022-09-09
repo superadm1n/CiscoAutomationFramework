@@ -251,7 +251,7 @@ def start_threads(object, ips, username, password, enable_password=None,
     :param wait_for_threads: Wait for all threads to complete before returning
     :type wait_for_threads: bool
     :return: List of threads either running or completed depending on if wait_for_threads is True/False
-    :rtype: list[object]
+    :rtype: list[SSH, SSHSplitDeviceType, type(object)]
     """
 
     if not issubclass(object, SSH):
