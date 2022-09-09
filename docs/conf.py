@@ -22,7 +22,7 @@ copyright = '2022, Kyle Kowalczyk'
 author = 'Kyle Kowalczyk'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = '1.0.2'
 
 
 # -- General configuration ---------------------------------------------------
