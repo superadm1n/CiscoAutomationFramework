@@ -19,16 +19,28 @@ from CiscoAutomationFramework.FirmwareDetect import detect_firmware
 
 def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10):
     """
+    Connects to your cisco device, returns a firmware specific instance of CiscoFirmware object.
 
-    Args:
-        ip (str): IP address or hostname of Cisco device
-        username (str): Username used to login
-        password (str): Password for user
-        port (int): Port to use (default 22)
-        enable_password (str): Enable password to use if the user does not have privileges directly to privilege exec
-        timeout (int):
+    :param ip: IP address or hostname of Cisco device
+    :type ip: str
 
-    Returns: CiscoFirmware
+    :param username: Username used to login
+    :type username: str
+
+    :param password: Password for user
+    :type password: str
+
+    :param port:  Port to use (default 22)
+    :type port: int
+
+    :param enable_password: Enable password to use if the user does not have privileges directly to privilege exec
+    :type enable_password: str
+
+    :param timeout: SSH timeout in seconds
+    :type timeout: int
+
+    :return: CiscoFirmware Object
+    :rtype: CiscoFirmware
 
     """
 
