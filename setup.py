@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 #from CiscoAutomationFramework import __version__
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 description = '''The CiscoAutomationFramework is designed to be an interface for network engineers to 
 issue commands and retrieve output from Cisco devices regardless of firmware so they can easily build automation 
