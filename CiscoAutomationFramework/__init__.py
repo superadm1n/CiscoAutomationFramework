@@ -15,9 +15,10 @@ limitations under the License.
 '''
 from CiscoAutomationFramework.TransportEngines import SSHEngine
 from CiscoAutomationFramework.FirmwareDetect import detect_firmware
+from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
 
 
-def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10):
+def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10) -> CiscoFirmware:
     """
     Connects to your cisco device, returns a firmware specific instance of CiscoFirmware object.
 
