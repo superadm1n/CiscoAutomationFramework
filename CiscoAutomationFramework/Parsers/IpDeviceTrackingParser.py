@@ -32,6 +32,7 @@ class EntryParser:
     @property
     def mac_address(self):
         """
+        MAC address of the ip device tracking entry
 
         :return: MAC Address
         :rtype: str
@@ -41,6 +42,7 @@ class EntryParser:
     @property
     def vlan(self):
         """
+        Extracts vlan of the ip device tracking entry
 
         :return: Vlan
         :rtype: str
@@ -50,6 +52,7 @@ class EntryParser:
     @property
     def interface(self):
         """
+        Extracts interface of the ip device tracking entry
 
         :return: Switch Interface
         :rtype: str
@@ -59,6 +62,7 @@ class EntryParser:
     @property
     def probe_timeout(self):
         """
+        Extracts probe timeout of the ip device tracking entry
 
         :return: Probe Timeout
         :rtype: str
@@ -68,6 +72,7 @@ class EntryParser:
     @property
     def state(self):
         """
+        Extracts state of the ip device tracking entry
 
         :return: State
         :rtype: str
@@ -77,6 +82,7 @@ class EntryParser:
     @property
     def source(self):
         """
+        Extracts source of the ip device tracking entry
 
         :return: Source
         :rtype: str
@@ -96,6 +102,7 @@ class DeviceTrackingOutputParser:
     def entries(self):
         """
         Extracts the entires from the table and returns them as a list
+
         :return: List of table entries as EntryParser instances
         :rtype: list[EntryParser]
         """

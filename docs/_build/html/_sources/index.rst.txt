@@ -18,6 +18,7 @@ CLI section when issuing commands.
    connect
    interact
    concurency
+   parsers
 
 Example Usage
 ========
@@ -53,13 +54,6 @@ There are integrated output parsers so you can have an easy way of interacting t
    parser = InterfaceStatusOutputParser(output)
    for entry in parser.interfaces:
       print(f'{entry.name} - {entry.vlan} - {entry.status} - {entry.description}')
-
-
-
-
-
-
-
 
 
 Indices and tables

@@ -1,0 +1,431 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Command Output Parsers &#8212; CiscoAutomationFramework 1.0.2 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Interacting with Multiple Network Devices at the same time" href="concurency.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="command-output-parsers">
+<h1>Command Output Parsers<a class="headerlink" href="#command-output-parsers" title="Permalink to this headline">¶</a></h1>
+<p>CiscoAutomationFramework provides integrated parsers for various command outputs. These parsers allow
+you to pass in the output from the network device and be able to iterate over output and/or extract
+data from the output in a programatic way versus needing to build your own parsers</p>
+<div class="section" id="show-interface-status-parser">
+<h2>Show Interface Status Parser<a class="headerlink" href="#show-interface-status-parser" title="Permalink to this headline">¶</a></h2>
+<p>Pass in the raw output from “show interface status” command to this parser and you will be
+able to iterate over the table and interact with the entries individually</p>
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.InterfaceStatusParser.</code><code class="descname">InterfaceStatusOutputParser</code><span class="sig-paren">(</span><em>raw_table</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide the output directly from the device after issuing the command ‘show interface status’ to
+this object to parse it</p>
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces">
+<code class="descname">interfaces</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the raw output from the command and provides a list of all entries from the table</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">LineParser</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser" title="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser">LineParser</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.InterfaceStatusParser.</code><code class="descname">LineParser</code><span class="sig-paren">(</span><em>raw_line</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description">
+<code class="descname">description</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description set on interface</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Confiured Description</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex">
+<code class="descname">duplex</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface duplex settings ex. auto, a-full a-half</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Duplex Setting</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name">
+<code class="descname">name</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the interface ex. Gi1/0/1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Name abbriviated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present">
+<code class="descname">not_present</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True/False if the text “not present” in the lowercase line</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed">
+<code class="descname">speed</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface Operating Speed ex. auto, a-100, a-1000</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Speed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status">
+<code class="descname">status</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status of interface ex. connected, notconnected, disabled, err-disable, etc</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">interface status</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type">
+<code class="descname">type</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface Type ex. 10/100/1000BaseTX, Not Present</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan">
+<code class="descname">vlan</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vlan configuration of interface ex. 1, 100, trunk, routed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">vlan configuration</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ip-device-tracking-parser">
+<h2>IP Device Tracking Parser<a class="headerlink" href="#ip-device-tracking-parser" title="Permalink to this headline">¶</a></h2>
+<p>Pass in the raw output from “show ip device tracking all” and this parser allows you to iterate
+over the contents of the table one at a time.</p>
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.</code><code class="descname">DeviceTrackingOutputParser</code><span class="sig-paren">(</span><em>output_from_device</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries">
+<code class="descname">entries</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts the entires from the table and returns them as a list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of table entries as EntryParser instances</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser" title="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser">EntryParser</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.</code><code class="descname">EntryParser</code><span class="sig-paren">(</span><em>entry_data</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface">
+<code class="descname">interface</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts interface of the ip device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Switch Interface</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address">
+<code class="descname">ip_address</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>IP address of the IP device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">IP address</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa">
+<code class="descname">is_apipa</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa" title="Permalink to this definition">¶</a></dt>
+<dd><p>True/False if the IP address in the entry is an APIPA address.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address">
+<code class="descname">mac_address</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>MAC address of the ip device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">MAC Address</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout">
+<code class="descname">probe_timeout</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts probe timeout of the ip device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Probe Timeout</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source">
+<code class="descname">source</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts source of the ip device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Source</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state">
+<code class="descname">state</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts state of the ip device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">State</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan">
+<code class="descname">vlan</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts vlan of the ip device tracking entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vlan</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Command Output Parsers</a><ul>
+<li><a class="reference internal" href="#show-interface-status-parser">Show Interface Status Parser</a></li>
+<li><a class="reference internal" href="#ip-device-tracking-parser">IP Device Tracking Parser</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="concurency.html" title="previous chapter">Interacting with Multiple Network Devices at the same time</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/parsers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Kyle Kowalczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/parsers.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
