@@ -495,6 +495,159 @@ are in it</p>
 </dd></dl>
 
 </div>
+<div class="section" id="power-inline-parser">
+<h2>Power Inline Parser<a class="headerlink" href="#power-inline-parser" title="Permalink to this headline">¶</a></h2>
+<p>Pass the raw output from ‘show power inline’ to this parser and you will
+be able to iterate over the entries in the power inline table:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<span class="kn">from</span> <span class="nn">CiscoAutomationFramework.Parsers.PowerInlineParser</span> <span class="kn">import</span> <span class="n">PowerInlineParser</span>
+
+<span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">PowerInlineParser</span><span class="p">(</span><span class="n">ssh</span><span class="o">.</span><span class="n">send_command_get_output</span><span class="p">(</span><span class="s1">&#39;show power inline&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">parser</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">watts</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">detected_device</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.PowerInlineParser.</code><code class="descname">PowerInlineParser</code><span class="sig-paren">(</span><em>sh_power_inline</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces">
+<code class="descname">interfaces</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of interfaces in the power inline table to extract the values from the entry</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of entries in the power inline table</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface" title="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface">PowerInlineInterface</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.PowerInlineParser.</code><code class="descname">PowerInlineInterface</code><span class="sig-paren">(</span><em>interface_data</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin">
+<code class="descname">admin</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Admin column of the entry ex. auto</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Admin column</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device">
+<code class="descname">detected_device</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detected device type of connected device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Detected device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts">
+<code class="descname">max_watts</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Max watts capable of being drawn on port</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Max watts supported</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name">
+<code class="descname">name</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface name ex. Gi1/0/5</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper">
+<code class="descname">oper</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Oper column of the entry, off/on weather it is providing power or not</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Operation status</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class">
+<code class="descname">poe_class</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>POE class of connected device ex. 0, 1, 2, 3, n/a</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">POE Class</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts">
+<code class="descname">watts</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Watts currently being drawn on port by connected device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Watts currently drawn</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -510,6 +663,7 @@ are in it</p>
 <li><a class="reference internal" href="#show-interface-status-parser">Show Interface Status Parser</a></li>
 <li><a class="reference internal" href="#ip-device-tracking-parser">IP Device Tracking Parser</a></li>
 <li><a class="reference internal" href="#mac-address-table-parser">MAC Address Table Parser</a></li>
+<li><a class="reference internal" href="#power-inline-parser">Power Inline Parser</a></li>
 </ul>
 </li>
 </ul>
