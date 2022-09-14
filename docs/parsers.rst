@@ -26,3 +26,15 @@ over the contents of the table one at a time.
 
 .. autoclass:: CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser
    :members:
+
+MAC Address Table Parser
+------
+Pass in the raw output from "show mac address-table" and this parser allows you to iterate
+over the contents of the table one at a time and also analyze the table in other ways.
+
+
+.. autoclass:: CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser
+   :members:
+
+.. autoclass:: CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser
+   :members:

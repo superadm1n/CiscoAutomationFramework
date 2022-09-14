@@ -366,6 +366,125 @@ over the contents of the table one at a time.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="mac-address-table-parser">
+<h2>MAC Address Table Parser<a class="headerlink" href="#mac-address-table-parser" title="Permalink to this headline">¶</a></h2>
+<p>Pass in the raw output from “show mac address-table” and this parser allows you to iterate
+over the contents of the table one at a time and also analyze the table in other ways.</p>
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.MacAddressTableParser.</code><code class="descname">MacAddressTableParser</code><span class="sig-paren">(</span><em>raw_table</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus">
+<code class="descname">is_nexus</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks the raw table for specific key words to determine if it is a Nexus platform or not returning
+True if it is False if it is not</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries">
+<code class="descname">table_entries</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the mac address table and returns a list of the entries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of entries from the MAC address table</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser" title="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser">MacEntryParser</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.MacAddressTableParser.</code><code class="descname">MacEntryParser</code><span class="sig-paren">(</span><em>raw_entry</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface">
+<code class="descname">interface</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface on device that the MAC address is on ex. Gi1/0/8</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface on Device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus">
+<code class="descname">is_nexus</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches the entire mac address table, checking if any of a set of keywords
+are in it</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address">
+<code class="descname">mac_address</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>MAC address from the row</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">MAC Address</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type">
+<code class="descname">type</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Address type from the row ex. dynamic, static</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Address Type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan">
+<code class="descname">vlan</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vlan from the row</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vlan</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -380,6 +499,7 @@ over the contents of the table one at a time.</p>
 <li><a class="reference internal" href="#">Command Output Parsers</a><ul>
 <li><a class="reference internal" href="#show-interface-status-parser">Show Interface Status Parser</a></li>
 <li><a class="reference internal" href="#ip-device-tracking-parser">IP Device Tracking Parser</a></li>
+<li><a class="reference internal" href="#mac-address-table-parser">MAC Address Table Parser</a></li>
 </ul>
 </li>
 </ul>

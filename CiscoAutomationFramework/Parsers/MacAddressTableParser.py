@@ -1,93 +1,121 @@
-
-interface_abbrivs = ('fa', 'gi', 'te', 'fo', 'eth', 'po')
-
-
-class MacAddressTableInterface:
-
-    def __init__(self, name, mac_addresses):
-        self._name = name
-        self._mac_addresses = mac_addresses
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def mac_addresses(self):
-        return self._mac_addresses
-
-    @property
-    def num_of_macs(self):
-        return len(self._mac_addresses)
-
-    def has_mac(self, mac):
-        return mac in self.mac_addresses
-
-    def __repr__(self):
-        return f'{type(self).__name__}({self.name}, num_of_macs: {self.num_of_macs})'
-
-
-class MacAddressTableParser:
-
-    def __init__(self, mac_address_table):
-        self._table = mac_address_table
+class MacEntryParser:
+    def __init__(self, raw_entry):
+        self.raw_entry = raw_entry
+        self.split_entry = raw_entry.split()
 
     @property
     def is_nexus(self):
         """Searches the entire mac address table, checking if any of a set of keywords
         are in it"""
-        table_as_string = ' '.join(self._table).lower()
+        return len(self.split_entry) > 4
+
+    @property
+    def mac_address(self):
+        """
+        MAC address from the row
+
+        :return: MAC Address
+        :rtype: str
+        """
+        if self.is_nexus:
+            return self.split_entry[2]
+        return self.split_entry[1]
+
+    @property
+    def vlan(self):
+        """
+         Vlan from the row
+
+        :return: Vlan
+        :rtype: str
+        """
+        if self.is_nexus:
+            return self.split_entry[1]
+        return self.split_entry[0]
+
+    @property
+    def type(self):
+        """
+        Address type from the row ex. dynamic, static
+
+        :return: Address Type
+        :rtype: str
+        """
+        if self.is_nexus:
+            return self.split_entry[3]
+        return self.split_entry[2]
+
+    @property
+    def interface(self):
+        """
+        Interface on device that the MAC address is on ex. Gi1/0/8
+
+        :return: Interface on Device
+        :rtype: str
+        """
+        return self.split_entry[-1]
+
+
+class MacAddressTableParser:
+    def __init__(self, raw_table):
+        if isinstance(raw_table, str):
+            self.table = raw_table.splitlines()
+        else:
+            self.table = raw_table
+
+        if not self.abbreviated_command.startswith('sma'):
+            raise ValueError(f'The detected command {self.command} is not what is expected!')
+
+    @property
+    def is_nexus(self):
+        """
+        Checks the raw table for specific key words to determine if it is a Nexus platform or not returning
+        True if it is False if it is not
+
+        :return: True/False
+        :rtype: bool
+        """
+        table_as_string = ' '.join(self.table).lower()
         key_words = ['legend', 'vpc', 'peer']
         if any([word in table_as_string for word in key_words]):
             return True
         return False
 
-    def _extract_mac(self, line):
-        """
-        The MAC address on IOS is displayed in the 2nd column
-         All    0100.0ccc.cccc    STATIC      CPU
+    @property
+    def abbreviated_command(self):
+        return ''.join(x[0] for x in self.command.split())
 
-        and on Nexus platform it is displayed in the 3rd column
-        *    1     aaaa.bbbb.cccc   dynamic  0         F      F    Eth1/18
+    @property
+    def command(self):
+        return self.table[0]
 
-        so handle accordingly
-        """
-        if self.is_nexus:
-            return line.split()[2]
-        return line.split()[1]
+    def _is_mac(self, x):
+        avail_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
+        x = x.replace('.', '')
+        if len(x) != 12:
+            return False
+        for char in x:
+            if char.lower() not in avail_chars:
+                return False
+        return True
 
-    def _extract_interface(self, line):
-        """
-        The interface is displayed in the last column of output for both IOS and NXOS based on the
-        systems I have used, No need to handle differently
-        """
-        return line.split()[-1]
-
-    def _line_is_good_data(self, line):
-        if self.is_nexus:
-            if len(line.split()) == 8 and any(x in line.split()[-1].lower() for x in interface_abbrivs):
-                return True
-        else:
-            if len(line.split()) == 4 and any(x in line.split()[-1].lower() for x in interface_abbrivs):
+    def _mac_in_line(self, line):
+        for section in line.split():
+            if self._is_mac(section):
                 return True
         return False
 
-    def _parse(self):
-        data = {}
-        for line in self._table:
-            # make sure we dont try to parse part of the header, a separator line, blank lines, or anything
-            # that is not a mac address entry
-            if not self._line_is_good_data(line):
-                continue
-            interface = self._extract_interface(line)
-            mac = self._extract_mac(line)
-            if any(interface.lower().startswith(x) for x in interface_abbrivs):
-                if interface in data.keys():
-                    data[interface].append(mac)
-                else:
-                    data[interface] = [mac]
-        return data
-
     @property
     def table_entries(self):
-        return [MacAddressTableInterface(interface, mac_addresses) for interface, mac_addresses in self._parse().items()]
+        """
+        Parses the mac address table and returns a list of the entries
+
+        :return: List of entries from the MAC address table
+        :rtype: list[MacEntryParser]
+        """
+        data = []
+        for line in self.table:
+            if self._mac_in_line(line):
+                data.append(MacEntryParser(line))
+        return data
+
