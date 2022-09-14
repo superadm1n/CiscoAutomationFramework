@@ -1,0 +1,522 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Interacting with a Network Device &#8212; CiscoAutomationFramework 1.0.2 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Interacting with Multiple Network Devices at the same time" href="concurency.html" />
+    <link rel="prev" title="How To Connect to A Network Device" href="connect.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="interacting-with-a-network-device">
+<h1>Interacting with a Network Device<a class="headerlink" href="#interacting-with-a-network-device" title="Permalink to this headline">¶</a></h1>
+<p>After connecting to a device by running the CiscoAutomationFramework.connect_ssh you receive a
+child of this class that is specific to IOS/Nexus based on what is detected you are connected to.
+You will have all of the attributes documented here to interact with your Cisco device regardless
+of its firmware type.</p>
+<dl class="class">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware">
+<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.FirmwareBase.</code><code class="descname">CiscoFirmware</code><span class="sig-paren">(</span><em>transport</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.add_local_user">
+<code class="descname">add_local_user</code><span class="sig-paren">(</span><em>username</em>, <em>password</em>, <em>password_code=0</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.add_local_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method here should be generating a string that the network device accepts in the following format
+‘username USERNAME &lt;args&gt; &lt;kwarg key&gt; &lt;kwarg value&gt;  password PASSWORD_CODE PASSWORD’</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>username</strong> – Username to use</li>
+<li><strong>password</strong> – Password to set (cleartext or encrypted depending on password_code)</li>
+<li><strong>password_code</strong> – Code for password you are providing</li>
+<li><strong>args</strong> – Single word arguments in command string</li>
+<li><strong>kwargs</strong> – Key word arguments in command string</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Nothing</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.arp_table">
+<code class="descname">arp_table</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.arp_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the arp table in its raw form</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Arp Table</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.cli_to_config_mode">
+<code class="descname">cli_to_config_mode</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.cli_to_config_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Navigates the CLI into config mode regardless of where it is</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.cli_to_privileged_exec_mode">
+<code class="descname">cli_to_privileged_exec_mode</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.cli_to_privileged_exec_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Navigates the CLI into prvileged exec mode regardless of where it is. Will raise an EnablePasswordError
+if the transport engine does not have an enable password set and the network device asks for one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">CiscoAutomationFramework.Exceptions.EnablePasswordError</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.close_connection">
+<code class="descname">close_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.close_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes connection to device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.commands_sent">
+<code class="descname">commands_sent</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.commands_sent" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of all commands sent to the device in the order they are entered from first to last in the
+current session</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of commands sent</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.delete_local_user">
+<code class="descname">delete_local_user</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.delete_local_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a locally defined user on device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> (<em>str</em>) – username to delete</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.get_output">
+<code class="descname">get_output</code><span class="sig-paren">(</span><em>buffer_size=100</em>, <em>timeout=1</em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets output from the device until the prompt is returned or the timeout is reached. You should not need
+to run this directly often.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_size</strong> – Size of buffer when getting output from device. You shouldnt have to modify this much</li>
+<li><strong>timeout</strong> – Time to stop waiting for output if no output is received.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.hostname">
+<code class="descname">hostname</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hostname of the Cisco device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Hostname</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.interfaces">
+<code class="descname">interfaces</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.interfaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of interfaces on device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interfaces</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.is_nexus">
+<code class="descname">is_nexus</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.is_nexus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True/False if the Cisco device is a Nexus</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.mac_address_table">
+<code class="descname">mac_address_table</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.mac_address_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the MAC address table in its raw form</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">MAC Address Table</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.prompt">
+<code class="descname">prompt</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.prompt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the latest prompt that was returned from the device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Latest prompt returned from device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.running_config">
+<code class="descname">running_config</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.running_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns running config in its raw form</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Running Configuration</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.save_config">
+<code class="descname">save_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.save_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves running config to startup config</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.send_command">
+<code class="descname">send_command</code><span class="sig-paren">(</span><em>command</em>, <em>end='\n'</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.send_command" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Sends command to device, does not get any output. You should not need to run this directly often</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">param command:</th><td class="field-body">Command to send</td>
+</tr>
+<tr class="field-even field"><th class="field-name">param end:</th><td class="field-body">End character (default</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<dl class="docutils">
+<dt>)</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">return:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.send_command_get_output">
+<code class="descname">send_command_get_output</code><span class="sig-paren">(</span><em>command</em>, <em>end='\n'</em>, <em>buffer_size=100</em>, <em>timeout=1</em>, <em>delay=0.5</em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.send_command_get_output" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Sends a command to the device and returns the output from the device. If there were multiple commands sent
+this will gather the output from all the commands at once. This command is a combination of send_command
+and get_output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">param command:</th><td class="field-body">Command to send</td>
+</tr>
+<tr class="field-even field"><th class="field-name">param end:</th><td class="field-body">End character (default</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<dl class="docutils">
+<dt>)</dt>
+<dd><table class="first last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">param buffer_size:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">Size of buffer when getting output from device. You shouldnt have to modify this much</td>
+</tr>
+<tr class="field-even field"><th class="field-name">param timeout:</th><td class="field-body">Time to stop waiting for output if no output is received.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">param delay:</th><td class="field-body">Time to wait before gathering output from device</td>
+</tr>
+<tr class="field-even field"><th class="field-name">return:</th><td class="field-body">Output from device starting with command, ending with prompt in a list split by line</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.send_question_get_output">
+<code class="descname">send_question_get_output</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.send_question_get_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special method to get the output from sending a command with a question mark. This will
+send the command with a trailing ‘?’ get the output from that and then erase the command
+that is returned on the ending prompt. You should NOT put a question mark in the command
+this function will handle that for you but if you do, it will be removed so the CLI doesnt do something
+that is not expected</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command</strong> – Command to inspect</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of possible command completions, or next possible words in command</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.startup_config">
+<code class="descname">startup_config</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.startup_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns startup config in its raw form</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Startup Config</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.terminal_length">
+<code class="descname">terminal_length</code><span class="sig-paren">(</span><em>n='0'</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.terminal_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets terminal length of shell</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<em>str</em>) – length</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.terminal_width">
+<code class="descname">terminal_width</code><span class="sig-paren">(</span><em>n='0'</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.terminal_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets terminal width of shell</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<em>str</em>) – width</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="CiscoAutomationFramework.FirmwareBase.CiscoFirmware.uptime">
+<code class="descname">uptime</code><a class="headerlink" href="#CiscoAutomationFramework.FirmwareBase.CiscoFirmware.uptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns uptime of device</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Uptime</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="connect.html" title="previous chapter">How To Connect to A Network Device</a></li>
+      <li>Next: <a href="concurency.html" title="next chapter">Interacting with Multiple Network Devices at the same time</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/interact.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Kyle Kowalczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/interact.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

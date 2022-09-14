@@ -1,0 +1,159 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>How To Connect to A Network Device &#8212; CiscoAutomationFramework 1.0.2 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Interacting with a Network Device" href="interact.html" />
+    <link rel="prev" title="Welcome to CiscoAutomationFramework’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-connect-to-a-network-device">
+<h1>How To Connect to A Network Device<a class="headerlink" href="#how-to-connect-to-a-network-device" title="Permalink to this headline">¶</a></h1>
+<p>Calling the CiscoAutomationFramework.connect_ssh function is how you connect to a device.
+it sets up the connection and all of the
+low level library and hands you an instantiated child of the CiscoFirmware object specific to the device
+type you are connected to.</p>
+<p>You can connect by assigning the output directly to a variable:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<span class="n">ssh</span> <span class="o">=</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span>
+<span class="c1">#other code here</span>
+<span class="n">ssh</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>However It is recommended to use a context manager so you dont have to remember to close the connection
+or if an exception if hit in your code it closes for you:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
+    <span class="c1"># Code here while logged into the device</span>
+<span class="c1"># Code here while logged out of the device</span>
+</pre></div>
+</div>
+<span class="target" id="module-CiscoAutomationFramework"></span><p>Copyright 2021 Kyle Kowalczyk</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<blockquote>
+<div><a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></div></blockquote>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an “AS IS” BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+<dl class="function">
+<dt id="CiscoAutomationFramework.connect_ssh">
+<code class="descclassname">CiscoAutomationFramework.</code><code class="descname">connect_ssh</code><span class="sig-paren">(</span><em>ip</em>, <em>username</em>, <em>password</em>, <em>port=22</em>, <em>enable_password=None</em>, <em>timeout=10</em><span class="sig-paren">)</span> &#x2192; CiscoAutomationFramework.FirmwareBase.CiscoFirmware<a class="headerlink" href="#CiscoAutomationFramework.connect_ssh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects to your cisco device, returns a firmware specific instance of CiscoFirmware object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ip</strong> (<em>str</em>) – IP address or hostname of Cisco device</li>
+<li><strong>username</strong> (<em>str</em>) – Username used to login</li>
+<li><strong>password</strong> (<em>str</em>) – Password for user</li>
+<li><strong>port</strong> (<em>int</em>) – Port to use (default 22)</li>
+<li><strong>enable_password</strong> (<em>str</em>) – Enable password to use if the user does not have privileges directly to privilege exec</li>
+<li><strong>timeout</strong> (<em>int</em>) – SSH timeout in seconds</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CiscoFirmware Object</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware">CiscoFirmware</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to CiscoAutomationFramework’s documentation!</a></li>
+      <li>Next: <a href="interact.html" title="next chapter">Interacting with a Network Device</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/connect.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Kyle Kowalczyk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/connect.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
