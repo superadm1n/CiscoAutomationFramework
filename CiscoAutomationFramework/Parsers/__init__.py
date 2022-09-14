@@ -19,3 +19,4 @@ from CiscoAutomationFramework.Parsers.CDPparser import CDPparser
 from CiscoAutomationFramework.Parsers.PowerInlineParser import PowerInlineParser
 from CiscoAutomationFramework.Parsers.MacAddressTableParser import MacAddressTableParser
 from CiscoAutomationFramework.Parsers.InterfaceStatusParser import InterfaceStatusOutputParser
+from CiscoAutomationFramework.Parsers.IpDeviceTrackingParser import DeviceTrackingOutputParser

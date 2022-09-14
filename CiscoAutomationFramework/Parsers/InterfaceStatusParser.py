@@ -17,6 +17,7 @@ class LineParser:
     def name(self):
         """
         Name of the interface ex. Gi1/0/1
+
         :return: Interface Name abbriviated
         :rtype: str
         """
@@ -48,7 +49,9 @@ class LineParser:
     def duplex(self):
         """
         Interface duplex settings ex. auto, a-full a-half
-        :return:
+
+        :return: Duplex Setting
+        :rtype: str
         """
         return self.raw_line.split()[-3 + self.index_offset]
 
@@ -74,11 +77,21 @@ class LineParser:
 
     @property
     def description(self):
+        """
+        Description set on interface
+
+        :return: Confiured Description
+        :rtype: str
+        """
 
         return ' '.join(self.raw_line.split()[1:-5 + self.index_offset])
 
 
 class InterfaceStatusOutputParser:
+    """
+    Provide the output directly from the device after issuing the command 'show interface status' to
+    this object to parse it
+    """
     interface_beginnings = ('fa', 'gi', 'te', 'fo')
 
     def __init__(self, raw_table):
@@ -90,6 +103,7 @@ class InterfaceStatusOutputParser:
     @property
     def interfaces(self) -> list[LineParser]:
         """
+        Parses the raw output from the command and provides a list of all entries from the table
 
         :return: LineParser
         :rtype: list[LineParser]
