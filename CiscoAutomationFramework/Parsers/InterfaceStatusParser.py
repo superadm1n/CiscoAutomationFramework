@@ -101,7 +101,7 @@ class InterfaceStatusOutputParser:
             self.raw_table = raw_table
 
     @property
-    def interfaces(self) -> list[LineParser]:
+    def interfaces(self):
         """
         Parses the raw output from the command and provides a list of all entries from the table
 
