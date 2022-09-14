@@ -1,7 +1,8 @@
 from unittest import TestCase
 from CiscoAutomationFramework.Parsers.IpDeviceTrackingParser import DeviceTrackingOutputParser, EntryParser
 
-canned_output = """Global IP Device Tracking for clients = Enabled
+canned_output = """show ip device tracking all
+Global IP Device Tracking for clients = Enabled
 Global IP Device Tracking Probe Count = 3
 Global IP Device Tracking Probe Interval = 30
 Global IP Device Tracking Probe Delay Interval = 0
@@ -41,6 +42,17 @@ class TestOutputParser(TestCase):
 
     def test_returns_proper_number(self):
         self.assertEqual(len(self.parser.entries), 5)
+
+    def test_throws_value_error_if_command_missing(self):
+        canned_data = '\nGlobal DeviceTracking = Enabled\nhostname#'
+        self.assertRaises(ValueError, DeviceTrackingOutputParser, (canned_data))
+
+    def test_allows_pipe_in_command(self):
+        canned_data = 'show ip device tracking all | inc 1/0/17\nGlobal DeviceTracking = Enabled\nhostname#'
+        try:
+            _ = DeviceTrackingOutputParser(canned_data)
+        except ValueError:
+            self.fail('Instantiation of DeviceTrackingOutputParser raised ValueError when command contained a pipe')
 
 
 class TestEntryParser(TestCase):

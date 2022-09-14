@@ -93,10 +93,29 @@ class EntryParser:
 class DeviceTrackingOutputParser:
 
     def __init__(self, output_from_device):
+        """
+        Provide the raw output from the device, if getting directly from the frameworks get_output() methods
+        it will contain everything needed, but if not, make sure the first line of output is the command that
+        was entered, abbreviated for is ok (show ip device tracking all, sh ip de tr all)
+
+        :param output_from_device: raw output from device, first line is command entered to get output
+        :type output_from_device: Union[list, str]
+        """
         if not type(output_from_device) == list:
             self.output = output_from_device.splitlines()
         else:
             self.output = output_from_device
+
+        if not self.abbreviated_command.startswith('sidta'):
+            raise ValueError(f'The detected command {self.command} is not what is expected!')
+
+    @property
+    def abbreviated_command(self):
+        return ''.join(x[0] for x in self.command.split())
+
+    @property
+    def command(self):
+        return self.output[0]
 
     @property
     def entries(self):
