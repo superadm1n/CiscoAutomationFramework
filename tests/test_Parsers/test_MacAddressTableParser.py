@@ -74,6 +74,23 @@ class InterfaceStatusOutputParserTests(TestCase):
         self.assertEqual(iosnum, 12)
         self.assertEqual(nexusnum, 21)
 
+    def test_throws_value_error_if_command_missing(self):
+        canned_data = '\nGlobal DeviceTracking = Enabled\nhostname#'
+        self.assertRaises(ValueError, MacAddressTableParser, (canned_data))
+
+    def test_allows_pipe_in_command(self):
+        canned_data = 'show mac address-table | inc 1/0/17\nGlobal DeviceTracking = Enabled\nhostname#'
+        try:
+            _ = MacAddressTableParser(canned_data)
+        except ValueError:
+            self.fail('Instantiation of DeviceTrackingOutputParser raised ValueError when command contained a pipe')
+
+    def test_throws_value_error_if_wrong_command_output(self):
+        canned_data ='show ip device tracking all\nGlobal DeviceTracking = Enabled\nhostname#'
+        self.assertRaises(ValueError, MacAddressTableParser, (canned_data))
+
+
+
     def test_detects_nexus(self):
         self.assertEqual(self.nexus_parser.is_nexus, True)
 
