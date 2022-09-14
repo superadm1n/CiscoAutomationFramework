@@ -49,15 +49,13 @@ class NXOS(CiscoFirmware):
     def mac_address_table(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_mac = self.transport.send_command_get_output('show mac address-table')
-        return '\n'.join(raw_mac[8:-2])
+        return self.transport.send_command_get_output('show mac address-table')
 
     @property
     def arp_table(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        raw_arp = self.transport.send_command_get_output('show ip arp')
-        return '\n'.join(raw_arp[11:-2])
+        return self.transport.send_command_get_output('show ip arp')
 
     @property
     def running_config(self):

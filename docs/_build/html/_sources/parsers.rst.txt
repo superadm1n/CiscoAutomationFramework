@@ -30,7 +30,16 @@ over the contents of the table one at a time.
 MAC Address Table Parser
 ------
 Pass in the raw output from "show mac address-table" and this parser allows you to iterate
-over the contents of the table one at a time and also analyze the table in other ways.
+over the contents of the table one at a time and also analyze the table in other ways.::
+
+   from CiscoAutomationFramework import connect_ssh
+   from CiscoAutomationFramework.Parsers.MacAddressTableParser import MacAddressTableParser
+
+   with connect_ssh('ip', 'username', 'password') as ssh:
+      mac_table = MacAddressTableParser(ssh.mac_address_table)
+
+   for entry in mac_table:
+      print(f'{entry.interface} - {entry.vlan} - {entry.mac_address}')
 
 
 .. autoclass:: CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser
