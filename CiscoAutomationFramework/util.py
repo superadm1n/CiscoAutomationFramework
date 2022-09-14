@@ -1,3 +1,11 @@
+from ipaddress import ip_address
+
+def is_ipv4(addr):
+    try:
+        _ = ip_address(addr)
+        return True
+    except:
+        return False
 
 def column_print(data, spaces_between_columns=2, separator_char=None):
     """

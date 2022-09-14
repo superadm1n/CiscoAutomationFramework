@@ -58,6 +58,12 @@ class ConfigParser:
         Because we search if the title startswith your variable you could have multiple results
         so instead of always returning the first one, I give the option to return all
 
+        :param title_startswith: Text that the first line of the section starts with (ex. line vty)
+        :type title_startswith: str
+        :param return_all: If there are multiple matches return all if True (default True)
+        :type return_all: bool
+        :return: list of lists containing the sections of config
+        :rtype: list
         """
         for section in self._config_sections:
             if section[0].startswith(title_startswith):
@@ -67,6 +73,13 @@ class ConfigParser:
                     return section
 
     def has_global_config(self, config_string):
+        """
+        True/False if in the global configuration the string is found. The line must NOT start with a space
+        so if it is nested it will not be found
+
+        :param config_string:
+        :return:
+        """
         for line in self.running_config:
             if config_string in line and not line.startswith(' '):
                 return True
