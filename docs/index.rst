@@ -32,7 +32,7 @@ Basic connection to a device::
    print(ssh.startup_config)
    print(ssh.arp_table)
    print(ssh.mac_address_table)
-   ssh.close_connection
+   ssh.close_connection()
 
 You can also use a context manager (recommended) so you dont have to worry about closing the connection::
 
