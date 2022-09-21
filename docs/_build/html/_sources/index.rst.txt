@@ -19,6 +19,7 @@ CLI section when issuing commands.
    interact
    concurency
    parsers
+   utilities
 
 Example Usage
 ========
