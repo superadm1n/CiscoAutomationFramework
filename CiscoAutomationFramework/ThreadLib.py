@@ -19,7 +19,7 @@ class SSH(Thread, ABC):
 
     """
 
-    def __init__(self, ip, username, password, enable_password=None, perform_secondary_action=False):
+    def __init__(self, ip, username, password, enable_password=None, perform_secondary_action=False, **kwargs):
         """
 
         :param ip: IP address of device
@@ -229,7 +229,7 @@ class SSHSplitDeviceType(SSH):
 
 
 def start_threads(object, ips, username, password, enable_password=None,
-                  perform_secondary_action=False, wait_for_threads=False):
+                  perform_secondary_action=False, wait_for_threads=False, **kwargs):
 
     """
     This helper function is a quick and easy way to start your threads. Gives you an option for waiting for threads
@@ -250,6 +250,7 @@ def start_threads(object, ips, username, password, enable_password=None,
     :type perform_secondary_action: bool
     :param wait_for_threads: Wait for all threads to complete before returning
     :type wait_for_threads: bool
+    :param kwargs: Keyword arguments to be passed to your object. If your child class accepts additional arguments, pass them to the object via keyword arguments here.
     :return: List of threads either running or completed depending on if wait_for_threads is True/False
     :rtype: list[SSH, SSHSplitDeviceType, type(object)]
     """
@@ -259,7 +260,7 @@ def start_threads(object, ips, username, password, enable_password=None,
 
     # Instantiate thread objects and start them
     threads = [object(ip=ip, username=username, password=password, enable_password=enable_password,
-                      perform_secondary_action=perform_secondary_action) for ip in ips]
+                      perform_secondary_action=perform_secondary_action, **kwargs) for ip in ips]
     for thread in threads:
         thread.start()
 
