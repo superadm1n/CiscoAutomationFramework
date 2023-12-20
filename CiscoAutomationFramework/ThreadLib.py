@@ -83,7 +83,7 @@ class SSH(Thread, ABC):
 
     def run(self) -> None:
 
-        with connect_ssh(self.ip, self.username, self.password) as ssh:
+        with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password) as ssh:
             self.is_nexus = ssh.is_nexus
             self.hostname = ssh.hostname
             self.during_login(ssh)
