@@ -10,8 +10,7 @@ def detect_firmware(transport):
     if not isinstance(transport, BaseEngine):
         raise TypeError(f'transport argument MUST be an instance of {getmodule(BaseEngine).__name__}.{BaseEngine.__name__}')
 
-    _ = transport.send_command_get_output('terminal length 0')
-    show_version = transport.send_command_get_output('show version')
+    show_version = transport.send_command_get_truncated_output('show version')
 
     results = {'IOSXE': 0, 'IOS': 0, 'NXOS': 0, 'ASA': 0}
     for line in show_version[:10]:

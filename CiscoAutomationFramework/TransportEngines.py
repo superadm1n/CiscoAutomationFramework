@@ -99,6 +99,30 @@ class BaseEngine(ABC):
             sleep(delay)
         return self.get_output(buffer_size, timeout)
 
+    def send_command_get_truncated_output(self, command):
+
+        '''
+        Method to be used in an instance when setting the terminal length to 0 is not an option and the
+        output from the device will be truncated where you need to press the space bar to get it all. An example
+        is AP's I have ran into, when the show version is gathered upon login, the terminal length command is
+        not available yet until going into enable mode.
+
+        This method is blocking, so it has the potential to hang if for whatever reason the previously
+        known prompt is not returned.
+        '''
+
+        self.send_command(command)
+        output = []
+        while True:
+            for line in self.get_output(timeout=.1):
+                output.append(line)
+
+            if self.prompt in '\n'.join(output):
+                break
+            else:
+                self.send_command(' ', end='')
+        return output
+
     @property
     def in_user_exec_mode(self) -> bool:
         if self.prompt.endswith('>'):
