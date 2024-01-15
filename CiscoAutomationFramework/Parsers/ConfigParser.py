@@ -1,4 +1,5 @@
-from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList
+from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList, RouteMap,\
+    PrefixList
 
 
 class ConfigParser:
@@ -121,5 +122,51 @@ class ConfigParser:
         if len(acl_data) > 0:
             data.append(acl_data)
         return data
+
+    @property
+    def route_maps(self):
+
+        raw_route_maps = {}
+        working_map = ''
+        for line in self.running_config:
+            if line.startswith('route-map'):
+                # Start of a route map rule, set working_map so we will capture subsequent lines of configuration
+                working_map = line.split()[1]
+                if not working_map in raw_route_maps.keys():
+                    raw_route_maps[working_map] = [line]
+                else:
+                    raw_route_maps[working_map].append(line)
+                continue
+
+            if line.startswith('!'):
+                # Denotes the end of a route map rule, set working_map to an empty string to stop collecting config
+                working_map = ''
+
+            if working_map:
+                # If working_map is not empty, This line must be in a route map, collect it
+                raw_route_maps[working_map].append(line)
+
+        return [RouteMap(raw_config) for _, raw_config in raw_route_maps.items()]
+
+    @property
+    def prefix_lists(self):
+        lists = {}
+        for line in self.running_config:
+            if line.startswith('ip prefix-list'):
+                name = line.split()[2]
+                if not name in lists.keys():
+                    lists[name] = [line]
+                else:
+                    lists[name].append(line)
+
+        return [PrefixList(data) for _, data in lists.items()]
+
+    def get_prefix_list(self, name):
+        for list in self.prefix_lists:
+            if list.name == name:
+                return list
+        return None
+
+
 
 
