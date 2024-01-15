@@ -1,7 +1,7 @@
 from unittest import TestCase
 from CiscoAutomationFramework.Parsers.ConfigParser import ConfigParser
 from CiscoAutomationFramework.Parsers.ConfigSectionTypes import RouteMap, RouteMapRule
-from CiscoAutomationFramework.Parsers.PowerInlineParser import PowerInlineInterface, PowerInlineParser
+
 
 parser_canned_output = """
 !
