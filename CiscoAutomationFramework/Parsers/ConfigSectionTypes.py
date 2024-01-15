@@ -74,6 +74,10 @@ class PrefixListEntry:
         return ' '.join(self.split_raw_data[6:])
 
     @property
+    def prefix_cidr(self):
+        return self.prefix.split('/')[-1]
+
+    @property
     def less_than_equal_to(self):
         return 'le' in self.entire_prefix
 
