@@ -167,6 +167,12 @@ class ConfigParser:
                 return list
         return None
 
+    def get_route_map(self, name):
+        for map in self.route_maps:
+            if map.name == name:
+                return map
+        return None
+
 
 
 
