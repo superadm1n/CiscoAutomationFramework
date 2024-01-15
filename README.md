@@ -50,17 +50,20 @@ from CiscoAutomationFramework import connect_as_ssh
 ```
 
 ## Install latest version of the framework
-Note installing directly from the master branch on github is not the ideal solution for a production
-environment as it is has the potential to have bugs that have less of a chance making it to the package
+Note installing directly from the master branch or a version branch from github is not the ideal solution for a 
+production environment as it has the potential to have bugs that have less of a chance making it to the package
 release on pypi.
 
 That being said if you wish to have the latest features and are willing to live with a potential 
  for added bugs or help develop the framework, installing from github is where you should do and below
  is the command to install the package directly from github
 ```bash
-git clone https://github.com/superadm1n/CiscoAutomationFramework.git
+pip install git+https://github.com/Superadm1n/CiscoAutomationFramework.git
 ```
-
+or to install a specific branch
+```bash
+pip install git+https://github.com/Superadm1n/CiscoAutomationFramework.git@v1.0.8
+```
 ### Installing copy to develop
 
 Below are instructions for cloning a copy of the repository, building a virtual environment and setting your environment up to begin testing and developing.
