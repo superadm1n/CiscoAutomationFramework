@@ -177,10 +177,11 @@ class RouteMapRule:
         """
         Set clause configured in route map (if any configured)
         """
-        data = self._extract_line('set')
-        if data:
-            return data.strip()
-        return data
+        set_clauses = []
+        for line in self.raw_config:
+            if 'set' in line:
+                set_clauses.append(line.strip())
+        return set_clauses
 
     @property
     def description(self):
