@@ -38,6 +38,22 @@ class ConfigParser:
                     section_data = []
         return data
 
+    def sections_config_referenced_in(self, config_match, prepend_space_in_search=True):
+        """
+        Searches through all detected 'sections' of config for the supplied config_match string.
+        If it finds it nested in the section (in the indented section) it will return the first line of
+        that config section in a list with other matches.
+        """
+        search_string = f' {config_match}' if prepend_space_in_search else config_match
+
+        sections = []
+        for section in self._config_sections:
+            if any(search_string in x for x in section[1:]):
+                sections.append(section[0])
+
+        return sections
+
+
     def get_config_section(self, title_startswith, return_all=True):
         """
         Extracts a specific configuration section whos first line starts with your variable.
@@ -51,12 +67,14 @@ class ConfigParser:
         :return: list of lists containing the sections of config
         :rtype: list
         """
+        data = []
         for section in self._config_sections:
             if section[0].startswith(title_startswith):
                 if return_all:
-                    yield section
+                    data.append(section)
                 else:
                     return section
+        return data
 
     def has_global_config(self, config_string):
         """
