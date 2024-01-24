@@ -55,12 +55,24 @@ class RouteMapParserTests(TestCase):
             ]
         )
 
+        self.parser_blank_rule = RouteMap(
+            ['route-map MULTI-SET permit 10',
+             ' description abcdefg',
+             ' match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2',
+             ' set local-preference 800',
+             ' set community 12345',
+             'route-map MULTI-SET permit 20',]
+        )
+
     def test_detects_name(self):
         self.assertEqual(self.parser1.name, 'MULTI-SET')
 
     def test_detects_num_rules(self):
         self.assertEqual(self.parser1.num_rules, 1)
         self.assertEqual(self.parser2.num_rules, 2)
+
+    def test_extracts_detects_second_rule(self):
+        self.assertEqual(len(self.parser_blank_rule.rules), 2)
 
 
 class RouteMapRuleParserTests(TestCase):
@@ -88,5 +100,3 @@ class RouteMapRuleParserTests(TestCase):
 
     def test_extracts_description(self):
         self.assertEqual(self.parser.description, 'abcdefg')
-
-

@@ -205,27 +205,21 @@ class RouteMap(ConfigSection):
     to all rules, a single rule, and high level information about the route map.
     """
 
-    def _nextline_startswith_space(self, current_line_index):
-        try:
-            if self.raw_config[current_line_index + 1].startswith(' '):
-                return True
-        except IndexError:
-            return False
-        else:
-            return False
-
     @property
     def _raw_parsed_rules(self):
         data = []
         section_data = []
         for index, line in enumerate(self.raw_config):
-            if self._nextline_startswith_space(index):
-                section_data.append(line)
-            else:
-                if len(section_data) > 0:
-                    section_data.append(line)
+            if line.startswith('route-map'):
+                if section_data:
                     data.append(section_data)
-                    section_data = []
+                    section_data = [line]
+                    continue
+            section_data.append(line)
+
+        if section_data:
+            data.append(section_data)
+
         return data
 
     @property
