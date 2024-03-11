@@ -1,5 +1,6 @@
 from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList, RouteMap,\
     PrefixList
+from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
 
 
 class ConfigParser:
@@ -178,6 +179,14 @@ class ConfigParser:
                     lists[name].append(line)
 
         return [PrefixList(data) for _, data in lists.items()]
+
+    @property
+    def static_routes(self):
+        static_routes = []
+        for line in self.running_config:
+            if line.startswith('ip route'):
+                static_routes.append(StaticRoute(line))
+        return static_routes
 
     def get_prefix_list(self, name):
         for list in self.prefix_lists:
