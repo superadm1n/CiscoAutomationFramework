@@ -1,13 +1,4 @@
-
-
-class ConfigSection:
-    def __init__(self, raw_config):
-        self.raw_config = raw_config
-
-    def __eq__(self, other):
-        if isinstance(other, type(self)) and self.raw_config == other.raw_config:
-            return True
-        return False
+from CiscoAutomationFramework.Parsers.ConfigSectionObjects import ConfigSection
 
 
 class InterfaceConfig(ConfigSection):
@@ -139,12 +130,11 @@ class PrefixList(ConfigSection):
     def __repr__(self):
         return f'{type(self).__name__}({self.name})'
 
-class RouteMapRule:
+
+class RouteMapRule(ConfigSection):
     """
     Object to be used for each rule in a route map
     """
-    def __init__(self, raw_rule_config):
-        self.raw_config = raw_rule_config
 
     def _extract_line(self, match_string):
         for line in self.raw_config:
@@ -258,4 +248,3 @@ class RouteMap(ConfigSection):
 
     def __repr__(self):
         return f'{type(self).__name__}({self.name})'
-

@@ -14,6 +14,7 @@ ip prefix-list second_prefix_list seq 20 permit 172.16.1.0/24
 devicehostname#
 """
 
+
 class ConfigParserPrefixListExtractorTests(TestCase):
 
     def setUp(self):
@@ -31,6 +32,7 @@ class ConfigParserPrefixListExtractorTests(TestCase):
 
 class PrefixListEntryParserTests(TestCase):
     pass
+
 
 class PrefixListParserTests(TestCase):
     def setUp(self):

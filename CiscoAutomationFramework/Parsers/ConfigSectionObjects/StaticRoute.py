@@ -1,22 +1,20 @@
 from CiscoAutomationFramework.util import is_ipv4
 from ipaddress import IPv4Network
+from CiscoAutomationFramework.Parsers.ConfigSectionObjects import ConfigSection
 
 
-class StaticRoute:
-
-    def __init__(self, raw_data):
-        self.raw_data = raw_data
+class StaticRoute(ConfigSection):
 
     @property
     def vrf(self):
-        data = self.raw_data.split()
+        data = self.raw_config.split()
         for idx, word in enumerate(data):
             if word.lower() == 'vrf':
                 return data[idx+1]
 
     @property
     def network(self):
-        data = self.raw_data.split()
+        data = self.raw_config.split()
         for idx, word in enumerate(data):
             if is_ipv4(word):
                 subnet = word
@@ -25,14 +23,14 @@ class StaticRoute:
 
     @property
     def subnet(self):
-        data = self.raw_data.split()
+        data = self.raw_config.split()
         for idx, word in enumerate(data):
             if is_ipv4(word):
                 return word
 
     @property
     def mask(self):
-        data = self.raw_data.split()
+        data = self.raw_config.split()
         for idx, word in enumerate(data):
             if is_ipv4(word):
                 return data[idx + 1]
@@ -43,15 +41,14 @@ class StaticRoute:
 
     @property
     def destination(self):
-        data = self.raw_data.split()
+        data = self.raw_config.split()
         for idx, word in enumerate(data):
             if is_ipv4(word):
                 return data[idx + 2]
 
     @property
     def description(self):
-        data = self.raw_data.split()
+        data = self.raw_config.split()
         for idx, word in enumerate(data):
             if word == 'name':
                 return data[idx + 1]
-
