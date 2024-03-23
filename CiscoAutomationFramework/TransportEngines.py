@@ -1,3 +1,4 @@
+from CiscoAutomationFramework.Exceptions import AuthenticationException
 from paramiko import SSHClient, AutoAddPolicy
 from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
@@ -123,6 +124,51 @@ class BaseEngine(ABC):
                 self.send_command(' ', end='')
         return output
 
+    def _send_space_get_data(self, timeout=1):
+        self._send_command('', end='\n')
+        end = datetime.now() + timedelta(seconds=timeout)
+        data = ''
+        while not data.endswith(standard_prompt_endings):
+            from_device = self._get_output(1000)
+            if from_device:
+                data += from_device
+                end = datetime.now() + timedelta(seconds=timeout)
+            else:
+                sleep(.1)
+                if datetime.now() >= end:
+                    break
+        return data
+
+    def _prompt_lookup(self, output_data):
+        """
+        Recursive method that will try and find the prompt in the last 3 lines of config, if not
+        will send a space, get the data and call itself to run again
+        """
+
+        prompt = None
+        for line in reversed(output_data.splitlines()[-3:]):
+            if len(line.split()) == 1 and any(x in line for x in standard_prompt_endings):
+                prompt = line.strip().replace('\r\n', '')
+                break
+        if not prompt:
+            return self._prompt_lookup(self._send_space_get_data())
+
+        return prompt
+
+    def _get_prompt_and_hostname(self):
+        # gets initial prompt out of device
+        output = ''
+        while not output.endswith(standard_prompt_endings):
+            data = self._get_output(100)
+            output += data
+            if '% Authorization failed.' in output:
+                raise AuthenticationException('% Authorization failed.')
+        prompt = self._prompt_lookup(output)
+
+        # prompt = data.splitlines()[-1].strip()
+        hostname = prompt[:-1]
+        return prompt, hostname
+
     @property
     def in_user_exec_mode(self) -> bool:
         if self.prompt.endswith('>'):
@@ -166,11 +212,40 @@ class SSHEngine(BaseEngine):
         self.client.set_missing_host_key_policy(AutoAddPolicy())
         self.shell = None
         self.timeout = 10
+        self._pre_jumphost_hostname = ''
+
+    @property
+    def _in_jumphost(self):
+        return self._pre_jumphost_hostname != self.hostname
 
     def connect_to_server(self, ip, username, password, port):
         self.client.connect(hostname=ip, port=port, username=username, password=password, timeout=self.timeout)
         self.shell = self.client.invoke_shell()
         self.prompt, self.hostname = self._get_prompt_and_hostname()
+        self._pre_jumphost_hostname = self.hostname
+
+    def jumphost(self, ip, password, username=None, port=None, ssh_ver=None, vrf=None):
+        command_string = 'ssh '
+        if username:
+            command_string += f'-l {username} '
+        if port:
+            command_string += f'-p {port} '
+        if ssh_ver:
+            command_string += f'-v {ssh_ver} '
+        if vrf:
+            command_string += f'-vrf {vrf} '
+        command_string += ip
+
+        self.send_command(command_string)
+        sleep(.3)
+        _ = self._get_output(100)
+        self.send_command(password)
+        self.prompt, self.hostname = self._get_prompt_and_hostname()
+
+    def exit_jumphost(self):
+        if self._in_jumphost:
+            self.send_command('exit')
+            self.prompt, self.hostname = self._get_prompt_and_hostname()
 
     def _get_output(self, buffer_size):
         if self.shell.recv_ready():
@@ -181,51 +256,9 @@ class SSHEngine(BaseEngine):
         self.shell.send(f'{command}{end}')
 
     def close_connection(self):
+        self.exit_jumphost()
         self.client.close()
 
     # Methods required for some lower level SSH handling. These methods should not be called outside of this class
-
-    def _send_space_get_data(self, timeout=1):
-        self._send_command('', end='\n')
-        end = datetime.now() + timedelta(seconds=timeout)
-        data = ''
-        while not data.endswith(standard_prompt_endings):
-            from_device = self._get_output(1000)
-            if from_device:
-                data += from_device
-                end = datetime.now() + timedelta(seconds=timeout)
-            else:
-                sleep(.1)
-                if datetime.now() >= end:
-                    break
-        return data
-
-    def _prompt_lookup(self, output_data):
-        """
-        Recursive method that will try and find the prompt in the last 3 lines of config, if not
-        will send a space, get the data and call itself to run again
-        """
-
-        prompt = None
-        for line in reversed(output_data.splitlines()[-3:]):
-            if len(line.split()) == 1 and any(x in line for x in standard_prompt_endings):
-                prompt = line.strip().replace('\r\n', '')
-                break
-        if not prompt:
-            return self._prompt_lookup(self._send_space_get_data())
-
-        return prompt
-
-    def _get_prompt_and_hostname(self):
-        # gets initial prompt out of device
-        output = ''
-        while not output.endswith(standard_prompt_endings):
-            data = self._get_output(100)
-            output += data
-        prompt = self._prompt_lookup(output)
-
-        # prompt = data.splitlines()[-1].strip()
-        hostname = prompt[:-1]
-        return prompt, hostname
 
     # End low level methods

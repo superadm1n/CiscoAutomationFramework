@@ -64,3 +64,13 @@ def column_print(data, spaces_between_columns=2, separator_char=None):
         for index, word in enumerate(row):
             print_string += str(word).ljust(column_widths[index])
         print(print_string)
+
+def chunker(list, size):
+    """
+    Splits 1 large list into a list sub lists, where the sub lists can be any specific size
+    """
+    # looping till length l
+    end_list = []
+    for i in range(0, len(list), size):
+        end_list.append(list[i:i + size])
+    return end_list

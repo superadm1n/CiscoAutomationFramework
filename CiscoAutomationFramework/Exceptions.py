@@ -5,3 +5,7 @@ class EnablePasswordError(Exception):
 
 class ParserError(Exception):
     pass
+
+
+class AuthenticationException(Exception):
+    pass
