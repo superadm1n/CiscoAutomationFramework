@@ -1,12 +1,199 @@
 from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList, RouteMap,\
     PrefixList
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
+from collections import OrderedDict
+
+
+def matches_search_terms(key, search_terms, case_sensitive, full_match):
+    """Checks if the key matches any search term based on given options."""
+    if not case_sensitive:
+        key = key.lower()
+        search_terms_lower = [term.lower() for term in search_terms]
+    else:
+        search_terms_lower = search_terms
+
+    for term in search_terms_lower:
+
+        if full_match:
+            if key == term:  # Exact match
+                return True
+        else:
+            if term in key:  # Partial match
+                return True
+    return False
 
 
 class ConfigParser:
 
     def __init__(self, running_config):
         self.running_config = running_config.splitlines()
+        self._treed_config = {}
+
+    @property
+    def treed_config(self):
+        '''
+        The running config that was passed in, parsed into a string format
+
+        :return: dictionary tree
+        :rtype: dict
+        '''
+        if self._treed_config:
+            return self._treed_config
+        else:
+            root = OrderedDict()
+            stack = [(0, root)]
+
+            for line in self.running_config:
+                if not line.strip():
+                    continue
+
+                stripped = line.lstrip()
+                indent = len(line) - len(stripped)
+                key = stripped
+                current_node = {}
+
+                # If we're at the top level (no indentation), always attach to root
+                if indent == 0:
+                    parent = root
+                    stack = [(0, root)]  # Reset stack to this level
+                else:
+                    while stack and stack[-1][0] >= indent:
+                        stack.pop()
+
+                    if not stack:
+                        raise ValueError(f"Invalid indentation or format at line: {line}")
+
+                    parent = stack[-1][1]
+
+                parent[key] = current_node
+                stack.append((indent, current_node))
+            self._treed_config = root
+            return root
+
+    def search_config_tree(self, search_terms, case_sensitive=True, full_match=False, tree=None):
+        """
+        Searches the config tree for a set of search terms and returns the path to root for that match. Note: the
+        search will not return child branches after the match, just parent branches back to the root.
+
+        You may also specify if you want your search to be case sensitive, and you may also specify if you want
+        a full or partial match. For example if I do a full match for "description" but the line of configuration
+        is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+        "descrip", and the line is "description example" it WILL match.
+
+        :param search_terms: List of search terms to search for.
+        :type search_terms: list
+        :param case_sensitive: Whether the search is case-sensitive.
+        :type case_sensitive: bool
+        :default case_sensitive: True
+        :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+        :type full_match: bool
+        :param tree: The configuration tree to search, Do not specify this, its only used for recursion.
+        :type tree: dict or None
+        :default tree: None
+
+        :return: A dictionary containing matched and modified results.
+        :rtype: dict
+        """
+        if not tree:
+            tree = self.treed_config
+
+        if not any([isinstance(search_terms, x) for x in (list, tuple)]):
+            search_terms = [search_terms]
+            #raise TypeError('search_terms MUST be a list or tuple')
+
+        data = {}
+        for key, sub_tree in tree.items():
+            if matches_search_terms(key, search_terms, case_sensitive, full_match):
+                data[key] = sub_tree
+            elif isinstance(sub_tree, dict) and sub_tree:
+                path = self.search_config_tree(search_terms, case_sensitive, full_match, tree=sub_tree)
+                if path:
+                    data[key] = path
+        return data
+
+    def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, prepend_text='', append_text='', replace_tuple=('',''), tree=None):
+        """
+        Searches the config tree for a set of search terms, and if specified will run each line that matches
+        a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
+
+        Modification will ONLY occur to lines that CONTAIN a match! if you search for "description example" it will
+        also return in the tree the interface name ex. interface GigabitEthernet1/0/1, however that line will NOT
+        be eligible for the string modification because it does not contain "description example".
+
+        Additionally using that same interface example, the interface will likely have other config besides the
+        description, but if you search for the description, all other commands in that layer of the tree will
+        not be returned, just the path up to the root which in this case is the interface name.
+
+        You may also specify if you want your search to be case sensitive, and you may also specify if you want
+        a full or partial match. For example if I do a full match for "description" but the line of configuration
+        is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+        "descrip", and the line is "description example" it WILL match.
+
+        :param search_terms: List of search terms to search for.
+        :type search_terms: list
+        :param case_sensitive: Whether the search is case-sensitive.
+        :type case_sensitive: bool
+        :default case_sensitive: True
+        :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+        :type full_match: bool
+        :default full_match: False
+        :param prepend_text: Text to prepend to matches.
+        :type prepend_text: str
+        :default prepend_text: ""
+        :param append_text: Text to append to matches.
+        :type append_text: str
+        :default append_text: ""
+        :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
+        :type replace_tuple: tuple or None
+        :default replace_tuple: None
+        :param tree: The configuration tree to search. Do not specify this, its only used for recursion
+        :type tree: dict or None
+        :default tree: None
+
+        :return: A dictionary containing matched and modified results.
+        :rtype: dict
+        """
+        if not tree:
+            tree = self.treed_config
+
+        if not any([isinstance(search_terms, x) for x in (list, tuple)]):
+            search_terms = [search_terms]
+            # raise TypeError('search_terms MUST be a list or tuple')
+
+        data = {}
+        for key, sub_tree in tree.items():
+            if matches_search_terms(key, search_terms, case_sensitive, full_match):
+                data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
+            elif isinstance(sub_tree, dict) and sub_tree:
+                path = self.search_and_modify_config_tree(search_terms, case_sensitive, full_match, prepend_text, append_text, replace_tuple, sub_tree)
+                if path:
+                    data[key] = path
+        return data
+
+    def config_tree_to_list(self, tree, indent=0, indent_step=0):
+        """
+        Converts a tree representation of the configuration into a list that can be pasted
+        into a device
+
+        :param tree: Tree representation of a configuration file
+        :type tree: dict
+        :param indent: number of spaces to indent root with
+        :type indent: int
+        :param indent_step: number of indent spaces to increment when going from a root to a branch (default 0, no indent)
+
+        :return: List representation of config tree
+        :rtype: list
+        """
+
+        if not tree:
+            tree = self.treed_config
+
+        data = []
+        for key, subtree in tree.items():
+            data.append(f'{" " * (indent * indent_step)}{key}')
+            if isinstance(subtree, dict) and subtree:
+                data.extend(self.config_tree_to_list(subtree, indent + 1, indent_step))
+        return data
 
     def _nextline_startswith_space(self, current_line_index):
         try:
