@@ -334,6 +334,38 @@ class ConfigParser:
         return [RouteMap(name, config) for name, config in data.items()]
 
     @property
+    def unused_route_maps(self):
+
+        def find_nested_usage(tree, search_terms, nest_level=0):
+            if not any([True if isinstance(search_terms, x) else False for x in [list, tuple]]):
+                raise TypeError(f'search_terms MUST be a list or tuple')
+
+            tracker = []
+            for parent, sub_tree in tree.items():
+                if nest_level > 0:
+                    if any(term in parent for term in search_terms):
+                        tracker.append(True)
+                if sub_tree:
+                    results = find_nested_usage(sub_tree, search_terms, nest_level + 1)
+                    if results:
+                        tracker.append(results)
+            return any(tracker)
+
+
+        all_route_maps = {rm.name: False for rm in self.route_maps}
+
+        for name in all_route_maps.keys():
+            results = self.search_config_tree(name, full_match=False, case_sensitive=True)
+            syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
+            all_route_maps[name] = find_nested_usage(results, syntactic_usages)
+
+        unused_route_maps = []
+        for name, config in all_route_maps.items():
+            if not config:
+                unused_route_maps.append(self.get_route_map(name))
+        return unused_route_maps
+
+    @property
     def prefix_lists(self):
 
         data = {}

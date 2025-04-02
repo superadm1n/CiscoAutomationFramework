@@ -205,6 +205,9 @@ class RouteMapRule:
             return ' '.join(data.split()[1:])
         return data
 
+    def __repr__(self):
+        return f'{type(self).__name__}({self.sequence_number})'
+
 
 class RouteMap:
 
@@ -217,6 +220,9 @@ class RouteMap:
         self.rm_name = rm_name
         self.config = config
 
+    @property
+    def config_tree(self):
+        return {self.rm_name: self.config}
 
     @property
     def name(self):
