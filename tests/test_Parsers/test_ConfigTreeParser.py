@@ -56,8 +56,7 @@ class ConfigParserTreeTests(TestCase):
 
     def test_splits_a_string_by_lines(self):
         expected_tree = {'a': {'b': {'d': {}, 'e': {}}, 'c': {'f': {}, 'g': {'h': {}}}}}
-        self.assertEqual(self.simplified_output_parser.treed_config, expected_tree)
-
+        self.assertEqual(self.simplified_output_parser.config_tree, expected_tree)
 
     def test_searches_leaf(self):
         """

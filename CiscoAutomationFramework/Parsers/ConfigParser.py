@@ -27,18 +27,18 @@ class ConfigParser:
 
     def __init__(self, running_config):
         self.running_config = running_config.splitlines()
-        self._treed_config = {}
+        self._config_tree = {}
 
     @property
-    def treed_config(self):
+    def config_tree(self):
         '''
         The running config that was passed in, parsed into a string format
 
         :return: dictionary tree
         :rtype: dict
         '''
-        if self._treed_config:
-            return self._treed_config
+        if self._config_tree:
+            return self._config_tree
         else:
             root = OrderedDict()
             stack = [(0, root)]
@@ -67,7 +67,7 @@ class ConfigParser:
 
                 parent[key] = current_node
                 stack.append((indent, current_node))
-            self._treed_config = root
+            self._config_tree = root
             return root
 
     def search_config_tree(self, search_terms, case_sensitive=True, full_match=False, tree=None):
@@ -95,7 +95,7 @@ class ConfigParser:
         :rtype: dict
         """
         if not tree:
-            tree = self.treed_config
+            tree = self.config_tree
 
         if not any([isinstance(search_terms, x) for x in (list, tuple)]):
             search_terms = [search_terms]
@@ -154,7 +154,7 @@ class ConfigParser:
         :rtype: dict
         """
         if not tree:
-            tree = self.treed_config
+            tree = self.config_tree
 
         if not any([isinstance(search_terms, x) for x in (list, tuple)]):
             search_terms = [search_terms]
@@ -170,7 +170,7 @@ class ConfigParser:
                     data[key] = path
         return data
 
-    def config_tree_to_list(self, tree, indent=0, indent_step=0):
+    def config_tree_to_list(self, tree=None, indent=0, indent_step=0):
         """
         Converts a tree representation of the configuration into a list that can be pasted
         into a device
@@ -186,7 +186,7 @@ class ConfigParser:
         """
 
         if not tree:
-            tree = self.treed_config
+            tree = self.config_tree
 
         data = []
         for key, subtree in tree.items():
