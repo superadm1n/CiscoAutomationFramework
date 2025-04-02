@@ -39,29 +39,14 @@ class ConfigParserRouteMapExtractorTests(TestCase):
 class RouteMapParserTests(TestCase):
     def setUp(self):
         self.parser1 = RouteMap(
-            ['route-map MULTI-SET permit 10',
-             ' description abcdefg',
-             'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2',
-             ' set local-preference 800',
-             ' set community 12345']
+            'MULTI-SET',  {'route-map MULTI-SET permit 10': {'description abcdefg': {}, 'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {}, 'set local-preference 800': {}, 'set community 12345': {}}}
         )
         self.parser2 = RouteMap(
-            [
-                'route-map MULTI-RULES deny 10',
-                ' description abcdefg',
-                ' match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2',
-                'route-map MULTI-RULES permit 1000',
-                ' description Allow Everything Else'
-            ]
+            'MULTI-RULES', {'route-map MULTI-RULES deny 10': {'description abcdefg': {}, 'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {}}, 'route-map MULTI-RULES permit 1000': {'description Allow Everything Else': {}}}
         )
 
         self.parser_blank_rule = RouteMap(
-            ['route-map MULTI-SET permit 10',
-             ' description abcdefg',
-             ' match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2',
-             ' set local-preference 800',
-             ' set community 12345',
-             'route-map MULTI-SET permit 20',]
+            'MULTI-SET', {'route-map MULTI-SET permit 10': {'description abcdefg': {}, 'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {}, 'set local-preference 800': {}, 'set community 12345': {}}, 'route-map MULTI-SET permit 20': {}}
         )
 
     def test_detects_name(self):
@@ -79,11 +64,7 @@ class RouteMapRuleParserTests(TestCase):
 
     def setUp(self):
         self.parser = RouteMapRule(
-            ['route-map MULTI-SET permit 10',
-             ' description abcdefg',
-             ' match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2',
-             ' set local-preference 800',
-             ' set community 12345']
+           'route-map MULTI-SET permit 10', {'description abcdefg': {}, 'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {}, 'set local-preference 800': {}, 'set community 12345': {}}
         )
 
     def test_extracts_sequence_num(self):

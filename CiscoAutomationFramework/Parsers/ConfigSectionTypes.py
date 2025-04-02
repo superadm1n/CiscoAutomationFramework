@@ -133,51 +133,63 @@ class PrefixList(ConfigSection):
         return f'{type(self).__name__}({self.name})'
 
 
-class RouteMapRule(ConfigSection):
+class RouteMapRule:
     """
     Object to be used for each rule in a route map
     """
 
+    def __init__(self, definition, rule_config_tree):
+        self.definition = definition
+        self.rule_config_tree = rule_config_tree
+
     def _extract_line(self, match_string):
-        for line in self.raw_config:
-            if match_string in line:
-                return line
+        for key, sub_tree in self.rule_config_tree.items():
+            if match_string in key:
+                return key
+            elif sub_tree:
+                data = self._extract_line(match_string)
+                if data:
+                    return data
         return ''
+
+    def _extract_lines(self, match_string):
+        return_data = []
+        for key, sub_tree in self.rule_config_tree.items():
+            if match_string in key:
+                return_data.append(key)
+            elif sub_tree:
+                data = self._extract_line(match_string)
+                if data:
+                    return_data.append(data)
+        return return_data
 
     @property
     def sequence_number(self):
         """
         Rule Sequence Number
         """
-        return self.raw_config[0].split()[-1]
+        return self.definition.split()[-1]
 
     @property
     def action(self):
         """
         Rule action: permit/deny
         """
-        return self.raw_config[0].split()[2]
+        return self.definition.split()[2]
 
     @property
     def match_clause(self):
         """
         Match clause configured in route map (if any configured)
         """
-        data = self._extract_line('match')
-        if data:
-            return data.strip()
-        return data
+        return self._extract_line('match')
 
     @property
     def set_clause(self):
         """
         Set clause configured in route map (if any configured)
         """
-        set_clauses = []
-        for line in self.raw_config:
-            if 'set' in line:
-                set_clauses.append(line.strip())
-        return set_clauses
+        return self._extract_lines('set')
 
     @property
     def description(self):
@@ -190,50 +202,38 @@ class RouteMapRule(ConfigSection):
         return data
 
 
-class RouteMap(ConfigSection):
+class RouteMap:
 
     """
     Parser for entire route map. Responsible for parsing out each rule and providing access
     to all rules, a single rule, and high level information about the route map.
     """
 
-    @property
-    def _raw_parsed_rules(self):
-        data = []
-        section_data = []
-        for index, line in enumerate(self.raw_config):
-            if line.startswith('route-map'):
-                if section_data:
-                    data.append(section_data)
-                    section_data = [line]
-                    continue
-            section_data.append(line)
+    def __init__(self, rm_name, config):
+        self.rm_name = rm_name
+        self.config = config
 
-        if section_data:
-            data.append(section_data)
-
-        return data
 
     @property
     def name(self):
         """
         Name of route map
         """
-        return self.raw_config[0].split()[1]
+        return self.rm_name
 
     @property
     def num_rules(self):
         """
         Total number of rules in route map
         """
-        return len([x for x in self.raw_config if 'route-map' in x])
+        return len(self.config)
 
     @property
     def rules(self):
         """
         List of all rules in route map, each rule is in a RouteMapRule object
         """
-        return [RouteMapRule(x) for x in self._raw_parsed_rules]
+        return [RouteMapRule(definition, config) for definition, config in self.config.items()]
 
     @property
     def configured_sequence_numbers(self):

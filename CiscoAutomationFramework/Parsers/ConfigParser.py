@@ -323,27 +323,15 @@ class ConfigParser:
     @property
     def route_maps(self):
 
-        raw_route_maps = {}
-        working_map = ''
-        for line in self.running_config:
-            if line.startswith('route-map'):
-                # Start of a route map rule, set working_map so we will capture subsequent lines of configuration
-                working_map = line.split()[1]
-                if not working_map in raw_route_maps.keys():
-                    raw_route_maps[working_map] = [line]
-                else:
-                    raw_route_maps[working_map].append(line)
-                continue
+        data = {}
+        for cfg_line, nested_config in self.config_tree.items():
+            if 'route-map' in cfg_line:
+                name = cfg_line.split()[1]
+                if name not in data.keys():
+                    data[name] = {}
+                data[name].update({cfg_line: nested_config})
 
-            if line.startswith('!'):
-                # Denotes the end of a route map rule, set working_map to an empty string to stop collecting config
-                working_map = ''
-
-            if working_map:
-                # If working_map is not empty, This line must be in a route map, collect it
-                raw_route_maps[working_map].append(line)
-
-        return [RouteMap(raw_config) for _, raw_config in raw_route_maps.items()]
+        return [RouteMap(name, config) for name, config in data.items()]
 
     @property
     def prefix_lists(self):
