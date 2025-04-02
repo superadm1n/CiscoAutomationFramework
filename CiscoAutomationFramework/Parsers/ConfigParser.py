@@ -1,6 +1,7 @@
 from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList, RouteMap,\
     PrefixList
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
+from CiscoAutomationFramework.util import convert_config_tree_to_list, search_config_tree, search_and_modify_config_tree
 from collections import OrderedDict
 
 
@@ -95,20 +96,7 @@ class ConfigParser:
         """
         if not tree:
             tree = self.config_tree
-
-        if not any([isinstance(search_terms, x) for x in (list, tuple)]):
-            search_terms = [search_terms]
-            #raise TypeError('search_terms MUST be a list or tuple')
-
-        data = {}
-        for key, sub_tree in tree.items():
-            if matches_search_terms(key, search_terms, case_sensitive, full_match):
-                data[key] = sub_tree
-            elif isinstance(sub_tree, dict) and sub_tree:
-                path = self.search_config_tree(search_terms, case_sensitive, full_match, tree=sub_tree)
-                if path:
-                    data[key] = path
-        return data
+        return search_config_tree(tree, search_terms, case_sensitive, full_match)
 
     def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, prepend_text='', append_text='', replace_tuple=('',''), tree=None):
         """
@@ -154,20 +142,8 @@ class ConfigParser:
         """
         if not tree:
             tree = self.config_tree
-
-        if not any([isinstance(search_terms, x) for x in (list, tuple)]):
-            search_terms = [search_terms]
-            # raise TypeError('search_terms MUST be a list or tuple')
-
-        data = {}
-        for key, sub_tree in tree.items():
-            if matches_search_terms(key, search_terms, case_sensitive, full_match):
-                data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
-            elif isinstance(sub_tree, dict) and sub_tree:
-                path = self.search_and_modify_config_tree(search_terms, case_sensitive, full_match, prepend_text, append_text, replace_tuple, sub_tree)
-                if path:
-                    data[key] = path
-        return data
+        return search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, prepend_text,
+                                             append_text, replace_tuple)
 
     def config_tree_to_list(self, tree=None, indent=0, indent_step=0):
         """
@@ -187,12 +163,7 @@ class ConfigParser:
         if not tree:
             tree = self.config_tree
 
-        data = []
-        for key, subtree in tree.items():
-            data.append(f'{" " * (indent * indent_step)}{key}')
-            if isinstance(subtree, dict) and subtree:
-                data.extend(self.config_tree_to_list(subtree, indent + 1, indent_step))
-        return data
+        return convert_config_tree_to_list(tree=tree, indent=indent, indent_step=indent_step)
 
     def _nextline_startswith_space(self, current_line_index):
         try:
@@ -276,10 +247,10 @@ class ConfigParser:
                 return True
         return False
 
-    def interfaces_that_have_config(self, config_string):
+    def interfaces_that_have_config(self, config_string, full_match=False, case_sensitive=True):
         interfaces = []
         for interface in self.interface_configs:
-            if interface.has_config(config_string):
+            if interface.has_config(config_string, full_match=full_match, case_sensitive=case_sensitive):
                 interfaces.append(interface)
         return interfaces
 
@@ -293,14 +264,14 @@ class ConfigParser:
     @property
     def local_users(self):
         users = []
-        for line in self.running_config:
-            if line.lower().startswith('username'):
-                users.append(line.split()[1])
+        for config, child_config in self.config_tree.items():
+            if 'username' in config and not child_config:
+                users.append(config.split()[1])
         return users
 
     @property
     def interface_configs(self):
-        return [InterfaceConfig(x) for x in self._config_sections if x[0].startswith('interface')]
+        return [InterfaceConfig(name, config) for name, config in self.search_config_tree('interface ').items()]
 
     @property
     def ip_access_control_lists(self):

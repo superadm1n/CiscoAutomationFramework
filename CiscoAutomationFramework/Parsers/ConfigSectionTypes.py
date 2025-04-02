@@ -1,16 +1,18 @@
-from CiscoAutomationFramework.Parsers.ConfigSectionObjects import ConfigSection
+from CiscoAutomationFramework.Parsers.ConfigSectionObjects import ConfigSection, TreeConfigSection
+from CiscoAutomationFramework.util import search_config_tree
 
 
-class InterfaceConfig(ConfigSection):
+class InterfaceConfig(TreeConfigSection):
 
     @property
     def interface_name(self):
-        return self.raw_config[0].split()[-1]
+        return self.section.split()[-1]
 
-    def has_config(self, config_line):
-        for line in self.raw_config:
-            if config_line.lower() in line.lower():
-                return True
+    def has_config(self, config_line, case_sensitive=False, full_match=False):
+        results = search_config_tree({self.section: self.config}, config_line, case_sensitive=case_sensitive,
+                                     full_match=full_match)
+        if results:
+            return True
         return False
 
     def __repr__(self):
