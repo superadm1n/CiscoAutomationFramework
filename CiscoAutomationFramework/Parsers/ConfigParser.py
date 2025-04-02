@@ -40,22 +40,21 @@ class ConfigParser:
         if self._config_tree:
             return self._config_tree
         else:
-            root = OrderedDict()
-            stack = [(0, root)]
+            tree = OrderedDict()
+            stack = [(0, tree)]
 
             for line in self.running_config:
                 if not line.strip():
                     continue
 
-                stripped = line.lstrip()
-                indent = len(line) - len(stripped)
-                key = stripped
-                current_node = {}
+                text = line.lstrip()
+                indent = len(line) - len(text)
 
+                current_node = {}
                 # If we're at the top level (no indentation), always attach to root
                 if indent == 0:
-                    parent = root
-                    stack = [(0, root)]  # Reset stack to this level
+                    parent = tree
+                    stack = [(0, tree)]  # Reset stack to this level
                 else:
                     while stack and stack[-1][0] >= indent:
                         stack.pop()
@@ -65,10 +64,10 @@ class ConfigParser:
 
                     parent = stack[-1][1]
 
-                parent[key] = current_node
+                parent[text] = current_node
                 stack.append((indent, current_node))
-            self._config_tree = root
-            return root
+            self._config_tree = tree
+            return tree
 
     def search_config_tree(self, search_terms, case_sensitive=True, full_match=False, tree=None):
         """
