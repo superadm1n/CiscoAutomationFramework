@@ -196,6 +196,27 @@ class ConfigParser:
                     section_data = []
         return data
 
+    @property
+    def __global_config_lines(self):
+        """
+        !!Not for external use!!
+        Only local to this object at this time.
+
+        Will return a list of lines of configuration that DO NOT have any nested config.
+        Because the way Cisco IOS works when outputing the config, there may be instances
+        that an interface gets looped in as a blank interface will look like a global
+        line of config.
+
+        Until I find a better way of parsing to account for these edge cases in a comprehensive way,
+        I think its best to leave this to internal use
+        """
+        lines = []
+        for config, sub_tree in self.config_tree.items():
+            if not sub_tree:
+                lines.append(config)
+        return lines
+
+
     def sections_config_referenced_in(self, config_match, prepend_space_in_search=True):
         """
         Searches through all detected 'sections' of config for the supplied config_match string.
@@ -256,17 +277,17 @@ class ConfigParser:
 
     @property
     def version(self):
-        for line in self.running_config:
+        for line in self.__global_config_lines:
             if 'version' in line:
                 return line.split()[1]
-        return None
+        return ''
 
     @property
     def local_users(self):
         users = []
-        for config, child_config in self.config_tree.items():
-            if 'username' in config and not child_config:
-                users.append(config.split()[1])
+        for line in self.__global_config_lines:
+            if 'username' in line:
+                users.append(line.split()[1])
         return users
 
     @property
