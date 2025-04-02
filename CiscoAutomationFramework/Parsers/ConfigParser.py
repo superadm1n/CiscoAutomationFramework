@@ -335,16 +335,16 @@ class ConfigParser:
 
     @property
     def prefix_lists(self):
-        lists = {}
-        for line in self.running_config:
-            if line.startswith('ip prefix-list'):
-                name = line.split()[2]
-                if not name in lists.keys():
-                    lists[name] = [line]
-                else:
-                    lists[name].append(line)
 
-        return [PrefixList(data) for _, data in lists.items()]
+        data = {}
+        for config, sub_tree in self.config_tree.items():
+            if config.startswith('ip prefix-list'):
+                name = config.split()[2]
+                if name not in data.keys():
+                    data[name] = {}
+                data[name].update({config: sub_tree})
+
+        return [PrefixList(name, config) for name, config in data.items()]
 
     @property
     def static_routes(self):

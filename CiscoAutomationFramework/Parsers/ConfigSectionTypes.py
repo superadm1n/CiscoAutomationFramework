@@ -79,7 +79,7 @@ class PrefixListEntry:
         return 'ge' in self.entire_prefix
 
 
-class PrefixList(ConfigSection):
+class PrefixList():
 
     """
     Object containing the raw data of the entire prefix list. Example data below
@@ -92,26 +92,30 @@ class PrefixList(ConfigSection):
 
     """
 
+    def __init__(self, name, config):
+        self._name = name
+        self._config = config
+
     @property
     def name(self):
         """
         Name of prefix list
         """
-        return self.raw_config[0].split()[2]
+        return self._name
 
     @property
     def num_rules(self):
         """
         Total number of rules in prefix list
         """
-        return len(self.raw_config)
+        return len(self._config)
 
     @property
     def rules(self):
         """
         List of the rules (in entry parser object) that the prefix list has configured
         """
-        return [PrefixListEntry(x) for x in self.raw_config]
+        return [PrefixListEntry(config_line) for config_line, _ in self._config.items()]
 
     @property
     def sequence_numbers(self):
