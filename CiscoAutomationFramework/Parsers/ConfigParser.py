@@ -330,12 +330,11 @@ class ConfigParser:
     def route_maps(self):
 
         data = {}
-        for cfg_line, nested_config in self.config_tree.items():
-            if 'route-map' in cfg_line:
-                name = cfg_line.split()[1]
-                if name not in data.keys():
-                    data[name] = {}
-                data[name].update({cfg_line: nested_config})
+        for cfg_line, nested_config in self.search_config_tree('route-map', max_search_depth=1).items():
+            name = cfg_line.split()[1]
+            if name not in data.keys():
+                data[name] = {}
+            data[name].update({cfg_line: nested_config})
 
         return [RouteMap(name, config) for name, config in data.items()]
 
@@ -354,12 +353,11 @@ class ConfigParser:
     def prefix_lists(self):
 
         data = {}
-        for config, sub_tree in self.config_tree.items():
-            if config.startswith('ip prefix-list'):
-                name = config.split()[2]
-                if name not in data.keys():
-                    data[name] = {}
-                data[name].update({config: sub_tree})
+        for config, sub_tree in self.search_config_tree('ip prefix-list', max_search_depth=1).items():
+            name = config.split()[2]
+            if name not in data.keys():
+                data[name] = {}
+            data[name].update({config: sub_tree})
 
         return [PrefixList(name, config) for name, config in data.items()]
 
