@@ -116,46 +116,6 @@ def convert_config_tree_to_list(tree, indent=0, indent_step=0):
     return data
 
 
-def _depricated_search_config_tree(tree, search_terms, case_sensitive=True, full_match=False):
-    """
-    Searches the config tree for a set of search terms and returns the path to root for that match. Note: the
-    search will not return child branches after the match, just parent branches back to the root.
-
-    You may also specify if you want your search to be case sensitive, and you may also specify if you want
-    a full or partial match. For example if I do a full match for "description" but the line of configuration
-    is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
-    "descrip", and the line is "description example" it WILL match.
-
-    :param search_terms: List of search terms to search for.
-    :type search_terms: list
-    :param case_sensitive: Whether the search is case-sensitive.
-    :type case_sensitive: bool
-    :default case_sensitive: True
-    :param full_match: If True, matches the whole word exactly; else, allows partial matches.
-    :type full_match: bool
-    :param tree: The configuration tree to search, Do not specify this, its only used for recursion.
-    :type tree: dict or None
-    :default tree: None
-
-    :return: A dictionary containing matched and modified results.
-    :rtype: dict
-    """
-
-    if not any([isinstance(search_terms, x) for x in (list, tuple)]):
-        search_terms = [search_terms]
-        # raise TypeError('search_terms MUST be a list or tuple')
-
-    data = {}
-    for key, sub_tree in tree.items():
-        if matches_search_terms(key, search_terms, case_sensitive, full_match):
-            data[key] = sub_tree
-        elif isinstance(sub_tree, dict) and sub_tree:
-            path = _depricated_search_config_tree(sub_tree, search_terms, case_sensitive, full_match)
-            if path:
-                data[key] = path
-    return data
-
-
 def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                   max_search_depth=0, prepend_text='', append_text='',
                                   replace_tuple=('', ''), _depth=0):
