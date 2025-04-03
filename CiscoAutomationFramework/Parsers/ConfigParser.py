@@ -27,7 +27,10 @@ def matches_search_terms(key, search_terms, case_sensitive, full_match):
 class ConfigParser:
 
     def __init__(self, running_config):
-        self.running_config = running_config.splitlines()
+        if isinstance(running_config, str):
+            self.running_config = running_config.splitlines()
+        else:
+            self.running_config = running_config
         self._config_tree = {}
 
     @property
