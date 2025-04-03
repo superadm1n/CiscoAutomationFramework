@@ -364,6 +364,17 @@ class ConfigParser:
         return [PrefixList(name, config) for name, config in data.items()]
 
     @property
+    def unused_prefix_lists(self):
+        all_prefix_lists = {rm.name: {} for rm in self.prefix_lists}
+
+        for name in all_prefix_lists.keys():
+            all_usages = self.search_config_tree(name, full_match=False, case_sensitive=True)
+            syntactic_usages = [f'prefix-list {name}', f'match ip address {name}']
+            all_prefix_lists[name] = search_config_tree(all_usages, syntactic_usages, min_search_depth=1)
+
+        return [self.get_prefix_list(name) for name, config in all_prefix_lists.items() if not config]
+
+    @property
     def static_routes(self):
         static_routes = []
         for line in self.running_config:
