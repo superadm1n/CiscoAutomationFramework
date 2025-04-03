@@ -343,7 +343,6 @@ class ConfigParser:
     def unused_route_maps(self):
         all_route_maps = {rm.name: {} for rm in self.route_maps}
 
-        # Phase 1 of nested search
         for name in all_route_maps.keys():
             results = self.search_config_tree(name, full_match=False, case_sensitive=True)
             syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
