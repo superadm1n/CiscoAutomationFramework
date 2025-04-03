@@ -116,7 +116,7 @@ def convert_config_tree_to_list(tree, indent=0, indent_step=0):
     return data
 
 
-def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False):
+def _depricated_search_config_tree(tree, search_terms, case_sensitive=True, full_match=False):
     """
     Searches the config tree for a set of search terms and returns the path to root for that match. Note: the
     search will not return child branches after the match, just parent branches back to the root.
@@ -150,14 +150,15 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
         if matches_search_terms(key, search_terms, case_sensitive, full_match):
             data[key] = sub_tree
         elif isinstance(sub_tree, dict) and sub_tree:
-            path = search_config_tree(sub_tree, search_terms, case_sensitive, full_match)
+            path = _depricated_search_config_tree(sub_tree, search_terms, case_sensitive, full_match)
             if path:
                 data[key] = path
     return data
 
 
-def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_match=False, prepend_text='',
-                                  append_text='', replace_tuple=('', '')):
+def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
+                                  max_search_depth=0, prepend_text='', append_text='',
+                                  replace_tuple=('', ''), _depth=0):
     """
     Searches the config tree for a set of search terms, and if specified will run each line that matches
     a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
@@ -207,10 +208,72 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
     data = {}
     for key, sub_tree in tree.items():
         if matches_search_terms(key, search_terms, case_sensitive, full_match):
-            data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
+            # only capture results that are between the min/max search depth variables, 0 max is infinite
+            if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+                data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
         elif isinstance(sub_tree, dict) and sub_tree:
-            path = search_and_modify_config_tree(sub_tree, search_terms, case_sensitive, full_match, prepend_text,
-                                                 append_text, replace_tuple)
+            path = search_and_modify_config_tree(sub_tree, search_terms, case_sensitive, full_match, min_search_depth,
+                                                 max_search_depth, prepend_text, append_text, replace_tuple, _depth+1)
             if path:
                 data[key] = path
     return data
+
+
+def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0, max_search_depth=0, _depth=0):
+     """
+
+     Searches the config tree for a set of search terms and returns the path to root for that match and any sub
+     branchs under the match. Note: if a match is found, and there are other branches in that same level that dont
+     match, it will not return any of the other branches. For example if you search for an IP address and it is found
+     in an interface, it wont also return the description if configured.
+
+     You may also specify if you want your search to be case sensitive, and you may also specify if you want
+     a full or partial match. For example if I do a full match for "description" but the line of configuration
+     is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+     "descrip", and the line is "description example" it WILL match.
+
+     You can also specify the minimum depth to search the tree, for example using the config below searching for
+     "router bgp" will not yield any results, searching "vrf MYVRF" will yield results, but searching "vrf MYVRF"
+     with a nest_level of 1 will NOT because it is nested once, and you specified to not return any matches at or
+     below index 1:
+     router bgp 65000
+      ipv4 vrf MYVRF
+       network 10.0.0.0
+
+     You can also
+
+
+     :param tree: The configuration tree to search.
+     :type tree: dict or None
+     :param search_terms: List of search terms to search for.
+     :type search_terms: list
+     :param min_search_depth: Minimum depth at which to return search results if matches are found (0 returns anything, 1 excludes root, 2 excludes root and 1st nest level)
+     :type min_search_depth: int
+     :param max_search_depth: Maximum depth at which to return search results if matches are found (0 infinite [default], only includes root, 2 excludes root and 1st nest level).
+     :type max_search_depth: int
+     :default max_search_depth: 0
+     :param case_sensitive: Whether the search is case-sensitive.
+     :type case_sensitive: bool
+     :default case_sensitive: True
+     :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+     :type full_match: bool
+
+     :return: A dictionary containing matched and modified results.
+     :rtype: dict
+     """
+     if not any([isinstance(search_terms, x) for x in (list, tuple)]):
+         search_terms = [search_terms]
+         # raise TypeError('search_terms MUST be a list or tuple')
+
+     data = {}
+     for key, sub_tree in tree.items():
+         if matches_search_terms(key, search_terms, case_sensitive, full_match):
+             # only capture results that are between the min/max search depth variables, 0 max is infinite
+             if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+                data[key] = sub_tree
+         elif isinstance(sub_tree, dict) and sub_tree:
+             path = search_config_tree(sub_tree, search_terms, case_sensitive, full_match, min_search_depth, max_search_depth, _depth+1)
+             if path:
+                 data[key] = path
+     return data
+

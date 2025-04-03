@@ -1,7 +1,18 @@
 from unittest import TestCase
 from CiscoAutomationFramework.Parsers.ConfigParser import ConfigParser
+from CiscoAutomationFramework.util import search_config_tree, search_and_modify_config_tree
+from json import loads
+from collections import OrderedDict
 
-canned_output = """interface GigabitEthernet1/0/1
+canned_output = """hostname MyRouter
+!
+vrf definition CORP
+ rd 123:456
+ !
+ address-family ipv4
+  import ipv4 unicast map VRF_RM
+!
+interface GigabitEthernet1/0/1
  description Test
  switchport mode trunk
  switchport trunk allowed vlan 10,11,12
@@ -26,7 +37,28 @@ template peer-session TEST
  !
  address-family ipv4 vrf OTHERVRF
   network 172.16.0.0
+  redistribute ospfv3 1 match internal external 1 external 2 route-map RDIST_RM_USED
   redistribute connected
+ exit-address-family
+!
+route-map unused_route_map permit 10
+ description permit specific community
+ match community 1
+!
+route-map unused_route_map deny 20
+ description Deny everything else
+!
+route-map INBOUND_RM permit 10
+ description Used Route Map
+!
+route-map OUTBOUND_RM permit 10
+ description Used Route Map
+!
+route-map VRF_RM permit 10
+ description Used Route Map
+!
+route-map RDIST_RM_USED permit 10
+ description Used Route Map
 """
 
 
@@ -100,3 +132,41 @@ class ConfigParserTreeTests(TestCase):
         output = self.simplified_output_parser.config_tree_to_list(indent_step=1)
         expected = ['a', ' b', '  d', '  e', ' c', '  f', '  g', '   h']
         self.assertEqual(output, expected)
+
+    def test_finds_ununsed_route_maps(self):
+        self.assertEqual([x.name for x in self.parser.unused_route_maps], ['unused_route_map'])
+
+
+class RootParserSearchTests(TestCase):
+
+    def setUp(self) -> None:
+        self.parsed_config = OrderedDict({"hostname MyRouter": {}, "!": {}, "interface GigabitEthernet1/0/1": {"description InterfaceDescription": {}, "ip address 192.168.10.1 255.255.255.0": {}}, "archive": {"log config": {"logging enable": {}, "logging size 1000": {}, "notify syslog contenttype plaintext": {}}, "path bootflash:/backup": {}, "maximum 4": {}, "write-memory": {}}, "router bgp 65100": {"neighbor 192.168.10.2 remote-as 65200": {}, "!": {}, "address-family ipv4": {"network 10.100.0.0 mask 255.255.255.0": {}}, "address-family ipv4 vrf MyVRF": {"network 10.200.0.0 mask 255.255.255.0": {}, "neighbor 10.201.0.2 activate": {}, "neighbor 10.201.0.2 route-map from_neighbor in": {}}, "exit-address-family": {}}, "! ": {}, "route-map from_neighbor permit 10": {"description Permit select routes": {}, "match ip address prefix-list from_neighbor": {}}, "route-map from_neighbor deny 20": {"description Deny everything else": {}}, "route-map unused_route_map permit 10": {"description permit specific community": {}, "match community 1": {}}, "route-map unused_route_map deny 20": {"description Deny everything else": {}}, "ip prefix-list from_neighbor seq 10 permit 10.0.0.0/8 le 32": {}, "ip prefix-list from_neighbor seq 20 permit 192.168.0.0/24": {}, "ip prefix-list unused_pfx_list seq 10 permit 172.16.0.0/24 le 32": {}, "ip prefix-list unused_pfx_list seq 20 permit 172.17.0.0/24": {}})
+
+    def test_accepts_list(self):
+        try:
+            search_config_tree(self.parsed_config, ['hostname'])
+        except Exception:
+            self.fail('Unable to accept list as a search term')
+
+    def test_accepts_string(self):
+        try:
+            search_config_tree(self.parsed_config, 'hostname')
+        except Exception:
+            self.fail('Unable to accept string as a search term')
+
+    def test_root_search(self):
+        result = search_config_tree(self.parsed_config, 'hostname')
+        self.assertEqual(result, {'hostname MyRouter': {}})
+
+    def test_nested_search(self):
+        result = search_config_tree(self.parsed_config, 'InterfaceDescription')
+        self.assertEqual(result, {'interface GigabitEthernet1/0/1': {'description InterfaceDescription': {}}})
+
+    def test_search_min_depth(self):
+        result = search_config_tree(self.parsed_config, 'hostname', min_search_depth=1)
+        self.assertEqual(result, {})
+
+    def test_search_max_depth(self):
+        result = search_config_tree(self.parsed_config, 'InterfaceDescription', max_search_depth=1)
+        self.assertEqual(result, {})
+

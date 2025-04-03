@@ -1,7 +1,8 @@
 from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList, RouteMap,\
     PrefixList
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
-from CiscoAutomationFramework.util import convert_config_tree_to_list, search_config_tree, search_and_modify_config_tree
+from CiscoAutomationFramework.util import (convert_config_tree_to_list, search_config_tree,
+                                           search_and_modify_config_tree)
 from collections import OrderedDict
 
 
@@ -73,7 +74,7 @@ class ConfigParser:
             self._config_tree = tree
             return tree
 
-    def search_config_tree(self, search_terms, case_sensitive=True, full_match=False, tree=None):
+    def search_config_tree(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0, max_search_depth=0, tree=None):
         """
         Searches the config tree for a set of search terms and returns the path to root for that match. Note: the
         search will not return child branches after the match, just parent branches back to the root.
@@ -99,9 +100,11 @@ class ConfigParser:
         """
         if not tree:
             tree = self.config_tree
-        return search_config_tree(tree, search_terms, case_sensitive, full_match)
+        return search_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth, max_search_depth)
 
-    def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, prepend_text='', append_text='', replace_tuple=('',''), tree=None):
+    def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
+                                      max_search_depth=0, prepend_text='', append_text='', replace_tuple=('',''),
+                                      tree=None):
         """
         Searches the config tree for a set of search terms, and if specified will run each line that matches
         a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
@@ -145,8 +148,8 @@ class ConfigParser:
         """
         if not tree:
             tree = self.config_tree
-        return search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, prepend_text,
-                                             append_text, replace_tuple)
+        return search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth,
+                                             max_search_depth, prepend_text, append_text, replace_tuple)
 
     def config_tree_to_list(self, tree=None, indent=0, indent_step=0):
         """
@@ -338,35 +341,15 @@ class ConfigParser:
 
     @property
     def unused_route_maps(self):
+        all_route_maps = {rm.name: {} for rm in self.route_maps}
 
-        def find_nested_usage(tree, search_terms, nest_level=0):
-            if not any([True if isinstance(search_terms, x) else False for x in [list, tuple]]):
-                raise TypeError(f'search_terms MUST be a list or tuple')
-
-            tracker = []
-            for parent, sub_tree in tree.items():
-                if nest_level > 0:
-                    if any(term in parent for term in search_terms):
-                        tracker.append(True)
-                if sub_tree:
-                    results = find_nested_usage(sub_tree, search_terms, nest_level + 1)
-                    if results:
-                        tracker.append(results)
-            return any(tracker)
-
-
-        all_route_maps = {rm.name: False for rm in self.route_maps}
-
+        # Phase 1 of nested search
         for name in all_route_maps.keys():
             results = self.search_config_tree(name, full_match=False, case_sensitive=True)
             syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
-            all_route_maps[name] = find_nested_usage(results, syntactic_usages)
+            all_route_maps[name] = search_config_tree(results, syntactic_usages, min_search_depth=1)
 
-        unused_route_maps = []
-        for name, config in all_route_maps.items():
-            if not config:
-                unused_route_maps.append(self.get_route_map(name))
-        return unused_route_maps
+        return [self.get_route_map(name) for name, config in all_route_maps.items() if not config]
 
     @property
     def prefix_lists(self):
