@@ -43,21 +43,21 @@ class IOS(CiscoFirmware):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
 
-        running_config = self.transport.send_command_get_output('show running-config', buffer_size=100)
+        running_config = self.transport.send_command_get_output('show running-config', buffer_size=1024)
         # if the running config grabbed is less than 4 lines and the prompt is not in the last 4 lines of the config
         while len(running_config) < 4 and not any([True if self.prompt in x else False for x in reversed(running_config[-4:])]):
-            running_config += self.transport.get_output(buffer_size=100, no_command_sent_previous=True)
-            sleep(.1)
+            running_config += self.transport.get_output(buffer_size=1024, no_command_sent_previous=True)
+            sleep(.3)
         return '\n'.join(running_config[2:-2])
 
     @property
     def startup_config(self):
         self.cli_to_privileged_exec_mode()
         self.terminal_length('0')
-        config = self.transport.send_command_get_output('show startup-config', buffer_size=100)
+        config = self.transport.send_command_get_output('show startup-config', buffer_size=1024)
         while len(config) < 4 and not any([True if self.prompt in x else False for x in reversed(config[-4:])]):
-            config += self.transport.get_output(buffer_size=100, no_command_sent_previous=True)
-            sleep(.1)
+            config += self.transport.get_output(buffer_size=1024, no_command_sent_previous=True)
+            sleep(.3)
         return '\n'.join(config[2:-2])
 
     def _terminal_length(self, n='0'):
