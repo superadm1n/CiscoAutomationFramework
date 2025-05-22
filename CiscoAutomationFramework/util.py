@@ -257,7 +257,8 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
 
 def extract_line_from_tree(tree, search_term, case_sensitive=True, full_match=False, find_all=False):
     """
-    Will extract the first occurance of "search_term" from "tree"
+    Extracts the first (or all) occurances of "search_term" from "tree". Can specify case sensitive, and full
+    match in the search
     """
     matches = []
 
