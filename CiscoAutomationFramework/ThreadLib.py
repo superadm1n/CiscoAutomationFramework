@@ -102,6 +102,17 @@ class SSH(Thread, ABC):
 
 
 class ReadOnlySSH(SSH):
+    """
+    Use this class to guarantee a script will not be able to change any configuration on a device
+
+    SSH object that inspects all commands sent to the device and if it detects "configuration terminal" or any
+    variation such as "conf t" etc it will throw an exception not allowing you to enter config terminal. This
+    inspection happens in the transport engine so even integrated ssh methods such as cli_to_config_mode will
+    throw the exception.
+
+    It is functionally equivalent to the "SSH" class, but wont let you into config mode.
+
+    """
 
     @property
     def _ssh_engine(self):
