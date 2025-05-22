@@ -1,6 +1,7 @@
 from threading import Thread
 from CiscoAutomationFramework import connect_ssh
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
+from CiscoAutomationFramework.TransportEngines import SSHEngine, NonConfigTSSHEngine
 from abc import ABC, abstractmethod
 
 
@@ -81,9 +82,13 @@ class SSH(Thread, ABC):
         """
         pass
 
+    @property
+    def _ssh_engine(self):
+        return SSHEngine
+
     def run(self) -> None:
 
-        with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password) as ssh:
+        with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password, engine=self._ssh_engine) as ssh:
             self.is_nexus = ssh.is_nexus
             self.hostname = ssh.hostname
             self.during_login(ssh)
@@ -91,6 +96,13 @@ class SSH(Thread, ABC):
                 self.secondary_action(ssh)
                 self.post_secondary_action(ssh)
             self.commands_sent = ssh.commands_sent
+
+
+class ReadOnlySSH(SSH):
+
+    @property
+    def _ssh_engine(self):
+        return NonConfigTSSHEngine
 
 
 class SSHSplitDeviceType(SSH):

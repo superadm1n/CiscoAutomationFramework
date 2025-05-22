@@ -1,4 +1,20 @@
-from CiscoAutomationFramework.TransportEngines import BaseEngine
+from CiscoAutomationFramework.TransportEngines import BaseEngine, NonConfigTSSHEngine
+
+
+class _CannedShell:
+
+    def send(self, *args, **kwargs):
+        pass
+
+    def close(self, *args, **kwargs):
+        pass
+
+
+class TestableNonConfTEngine(NonConfigTSSHEngine):
+
+    def __init__(self):
+        self.shell = _CannedShell()
+
 
 
 class BaseTestableGetOutput(BaseEngine):

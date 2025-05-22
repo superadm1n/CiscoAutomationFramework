@@ -1,4 +1,4 @@
-from CiscoAutomationFramework.Exceptions import AuthenticationException
+from CiscoAutomationFramework.Exceptions import AuthenticationException, ForbiddenError
 from paramiko import SSHClient, AutoAddPolicy
 from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
@@ -258,6 +258,36 @@ class SSHEngine(BaseEngine):
     def close_connection(self):
         self.exit_jumphost()
         self.client.close()
+
+
+class NonConfigTSSHEngine(SSHEngine):
+
+    def __is_configure_terminal_abbreviation(self, command):
+        valid_configure = "configure"
+        valid_terminal = "terminal"
+
+        # Split input into words
+        parts = command.strip().lower().split()
+
+        if len(parts) != 2:
+            return False
+
+        config_part, term_part = parts
+
+        # Check if config_part is a valid prefix of "configure"
+        if not valid_configure.startswith(config_part):
+            return False
+
+        # Check if term_part is a valid prefix of "terminal"
+        if not valid_terminal.startswith(term_part):
+            return False
+
+        return True
+
+    def _send_command(self, command, end='\n'):
+        if self.__is_configure_terminal_abbreviation(command):
+            raise ForbiddenError('You are not allowed to enter config t mode using this engine!')
+        super()._send_command(command, end)
 
     # Methods required for some lower level SSH handling. These methods should not be called outside of this class
 
