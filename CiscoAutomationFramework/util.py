@@ -1,4 +1,4 @@
-from ipaddress import ip_address
+from ipaddress import ip_address, IPv4Network, AddressValueError
 
 
 def abbreviate_interface(interface_string, max_chars=2):
@@ -27,6 +27,22 @@ def is_ipv4(addr):
         _ = ip_address(addr)
         return True
     except:
+        return False
+
+
+def is_ipv4_subnet(string):
+    '''
+    Checks if a string that you pass in is a representation of an IPv4 Subnet ex. 192.168.10.0/24, 10.0.0.0/8, 0.0.0.0/0.
+
+    :param string: String to check
+    :type string: str
+    :return: True/False
+    :rtype: bool
+    '''
+    try:
+        IPv4Network(string)
+        return True
+    except AddressValueError:
         return False
 
 
@@ -74,6 +90,7 @@ def chunker(list, size):
     for i in range(0, len(list), size):
         end_list.append(list[i:i + size])
     return end_list
+
 
 def matches_search_terms(key, search_terms, case_sensitive, full_match):
     """Checks if the key matches any search term based on given options."""
@@ -185,7 +202,7 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
      Searches the config tree for a set of search terms and returns the path to root for that match and any sub
      branchs under the match. Note: if a match is found, and there are other branches in that same level that dont
      match, it will not return any of the other branches. For example if you search for an IP address and it is found
-     in an interface, it wont also return the description if configured.
+     in an interface, it wont also return the description if there is one, but it will return the "interface x".
 
      You may also specify if you want your search to be case sensitive, and you may also specify if you want
      a full or partial match. For example if I do a full match for "description" but the line of configuration
@@ -237,3 +254,38 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
                  data[key] = path
      return data
 
+
+def extract_line_from_tree(tree, search_term, case_sensitive=True, full_match=False, find_all=False):
+    """
+    Will extract the first occurance of "search_term" from "tree"
+    """
+    matches = []
+
+    for key, sub_tree in tree.items():
+        if matches_search_terms(key, [search_term], case_sensitive, full_match):
+            if not find_all:
+                return key
+            matches.append(key)
+        if isinstance(sub_tree, dict) and sub_tree:
+            result = extract_line_from_tree(sub_tree, search_term, case_sensitive, full_match, find_all)
+            if find_all:
+                if result:
+                    matches.extend(result if isinstance(result, list) else [result])
+            elif result:
+                return result
+
+    return matches if find_all else None
+
+def tree_is_subset(subset: dict, reference: dict) -> bool:
+    for key, sub_val in subset.items():
+        if key not in reference:
+            return False
+        ref_val = reference[key]
+        if isinstance(sub_val, dict):
+            if not isinstance(ref_val, dict):
+                return False
+            if not tree_is_subset(sub_val, ref_val):
+                return False
+        elif sub_val != ref_val:
+            return False
+    return True
