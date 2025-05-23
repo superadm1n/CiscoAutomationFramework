@@ -1,7 +1,7 @@
 from threading import Thread
 from CiscoAutomationFramework import connect_ssh
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
-from CiscoAutomationFramework.TransportEngines import SSHEngine, NonConfigTSSHEngine
+from CiscoAutomationFramework.TransportEngines import SSHEngine, ReadOnlySSHEngine
 from abc import ABC, abstractmethod
 
 
@@ -116,7 +116,7 @@ class ReadOnlySSH(SSH):
 
     @property
     def _ssh_engine(self):
-        return NonConfigTSSHEngine
+        return ReadOnlySSHEngine
 
 
 class SSHSplitDeviceType(SSH):

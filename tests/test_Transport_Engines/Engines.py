@@ -1,4 +1,4 @@
-from CiscoAutomationFramework.TransportEngines import BaseEngine, NonConfigTSSHEngine
+from CiscoAutomationFramework.TransportEngines import BaseEngine, ReadOnlySSHEngine
 
 
 class _CannedShell:
@@ -10,7 +10,7 @@ class _CannedShell:
         pass
 
 
-class TestableNonConfTEngine(NonConfigTSSHEngine):
+class TestableNonConfTEngine(ReadOnlySSHEngine):
 
     def __init__(self):
         self.shell = _CannedShell()

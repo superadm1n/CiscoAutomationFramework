@@ -260,7 +260,7 @@ class SSHEngine(BaseEngine):
         self.client.close()
 
 
-class NonConfigTSSHEngine(SSHEngine):
+class ReadOnlySSHEngine(SSHEngine):
 
     def __is_configure_terminal_abbreviation(self, command):
         valid_configure = "configure"
