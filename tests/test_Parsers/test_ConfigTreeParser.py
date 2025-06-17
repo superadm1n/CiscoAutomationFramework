@@ -1,8 +1,9 @@
 from unittest import TestCase
 from CiscoAutomationFramework.Parsers.ConfigParser import ConfigParser
-from CiscoAutomationFramework.util import search_config_tree, search_and_modify_config_tree
+from CiscoAutomationFramework.util import search_config_tree, search_and_modify_config_tree, trees_are_equal
 from json import loads
 from collections import OrderedDict
+from copy import deepcopy
 
 canned_output = """hostname MyRouter
 !
@@ -170,3 +171,33 @@ class RootParserSearchTests(TestCase):
         result = search_config_tree(self.parsed_config, 'InterfaceDescription', max_search_depth=1)
         self.assertEqual(result, {})
 
+
+
+
+class EqualityParserTests(TestCase):
+
+    def setUp(self) -> None:
+        self.t1 = OrderedDict({"hostname MyRouter": {}, "!": {}, "interface GigabitEthernet1/0/1": {"description InterfaceDescription": {}, "ip address 192.168.10.1 255.255.255.0": {}}})
+        self.t2 = OrderedDict({"hostname MyRouter": {}, "!": {},
+                               "interface GigabitEthernet1/0/1": {"description different_descriotion": {},
+                                                                  "ip address 192.168.10.1 255.255.255.0": {}}})
+
+    def test_able_to_exclude_key(self):
+        result = trees_are_equal(self.t1, self.t2, exclude_keys=['description'])
+        self.assertEqual(True, result)
+
+    def test_detects_mismatch(self):
+        result = trees_are_equal(self.t1, self.t2)
+        self.assertEqual(False, result)
+
+    def test_catches_additonal_key_in_first_tree(self):
+        t1 = deepcopy(self.t1)
+        t1['newkey'] = {}
+        result = trees_are_equal(t1, self.t2)
+        self.assertEqual(False, result)
+
+    def test_catches_additonal_key_in_second_tree(self):
+        t2 = deepcopy(self.t2)
+        t2['newkey'] = {}
+        result = trees_are_equal(self.t1, t2)
+        self.assertEqual(False, result)

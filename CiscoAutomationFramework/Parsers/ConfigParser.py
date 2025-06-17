@@ -2,7 +2,7 @@ from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig,
     PrefixList
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
 from CiscoAutomationFramework.util import (convert_config_tree_to_list, search_config_tree,
-                                           search_and_modify_config_tree, tree_is_subset)
+                                           search_and_modify_config_tree, tree_is_subset, trees_are_equal)
 from collections import OrderedDict
 
 
@@ -38,6 +38,11 @@ class ConfigParser:
         if not isinstance(item, ConfigParser):
             return False
         return tree_is_subset(item.config_tree, self.config_tree)
+
+    def __eq__(self, other):
+        if not isinstance(other, ConfigParser):
+            return False
+        return trees_are_equal(other.config_tree, self.config_tree)
 
     @property
     def config_tree(self):

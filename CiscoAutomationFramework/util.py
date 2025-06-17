@@ -290,3 +290,21 @@ def tree_is_subset(subset: dict, reference: dict) -> bool:
         elif sub_val != ref_val:
             return False
     return True
+
+def trees_are_equal(tree1: dict, tree2: dict, exclude_keys=[]) -> bool:
+    """Will check if 2 trees are equal or not. Can specify to exclude certain text
+    NOTE this will check recursively and symmetrically so you cant have extra config in either tree and match"""
+    def worker(tree1, tree2, exclude_keys=[]):
+        tracker = []
+        for config, sub_tree in tree1.items():
+            if any(x in config for x in exclude_keys):
+                pass
+            else:
+                # do the comparison
+                tracker.append(config in tree2.keys())
+            if sub_tree:
+                tracker.append(worker(sub_tree, tree2.get(config, {}), exclude_keys))
+
+        return all(tracker)
+
+    return all([worker(tree1, tree2, exclude_keys), worker(tree2, tree1, exclude_keys)])
