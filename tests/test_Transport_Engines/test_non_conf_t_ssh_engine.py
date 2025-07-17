@@ -20,3 +20,23 @@ class TestGettingOutput(TestCase):
         combos = generate_abbreviations("configure", "terminal")
         for command in combos:
             self.assertRaises(ForbiddenError, self.engine._send_command, command)
+
+    def test_cant_write_erase(self):
+        '''Test to make sure any combo of "write erase" will throw an error'''
+        combos = generate_abbreviations('write', 'erase')
+        for command in combos:
+            self.assertRaises(ForbiddenError, self.engine._send_command, command)
+
+    def test_cant_reload(self):
+        '''Test to make sure any combo of "reload" will throw an error'''
+        cmd = 'reload'
+        combos = [cmd[:x] for x in range(1, len(cmd)+1)]
+        for command in combos:
+            self.assertRaises(ForbiddenError, self.engine._send_command, command)
+
+    def test_can_issue_show_command(self):
+        '''Test to make sure you can still send a show command'''
+        try:
+            self.engine._send_command('show ip int br')
+        except ForbiddenError:
+            self.fail('Unable to issue a show command')

@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from time import sleep
 
 default_command_end = '\n'
-default_buffer = 100
+default_buffer = 1024
 default_timeout = 1
 default_delay = .5
 standard_prompt_endings = ('>', '#', '> ', '# ')
@@ -262,31 +262,30 @@ class SSHEngine(BaseEngine):
 
 class ReadOnlySSHEngine(SSHEngine):
 
-    def __is_configure_terminal_abbreviation(self, command):
-        valid_configure = "configure"
-        valid_terminal = "terminal"
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.__forbidden_commands = ['configure terminal', 'write erase', 'reload']
+
+    @property
+    def forbidden_commands(self):
+        return self.__forbidden_commands
+
+    def is_forbidden_command(self, command):
 
         # Split input into words
-        parts = command.strip().lower().split()
+        command_parts = command.strip().lower().split()
 
-        if len(parts) != 2:
-            return False
+        for forbidden_command in self.forbidden_commands:
+            split_forbidden_command = forbidden_command.split()
+            if len(command_parts) == len(split_forbidden_command):
+                if all([True if forbidden_word.startswith(command_word) else False for command_word, forbidden_word in zip(command_parts, split_forbidden_command)]):
+                    return True
 
-        config_part, term_part = parts
-
-        # Check if config_part is a valid prefix of "configure"
-        if not valid_configure.startswith(config_part):
-            return False
-
-        # Check if term_part is a valid prefix of "terminal"
-        if not valid_terminal.startswith(term_part):
-            return False
-
-        return True
+        return False
 
     def _send_command(self, command, end='\n'):
-        if self.__is_configure_terminal_abbreviation(command):
-            raise ForbiddenError('You are not allowed to enter config t mode using this engine!')
+        if self.is_forbidden_command(command):
+            raise ForbiddenError(f'You are not allowed to issue "{command}" using this engine!')
         super()._send_command(command, end)
 
     # Methods required for some lower level SSH handling. These methods should not be called outside of this class

@@ -12,8 +12,10 @@ class _CannedShell:
 
 class TestableNonConfTEngine(ReadOnlySSHEngine):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.shell = _CannedShell()
+
 
 
 
