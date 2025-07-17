@@ -96,6 +96,12 @@ class PrefixList():
         self._name = name
         self._config = config
 
+    def __eq__(self, other):
+        if not isinstance(other, PrefixList):
+            raise TypeError('other MUST be an instance of PrefixList')
+
+        return all([self._name == other._name, self._config == other._config])
+
     @property
     def name(self):
         """

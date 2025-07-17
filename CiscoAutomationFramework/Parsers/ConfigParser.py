@@ -44,6 +44,12 @@ class ConfigParser:
             return False
         return trees_are_equal(other.config_tree, self.config_tree)
 
+    def __repr__(self):
+        return '\n'.join(self.running_config)
+
+    def __str__(self):
+        return '\n'.join(self.running_config)
+
     @property
     def config_tree(self):
         '''
@@ -106,11 +112,13 @@ class ConfigParser:
         :default tree: None
 
         :return: A dictionary containing matched and modified results.
-        :rtype: dict
+        :rtype: ConfigParser
         """
         if not tree:
             tree = self.config_tree
-        return search_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth, max_search_depth)
+        result_dict = search_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth, max_search_depth)
+
+        return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
 
     def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                       max_search_depth=0, prepend_text='', append_text='', replace_tuple=('',''),
@@ -154,12 +162,14 @@ class ConfigParser:
         :default tree: None
 
         :return: A dictionary containing matched and modified results.
-        :rtype: dict
+        :rtype: ConfigParser
         """
         if not tree:
             tree = self.config_tree
-        return search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth,
+        result_dict = search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth,
                                              max_search_depth, prepend_text, append_text, replace_tuple)
+
+        return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
 
     def config_tree_to_list(self, tree=None, indent=0, indent_step=0):
         """
@@ -308,7 +318,7 @@ class ConfigParser:
 
     @property
     def interface_configs(self):
-        return [InterfaceConfig(name, config) for name, config in self.search_config_tree('interface ').items()]
+        return [InterfaceConfig(name, config) for name, config in self.search_config_tree('interface ', max_search_depth=1).config_tree.items()]
 
     @property
     def ip_access_control_lists(self):
@@ -340,7 +350,7 @@ class ConfigParser:
     def route_maps(self):
 
         data = {}
-        for cfg_line, nested_config in self.search_config_tree('route-map', max_search_depth=1).items():
+        for cfg_line, nested_config in self.search_config_tree('route-map', max_search_depth=1).config_tree.items():
             name = cfg_line.split()[1]
             if name not in data.keys():
                 data[name] = {}
@@ -355,7 +365,7 @@ class ConfigParser:
         for name in all_route_maps.keys():
             results = self.search_config_tree(name, full_match=False, case_sensitive=True)
             syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
-            all_route_maps[name] = search_config_tree(results, syntactic_usages, min_search_depth=1)
+            all_route_maps[name] = search_config_tree(results.config_tree, syntactic_usages, min_search_depth=1)
 
         return [self.get_route_map(name) for name, config in all_route_maps.items() if not config]
 
@@ -363,7 +373,7 @@ class ConfigParser:
     def prefix_lists(self):
 
         data = {}
-        for config, sub_tree in self.search_config_tree('ip prefix-list', max_search_depth=1).items():
+        for config, sub_tree in self.search_config_tree('ip prefix-list', max_search_depth=1).config_tree.items():
             name = config.split()[2]
             if name not in data.keys():
                 data[name] = {}
