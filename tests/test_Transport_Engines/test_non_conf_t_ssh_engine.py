@@ -1,6 +1,6 @@
 from unittest import TestCase
 from CiscoAutomationFramework.Exceptions import ForbiddenError
-from Engines import TestableNonConfTEngine
+from tests.test_Transport_Engines.Engines import TestableNonConfTEngine
 
 def generate_abbreviations(cmd1, cmd2):
     abbreviations = []
