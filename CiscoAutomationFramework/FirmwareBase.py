@@ -99,6 +99,13 @@ class CiscoFirmware(ABC):
 
     @property
     def config_parser(self):
+        """
+        Returns a config parser object with the full running configuration of the device. This is a helper function
+        so that you do not have to import the config parser object and feed it the running config of the device
+
+        :return: Config Parser object with full running configuration
+        :rtype: ConfigParser
+        """
         self.cli_to_privileged_exec_mode()
         return ConfigParser(self.running_config)
 
