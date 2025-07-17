@@ -1,6 +1,7 @@
 from CiscoAutomationFramework.TransportEngines import BaseEngine, default_buffer, default_timeout, \
     default_command_end, default_delay
 from CiscoAutomationFramework.Exceptions import EnablePasswordError
+from CiscoAutomationFramework.Parsers.ConfigParser import ConfigParser
 from abc import ABC, abstractmethod
 from inspect import getmodule
 
@@ -95,6 +96,11 @@ class CiscoFirmware(ABC):
         :rtype: str
         """
         return self.transport.hostname
+
+    @property
+    def config_parser(self):
+        self.cli_to_privileged_exec_mode()
+        return ConfigParser(self.running_config)
 
     def send_command_get_output(self, command, end=default_command_end, buffer_size=default_buffer,
                                 timeout=default_timeout, delay=default_delay) -> list:
