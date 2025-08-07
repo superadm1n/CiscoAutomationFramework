@@ -37,10 +37,7 @@ class PrefixListEntryParserTests(TestCase):
 class PrefixListParserTests(TestCase):
     def setUp(self):
         self.parser = PrefixList(
-            [
-                'ip prefix-list first_prefix_list seq 10 permit 10.0.0.0/8 le 32',
-                'ip prefix-list first_prefix_list seq 20 permit 192.168.0.0/24'
-            ]
+            'first_prefix_list', {'ip prefix-list first_prefix_list seq 10 permit 10.0.0.0/8 le 32': {}, 'ip prefix-list first_prefix_list seq 20 permit 192.168.0.0/24': {}}
         )
 
     def test_detects_name(self):

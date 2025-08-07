@@ -1,12 +1,195 @@
 from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig, IPAccessControlList, RouteMap,\
     PrefixList
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
+from CiscoAutomationFramework.util import (convert_config_tree_to_list, search_config_tree,
+                                           search_and_modify_config_tree, tree_is_subset, trees_are_equal)
+from collections import OrderedDict
+
+
+def matches_search_terms(key, search_terms, case_sensitive, full_match):
+    """Checks if the key matches any search term based on given options."""
+    if not case_sensitive:
+        key = key.lower()
+        search_terms_lower = [term.lower() for term in search_terms]
+    else:
+        search_terms_lower = search_terms
+
+    for term in search_terms_lower:
+
+        if full_match:
+            if key == term:  # Exact match
+                return True
+        else:
+            if term in key:  # Partial match
+                return True
+    return False
 
 
 class ConfigParser:
 
     def __init__(self, running_config):
-        self.running_config = running_config.splitlines()
+        if isinstance(running_config, str):
+            self.running_config = running_config.splitlines()
+        else:
+            self.running_config = running_config
+        self._config_tree = {}
+
+    def __contains__(self, item):
+        if not isinstance(item, ConfigParser):
+            return False
+        return tree_is_subset(item.config_tree, self.config_tree)
+
+    def __eq__(self, other):
+        if not isinstance(other, ConfigParser):
+            return False
+        return trees_are_equal(other.config_tree, self.config_tree)
+
+    def __repr__(self):
+        return '\n'.join(self.running_config)
+
+    def __str__(self):
+        return '\n'.join(self.running_config)
+
+    @property
+    def config_tree(self):
+        '''
+        The running config that was passed in, parsed into a string format
+
+        :return: dictionary tree
+        :rtype: dict
+        '''
+        if self._config_tree:
+            return self._config_tree
+        else:
+            tree = OrderedDict()
+            stack = [(0, tree)]
+
+            for line in self.running_config:
+                if not line.strip():
+                    continue
+
+                text = line.lstrip()
+                indent = len(line) - len(text)
+
+                current_node = {}
+                # If we're at the top level (no indentation), always attach to root
+                if indent == 0:
+                    parent = tree
+                    stack = [(0, tree)]  # Reset stack to this level
+                else:
+                    while stack and stack[-1][0] >= indent:
+                        stack.pop()
+
+                    if not stack:
+                        raise ValueError(f"Invalid indentation or format at line: {line}")
+
+                    parent = stack[-1][1]
+
+                parent[text] = current_node
+                stack.append((indent, current_node))
+            self._config_tree = tree
+            return tree
+
+    def search_config_tree(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0, max_search_depth=0, tree=None):
+        """
+        Searches the config tree for a set of search terms and returns the path to root for that match. Note: the
+        search will not return child branches after the match, just parent branches back to the root.
+
+        You may also specify if you want your search to be case sensitive, and you may also specify if you want
+        a full or partial match. For example if I do a full match for "description" but the line of configuration
+        is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+        "descrip", and the line is "description example" it WILL match.
+
+        :param search_terms: List of search terms to search for.
+        :type search_terms: list
+        :param case_sensitive: Whether the search is case-sensitive.
+        :type case_sensitive: bool
+        :default case_sensitive: True
+        :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+        :type full_match: bool
+        :param tree: The configuration tree to search, Do not specify this, its only used for recursion.
+        :type tree: dict or None
+        :default tree: None
+
+        :return: A dictionary containing matched and modified results.
+        :rtype: ConfigParser
+        """
+        if not tree:
+            tree = self.config_tree
+        result_dict = search_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth, max_search_depth)
+
+        return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
+
+    def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
+                                      max_search_depth=0, prepend_text='', append_text='', replace_tuple=('',''),
+                                      tree=None):
+        """
+        Searches the config tree for a set of search terms, and if specified will run each line that matches
+        a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
+
+        Modification will ONLY occur to lines that CONTAIN a match! if you search for "description example" it will
+        also return in the tree the interface name ex. interface GigabitEthernet1/0/1, however that line will NOT
+        be eligible for the string modification because it does not contain "description example".
+
+        Additionally using that same interface example, the interface will likely have other config besides the
+        description, but if you search for the description, all other commands in that layer of the tree will
+        not be returned, just the path up to the root which in this case is the interface name.
+
+        You may also specify if you want your search to be case sensitive, and you may also specify if you want
+        a full or partial match. For example if I do a full match for "description" but the line of configuration
+        is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+        "descrip", and the line is "description example" it WILL match.
+
+        :param search_terms: List of search terms to search for.
+        :type search_terms: list
+        :param case_sensitive: Whether the search is case-sensitive.
+        :type case_sensitive: bool
+        :default case_sensitive: True
+        :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+        :type full_match: bool
+        :default full_match: False
+        :param prepend_text: Text to prepend to matches.
+        :type prepend_text: str
+        :default prepend_text: ""
+        :param append_text: Text to append to matches.
+        :type append_text: str
+        :default append_text: ""
+        :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
+        :type replace_tuple: tuple or None
+        :default replace_tuple: None
+        :param tree: The configuration tree to search. Do not specify this, its only used for recursion
+        :type tree: dict or None
+        :default tree: None
+
+        :return: A dictionary containing matched and modified results.
+        :rtype: ConfigParser
+        """
+        if not tree:
+            tree = self.config_tree
+        result_dict = search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth,
+                                             max_search_depth, prepend_text, append_text, replace_tuple)
+
+        return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
+
+    def config_tree_to_list(self, tree=None, indent=0, indent_step=0):
+        """
+        Converts a tree representation of the configuration into a list that can be pasted
+        into a device
+
+        :param tree: Tree representation of a configuration file
+        :type tree: dict
+        :param indent: number of spaces to indent root with
+        :type indent: int
+        :param indent_step: number of indent spaces to increment when going from a root to a branch (default 0, no indent)
+
+        :return: List representation of config tree
+        :rtype: list
+        """
+
+        if not tree:
+            tree = self.config_tree
+
+        return convert_config_tree_to_list(tree=tree, indent=indent, indent_step=indent_step)
 
     def _nextline_startswith_space(self, current_line_index):
         try:
@@ -38,6 +221,27 @@ class ConfigParser:
                     data.append(section_data)
                     section_data = []
         return data
+
+    @property
+    def __global_config_lines(self):
+        """
+        !!Not for external use!!
+        Only local to this object at this time.
+
+        Will return a list of lines of configuration that DO NOT have any nested config.
+        Because the way Cisco IOS works when outputing the config, there may be instances
+        that an interface gets looped in as a blank interface will look like a global
+        line of config.
+
+        Until I find a better way of parsing to account for these edge cases in a comprehensive way,
+        I think its best to leave this to internal use
+        """
+        lines = []
+        for config, sub_tree in self.config_tree.items():
+            if not sub_tree:
+                lines.append(config)
+        return lines
+
 
     def sections_config_referenced_in(self, config_match, prepend_space_in_search=True):
         """
@@ -90,31 +294,31 @@ class ConfigParser:
                 return True
         return False
 
-    def interfaces_that_have_config(self, config_string):
+    def interfaces_that_have_config(self, config_string, full_match=False, case_sensitive=True):
         interfaces = []
         for interface in self.interface_configs:
-            if interface.has_config(config_string):
+            if interface.has_config(config_string, full_match=full_match, case_sensitive=case_sensitive):
                 interfaces.append(interface)
         return interfaces
 
     @property
     def version(self):
-        for line in self.running_config:
+        for line in self.__global_config_lines:
             if 'version' in line:
                 return line.split()[1]
-        return None
+        return ''
 
     @property
     def local_users(self):
         users = []
-        for line in self.running_config:
-            if line.lower().startswith('username'):
+        for line in self.__global_config_lines:
+            if 'username' in line:
                 users.append(line.split()[1])
         return users
 
     @property
     def interface_configs(self):
-        return [InterfaceConfig(x) for x in self._config_sections if x[0].startswith('interface')]
+        return [InterfaceConfig(name, config) for name, config in self.search_config_tree('interface ', max_search_depth=1).config_tree.items()]
 
     @property
     def ip_access_control_lists(self):
@@ -145,40 +349,48 @@ class ConfigParser:
     @property
     def route_maps(self):
 
-        raw_route_maps = {}
-        working_map = ''
-        for line in self.running_config:
-            if line.startswith('route-map'):
-                # Start of a route map rule, set working_map so we will capture subsequent lines of configuration
-                working_map = line.split()[1]
-                if not working_map in raw_route_maps.keys():
-                    raw_route_maps[working_map] = [line]
-                else:
-                    raw_route_maps[working_map].append(line)
-                continue
+        data = {}
+        for cfg_line, nested_config in self.search_config_tree('route-map', max_search_depth=1).config_tree.items():
+            name = cfg_line.split()[1]
+            if name not in data.keys():
+                data[name] = {}
+            data[name].update({cfg_line: nested_config})
 
-            if line.startswith('!'):
-                # Denotes the end of a route map rule, set working_map to an empty string to stop collecting config
-                working_map = ''
+        return [RouteMap(name, config) for name, config in data.items()]
 
-            if working_map:
-                # If working_map is not empty, This line must be in a route map, collect it
-                raw_route_maps[working_map].append(line)
+    @property
+    def unused_route_maps(self):
+        all_route_maps = {rm.name: {} for rm in self.route_maps}
 
-        return [RouteMap(raw_config) for _, raw_config in raw_route_maps.items()]
+        for name in all_route_maps.keys():
+            results = self.search_config_tree(name, full_match=False, case_sensitive=True)
+            syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
+            all_route_maps[name] = search_config_tree(results.config_tree, syntactic_usages, min_search_depth=1)
+
+        return [self.get_route_map(name) for name, config in all_route_maps.items() if not config]
 
     @property
     def prefix_lists(self):
-        lists = {}
-        for line in self.running_config:
-            if line.startswith('ip prefix-list'):
-                name = line.split()[2]
-                if not name in lists.keys():
-                    lists[name] = [line]
-                else:
-                    lists[name].append(line)
 
-        return [PrefixList(data) for _, data in lists.items()]
+        data = {}
+        for config, sub_tree in self.search_config_tree('ip prefix-list', max_search_depth=1).config_tree.items():
+            name = config.split()[2]
+            if name not in data.keys():
+                data[name] = {}
+            data[name].update({config: sub_tree})
+
+        return [PrefixList(name, config) for name, config in data.items()]
+
+    @property
+    def unused_prefix_lists(self):
+        all_prefix_lists = {rm.name: {} for rm in self.prefix_lists}
+
+        for name in all_prefix_lists.keys():
+            all_usages = self.search_config_tree(name, full_match=False, case_sensitive=True)
+            syntactic_usages = [f'prefix-list {name}', f'match ip address {name}']
+            all_prefix_lists[name] = search_config_tree(all_usages, syntactic_usages, min_search_depth=1)
+
+        return [self.get_prefix_list(name) for name, config in all_prefix_lists.items() if not config]
 
     @property
     def static_routes(self):

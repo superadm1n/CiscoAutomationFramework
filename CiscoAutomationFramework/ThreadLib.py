@@ -1,7 +1,11 @@
 from threading import Thread
 from CiscoAutomationFramework import connect_ssh
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
+from CiscoAutomationFramework.TransportEngines import SSHEngine, ReadOnlySSHEngine
 from abc import ABC, abstractmethod
+
+
+__all__ = ['SSH', 'ReadOnlySSH', 'SSHSplitDeviceType']
 
 
 class SSH(Thread, ABC):
@@ -81,9 +85,13 @@ class SSH(Thread, ABC):
         """
         pass
 
+    @property
+    def _ssh_engine(self):
+        return SSHEngine
+
     def run(self) -> None:
 
-        with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password) as ssh:
+        with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password, engine=self._ssh_engine) as ssh:
             self.is_nexus = ssh.is_nexus
             self.hostname = ssh.hostname
             self.during_login(ssh)
@@ -91,6 +99,24 @@ class SSH(Thread, ABC):
                 self.secondary_action(ssh)
                 self.post_secondary_action(ssh)
             self.commands_sent = ssh.commands_sent
+
+
+class ReadOnlySSH(SSH):
+    """
+    Use this class to guarantee a script will not be able to change any configuration on a device
+
+    SSH object that inspects all commands sent to the device and if it detects "configuration terminal" or any
+    variation such as "conf t" etc it will throw an exception not allowing you to enter config terminal. This
+    inspection happens in the transport engine so even integrated ssh methods such as cli_to_config_mode will
+    throw the exception.
+
+    It is functionally equivalent to the "SSH" class, but wont let you into config mode.
+
+    """
+
+    @property
+    def _ssh_engine(self):
+        return ReadOnlySSHEngine
 
 
 class SSHSplitDeviceType(SSH):

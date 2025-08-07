@@ -3,7 +3,7 @@ from CiscoAutomationFramework.FirmwareDetect import detect_firmware
 from CiscoAutomationFramework.FirmwareBase import CiscoFirmware
 
 
-def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10) -> CiscoFirmware:
+def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10, engine=SSHEngine) -> CiscoFirmware:
     """
     Connects to your cisco device, returns a firmware specific instance of CiscoFirmware object.
 
@@ -25,12 +25,19 @@ def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=1
     :param timeout: SSH timeout in seconds
     :type timeout: int
 
+    :param
+
     :return: CiscoFirmware Object
     :rtype: CiscoFirmware
 
     """
 
-    engine = SSHEngine()
+    if engine:
+        if not issubclass(engine, SSHEngine):
+            raise TypeError('engine MUST be an SSHEngine!')
+
+
+    engine = engine()
     engine.enable_password = enable_password
     engine.timeout = timeout
     engine.connect_to_server(ip, username, password, port)

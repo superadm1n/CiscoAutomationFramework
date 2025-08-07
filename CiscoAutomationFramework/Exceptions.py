@@ -9,3 +9,6 @@ class ParserError(Exception):
 
 class AuthenticationException(Exception):
     pass
+
+class ForbiddenError(Exception):
+    pass

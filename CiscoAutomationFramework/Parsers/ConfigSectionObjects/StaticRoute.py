@@ -5,6 +5,9 @@ from CiscoAutomationFramework.Parsers.ConfigSectionObjects import ConfigSection
 
 class StaticRoute(ConfigSection):
 
+    def __repr__(self):
+        return self.raw_config
+
     @property
     def vrf(self):
         data = self.raw_config.split()

@@ -1,4 +1,22 @@
-from CiscoAutomationFramework.TransportEngines import BaseEngine
+from CiscoAutomationFramework.TransportEngines import BaseEngine, ReadOnlySSHEngine
+
+
+class _CannedShell:
+
+    def send(self, *args, **kwargs):
+        pass
+
+    def close(self, *args, **kwargs):
+        pass
+
+
+class TestableNonConfTEngine(ReadOnlySSHEngine):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.shell = _CannedShell()
+
+
 
 
 class BaseTestableGetOutput(BaseEngine):
