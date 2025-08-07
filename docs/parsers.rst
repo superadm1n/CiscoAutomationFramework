@@ -69,3 +69,22 @@ be able to iterate over the entries in the power inline table::
 
 .. autoclass:: CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface
    :members:
+
+
+Running Config Parser
+======
+The config parser is one of the most useful features of the CiscoAutomationFramework. It allows integrated
+functions to recursively search configuration, compare configuration, and modify configuration in line.
+
+you can access this object by ssh.config_parser or you can access the object directly and load in config from anywhere
+such as a configuration backup text file.
+
+.. literalinclude:: ../ExampleScripts/dynamic_removal_config_generator.py
+   :language: python
+   :linenos:
+   :caption: An example script that will take live configuration and generate the removal config that needs to be entered into the device.
+
+
+.. autoclass:: CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser
+   :members:
+

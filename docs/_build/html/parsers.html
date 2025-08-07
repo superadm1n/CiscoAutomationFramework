@@ -121,6 +121,19 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#running-config-parser">Running Config Parser</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser"><code class="docutils literal notranslate"><span class="pre">ConfigParser</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.config_tree"><code class="docutils literal notranslate"><span class="pre">ConfigParser.config_tree</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.config_tree_to_list"><code class="docutils literal notranslate"><span class="pre">ConfigParser.config_tree_to_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.get_config_section"><code class="docutils literal notranslate"><span class="pre">ConfigParser.get_config_section()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.has_global_config"><code class="docutils literal notranslate"><span class="pre">ConfigParser.has_global_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.search_and_modify_config_tree"><code class="docutils literal notranslate"><span class="pre">ConfigParser.search_and_modify_config_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.search_config_tree"><code class="docutils literal notranslate"><span class="pre">ConfigParser.search_config_tree()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.sections_config_referenced_in"><code class="docutils literal notranslate"><span class="pre">ConfigParser.sections_config_referenced_in()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
 </ul>
 
@@ -691,6 +704,306 @@ be able to iterate over the entries in the power inline table:</p>
 </dd></dl>
 
 </section>
+</section>
+<section id="running-config-parser">
+<h1>Running Config Parser<a class="headerlink" href="#running-config-parser" title="Link to this heading"></a></h1>
+<p>The config parser is one of the most useful features of the CiscoAutomationFramework. It allows integrated
+functions to recursively search configuration, compare configuration, and modify configuration in line.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">An example script that will take live configuration and generate the removal config that needs to be entered into the device.</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos">  2</span>
+<span class="linenos">  3</span><span class="sd">Copyright 2025 Kyle Kowalczyk</span>
+<span class="linenos">  4</span>
+<span class="linenos">  5</span><span class="sd">Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="linenos">  6</span><span class="sd">you may not use this file except in compliance with the License.</span>
+<span class="linenos">  7</span><span class="sd">You may obtain a copy of the License at</span>
+<span class="linenos">  8</span>
+<span class="linenos">  9</span><span class="sd">   http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="linenos"> 10</span>
+<span class="linenos"> 11</span><span class="sd">Unless required by applicable law or agreed to in writing, software</span>
+<span class="linenos"> 12</span><span class="sd">distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="linenos"> 13</span><span class="sd">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="linenos"> 14</span><span class="sd">See the License for the specific language governing permissions and</span>
+<span class="linenos"> 15</span><span class="sd">limitations under the License.</span>
+<span class="linenos"> 16</span>
+<span class="linenos"> 17</span><span class="sd">=========================================================================</span>
+<span class="linenos"> 18</span>
+<span class="linenos"> 19</span><span class="sd">Author: Kyle Kowalczyk</span>
+<span class="linenos"> 20</span>
+<span class="linenos"> 21</span><span class="sd">This is an example script for how you can use the ConfigParser class to</span>
+<span class="linenos"> 22</span><span class="sd">search for and dynamically generate the configuration needed to remove multiple BGP neighbors.</span>
+<span class="linenos"> 23</span>
+<span class="linenos"> 24</span><span class="sd">My hope is that this script gives you inspiration to other uses for dynamic configuration generation</span>
+<span class="linenos"> 25</span><span class="sd">weather that be for removal, modification, etc.</span>
+<span class="linenos"> 26</span>
+<span class="linenos"> 27</span><span class="sd">The output of this script will be:</span>
+<span class="linenos"> 28</span>
+<span class="linenos"> 29</span><span class="sd">router bgp 65100</span>
+<span class="linenos"> 30</span><span class="sd"> address-family ipv4 vrf CustA</span>
+<span class="linenos"> 31</span><span class="sd">  no neighbor 10.88.52.13 peer-group MyPeers</span>
+<span class="linenos"> 32</span><span class="sd">  no neighbor 10.88.52.13 activate</span>
+<span class="linenos"> 33</span><span class="sd"> address-family ipv4 vrf CustB</span>
+<span class="linenos"> 34</span><span class="sd">  no neighbor 10.88.55.25 remote-as 65102</span>
+<span class="linenos"> 35</span><span class="sd">  no neighbor 10.88.55.25 description To Router 1</span>
+<span class="linenos"> 36</span><span class="sd">  no neighbor 10.88.55.25 timers 20 60</span>
+<span class="linenos"> 37</span><span class="sd">  no neighbor 10.88.55.25 fall-over bfd</span>
+<span class="linenos"> 38</span><span class="sd">  no neighbor 10.88.55.25 activate</span>
+<span class="linenos"> 39</span><span class="sd">  no neighbor 10.88.55.25 send-community</span>
+<span class="linenos"> 40</span><span class="sd">  no neighbor 10.88.55.25 next-hop-self</span>
+<span class="linenos"> 41</span><span class="sd">  no neighbor 10.88.55.25 soft-reconfiguration inbound</span>
+<span class="linenos"> 42</span>
+<span class="linenos"> 43</span><span class="sd">=======================================================</span>
+<span class="linenos"> 44</span>
+<span class="linenos"> 45</span><span class="sd">This is meant to demonstrate how easy it is to read in the config, modify a portion of it, and getting</span>
+<span class="linenos"> 46</span><span class="sd">usable configuration right out of the box that you can either manually or via a larger script automatically apply.</span>
+<span class="linenos"> 47</span>
+<span class="linenos"> 48</span><span class="sd">Notice how there is not duplicated configuration such as multiple router bgp lines or address-family lines.</span>
+<span class="linenos"> 49</span><span class="sd">Also because we performed the search and modify function, only the configuration paths that were matched in our</span>
+<span class="linenos"> 50</span><span class="sd">search are shown, it omitted all other parts of our config.</span>
+<span class="linenos"> 51</span>
+<span class="linenos"> 52</span><span class="sd">Keep in mind the more generic the search like for an IP address like I did here could yield incorrect results if</span>
+<span class="linenos"> 53</span><span class="sd">there is a description somewhere with that IP so keep things as specific as possible when you can.</span>
+<span class="linenos"> 54</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 55</span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.Parsers.ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="linenos"> 56</span>
+<span class="linenos"> 57</span><span class="c1"># example running configuration</span>
+<span class="linenos"> 58</span><span class="n">example_config</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;interface GigabitEthernet1/0/1</span>
+<span class="linenos"> 59</span><span class="s1"> description InterfaceDescription</span>
+<span class="linenos"> 60</span><span class="s1"> mtu 1500</span>
+<span class="linenos"> 61</span><span class="s1">!</span>
+<span class="linenos"> 62</span><span class="s1">router bgp 65100</span>
+<span class="linenos"> 63</span><span class="s1"> address-family ipv4</span>
+<span class="linenos"> 64</span><span class="s1">  network 10.5.5.1 mask 255.255.255.255</span>
+<span class="linenos"> 65</span><span class="s1">  neighbor 10.88.51.13 activate</span>
+<span class="linenos"> 66</span><span class="s1">  neighbor 10.88.51.17 activate</span>
+<span class="linenos"> 67</span><span class="s1">  neighbor 10.88.51.25 activate</span>
+<span class="linenos"> 68</span><span class="s1">  maximum-paths 2</span>
+<span class="linenos"> 69</span><span class="s1"> exit-address-family</span>
+<span class="linenos"> 70</span><span class="s1"> !</span>
+<span class="linenos"> 71</span><span class="s1"> address-family ipv4 vrf CustA</span>
+<span class="linenos"> 72</span><span class="s1">  bgp router-id 172.20.61.205</span>
+<span class="linenos"> 73</span><span class="s1">  network 10.88.52.190 mask 255.255.255.255</span>
+<span class="linenos"> 74</span><span class="s1">  neighbor 10.88.52.13 peer-group MyPeers</span>
+<span class="linenos"> 75</span><span class="s1">  neighbor 10.88.52.13 activate</span>
+<span class="linenos"> 76</span><span class="s1">  neighbor 10.88.52.17 peer-group MyPeers</span>
+<span class="linenos"> 77</span><span class="s1">  neighbor 10.88.52.17 activate</span>
+<span class="linenos"> 78</span><span class="s1">  neighbor 10.88.52.25 remote-as 65102</span>
+<span class="linenos"> 79</span><span class="s1">  neighbor 10.88.52.25 description asdf</span>
+<span class="linenos"> 80</span><span class="s1">  neighbor 10.88.52.25 timers 20 60</span>
+<span class="linenos"> 81</span><span class="s1">  neighbor 10.88.52.25 fall-over bfd</span>
+<span class="linenos"> 82</span><span class="s1">  neighbor 10.88.52.25 activate</span>
+<span class="linenos"> 83</span><span class="s1">  neighbor 10.88.52.25 send-community</span>
+<span class="linenos"> 84</span><span class="s1">  neighbor 10.88.52.25 next-hop-self</span>
+<span class="linenos"> 85</span><span class="s1">  neighbor 10.88.52.25 soft-reconfiguration inbound</span>
+<span class="linenos"> 86</span><span class="s1">  maximum-paths 2</span>
+<span class="linenos"> 87</span><span class="s1"> exit-address-family</span>
+<span class="linenos"> 88</span><span class="s1"> !</span>
+<span class="linenos"> 89</span><span class="s1"> address-family ipv4 vrf CustB</span>
+<span class="linenos"> 90</span><span class="s1">  bgp router-id 172.20.93.205</span>
+<span class="linenos"> 91</span><span class="s1">  neighbor 10.88.55.13 peer-group MyPeers</span>
+<span class="linenos"> 92</span><span class="s1">  neighbor 10.88.55.13 activate</span>
+<span class="linenos"> 93</span><span class="s1">  neighbor 10.88.55.17 peer-group MyPeers</span>
+<span class="linenos"> 94</span><span class="s1">  neighbor 10.88.55.17 activate</span>
+<span class="linenos"> 95</span><span class="s1">  neighbor 10.88.55.25 remote-as 65102</span>
+<span class="linenos"> 96</span><span class="s1">  neighbor 10.88.55.25 description To Router 1</span>
+<span class="linenos"> 97</span><span class="s1">  neighbor 10.88.55.25 timers 20 60</span>
+<span class="linenos"> 98</span><span class="s1">  neighbor 10.88.55.25 fall-over bfd</span>
+<span class="linenos"> 99</span><span class="s1">  neighbor 10.88.55.25 activate</span>
+<span class="linenos">100</span><span class="s1">  neighbor 10.88.55.25 send-community</span>
+<span class="linenos">101</span><span class="s1">  neighbor 10.88.55.25 next-hop-self</span>
+<span class="linenos">102</span><span class="s1">  neighbor 10.88.55.25 soft-reconfiguration inbound</span>
+<span class="linenos">103</span><span class="s1">  maximum-paths 2</span>
+<span class="linenos">104</span><span class="s1"> exit-address-family</span>
+<span class="linenos">105</span><span class="s1">!</span>
+<span class="linenos">106</span><span class="s1">line console 0</span>
+<span class="linenos">107</span><span class="s1"> logging synchronous</span>
+<span class="linenos">108</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="linenos">109</span>
+<span class="linenos">110</span><span class="n">neighbors_to_remove</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10.88.52.13&#39;</span><span class="p">,</span> <span class="s1">&#39;10.88.55.25&#39;</span><span class="p">]</span>
+<span class="linenos">111</span>
+<span class="linenos">112</span><span class="n">parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">example_config</span><span class="p">)</span>
+<span class="linenos">113</span><span class="n">modified_config_tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">search_and_modify_config_tree</span><span class="p">(</span><span class="n">search_terms</span><span class="o">=</span><span class="n">neighbors_to_remove</span><span class="p">,</span> <span class="n">full_match</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prepend_text</span><span class="o">=</span><span class="s1">&#39;no &#39;</span><span class="p">)</span>
+<span class="linenos">114</span><span class="n">formatted_config</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">config_tree_to_list</span><span class="p">(</span><span class="n">modified_config_tree</span><span class="p">,</span> <span class="n">indent_step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">115</span>
+<span class="linenos">116</span><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">formatted_config</span><span class="p">:</span>
+<span class="linenos">117</span>    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.ConfigParser.</span></span><span class="sig-name descname"><span class="pre">ConfigParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">running_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.config_tree">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">config_tree</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.config_tree" title="Link to this definition"></a></dt>
+<dd><p>The running config that was passed in, parsed into a string format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary tree</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.config_tree_to_list">
+<span class="sig-name descname"><span class="pre">config_tree_to_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indent_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.config_tree_to_list" title="Link to this definition"></a></dt>
+<dd><p>Converts a tree representation of the configuration into a list that can be pasted
+into a device</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>dict</em>) – Tree representation of a configuration file</p></li>
+<li><p><strong>indent</strong> (<em>int</em>) – number of spaces to indent root with</p></li>
+<li><p><strong>indent_step</strong> – number of indent spaces to increment when going from a root to a branch (default 0, no indent)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List representation of config tree</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.get_config_section">
+<span class="sig-name descname"><span class="pre">get_config_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_startswith</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.get_config_section" title="Link to this definition"></a></dt>
+<dd><p>Extracts a specific configuration section whos first line starts with your variable.
+Because we search if the title startswith your variable you could have multiple results
+so instead of always returning the first one, I give the option to return all</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title_startswith</strong> (<em>str</em>) – Text that the first line of the section starts with (ex. line vty)</p></li>
+<li><p><strong>return_all</strong> (<em>bool</em>) – If there are multiple matches return all if True (default True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists containing the sections of config</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.has_global_config">
+<span class="sig-name descname"><span class="pre">has_global_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.has_global_config" title="Link to this definition"></a></dt>
+<dd><p>True/False if in the global configuration the string is found. The line must NOT start with a space
+so if it is nested it will not be found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_string</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.search_and_modify_config_tree">
+<span class="sig-name descname"><span class="pre">search_and_modify_config_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case_sensitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_tuple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('',</span> <span class="pre">'')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.search_and_modify_config_tree" title="Link to this definition"></a></dt>
+<dd><p>Searches the config tree for a set of search terms, and if specified will run each line that matches
+a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.</p>
+<p>Modification will ONLY occur to lines that CONTAIN a match! if you search for “description example” it will
+also return in the tree the interface name ex. interface GigabitEthernet1/0/1, however that line will NOT
+be eligible for the string modification because it does not contain “description example”.</p>
+<p>Additionally using that same interface example, the interface will likely have other config besides the
+description, but if you search for the description, all other commands in that layer of the tree will
+not be returned, just the path up to the root which in this case is the interface name.</p>
+<p>You may also specify if you want your search to be case sensitive, and you may also specify if you want
+a full or partial match. For example if I do a full match for “description” but the line of configuration
+is “description example” it will NOT match. Also if I do a partial match (by setting full match to false) for
+“descrip”, and the line is “description example” it WILL match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_terms</strong> (<em>list</em>) – List of search terms to search for.</p></li>
+<li><p><strong>case_sensitive</strong> (<em>bool</em>) – Whether the search is case-sensitive.</p></li>
+<li><p><strong>full_match</strong> (<em>bool</em>) – If True, matches the whole word exactly; else, allows partial matches.</p></li>
+<li><p><strong>prepend_text</strong> (<em>str</em>) – Text to prepend to matches.</p></li>
+<li><p><strong>append_text</strong> (<em>str</em>) – Text to append to matches.</p></li>
+<li><p><strong>replace_tuple</strong> (<em>tuple</em><em> or </em><em>None</em>) – A tuple (old_text, new_text) for replacing matches.</p></li>
+<li><p><strong>tree</strong> (<em>dict</em><em> or </em><em>None</em>) – The configuration tree to search. Do not specify this, its only used for recursion</p></li>
+</ul>
+</dd>
+<dt class="field-even">Default case_sensitive<span class="colon">:</span></dt>
+<dd class="field-even"><p>True</p>
+</dd>
+<dt class="field-odd">Default full_match<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+<dt class="field-even">Default prepend_text<span class="colon">:</span></dt>
+<dd class="field-even"><p>“”</p>
+</dd>
+<dt class="field-odd">Default append_text<span class="colon">:</span></dt>
+<dd class="field-odd"><p>“”</p>
+</dd>
+<dt class="field-even">Default replace_tuple<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Default tree<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing matched and modified results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser" title="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser">ConfigParser</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.search_config_tree">
+<span class="sig-name descname"><span class="pre">search_config_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_terms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case_sensitive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_search_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.search_config_tree" title="Link to this definition"></a></dt>
+<dd><p>Searches the config tree for a set of search terms and returns the path to root for that match. Note: the
+search will not return child branches after the match, just parent branches back to the root.</p>
+<p>You may also specify if you want your search to be case sensitive, and you may also specify if you want
+a full or partial match. For example if I do a full match for “description” but the line of configuration
+is “description example” it will NOT match. Also if I do a partial match (by setting full match to false) for
+“descrip”, and the line is “description example” it WILL match.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>search_terms</strong> (<em>list</em>) – List of search terms to search for.</p></li>
+<li><p><strong>case_sensitive</strong> (<em>bool</em>) – Whether the search is case-sensitive.</p></li>
+<li><p><strong>full_match</strong> (<em>bool</em>) – If True, matches the whole word exactly; else, allows partial matches.</p></li>
+<li><p><strong>tree</strong> (<em>dict</em><em> or </em><em>None</em>) – The configuration tree to search, Do not specify this, its only used for recursion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Default case_sensitive<span class="colon">:</span></dt>
+<dd class="field-even"><p>True</p>
+</dd>
+<dt class="field-odd">Default tree<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing matched and modified results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser" title="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser">ConfigParser</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.sections_config_referenced_in">
+<span class="sig-name descname"><span class="pre">sections_config_referenced_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepend_space_in_search</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser.sections_config_referenced_in" title="Link to this definition"></a></dt>
+<dd><p>Searches through all detected ‘sections’ of config for the supplied config_match string.
+If it finds it nested in the section (in the indented section) it will return the first line of
+that config section in a list with other matches.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 

@@ -111,7 +111,7 @@ neighbors_to_remove = ['10.88.52.13', '10.88.55.25']
 
 parser = ConfigParser(example_config)
 modified_config_tree = parser.search_and_modify_config_tree(search_terms=neighbors_to_remove, full_match=False, prepend_text='no ')
-formatted_config = parser.config_tree_to_list(modified_config_tree, indent_step=1)
+formatted_config = modified_config_tree.config_tree_to_list(indent_step=1)
 
 for line in formatted_config:
     print(line)
