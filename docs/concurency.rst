@@ -21,7 +21,7 @@ when you dont care, providing object to inherit from and override in both circum
 
 Example Scripts
 -----
-.. literalinclude:: ExampleScripts/basic_threaded_script_example.py
+.. literalinclude:: ../ExampleScripts/basic_threaded_script_example.py
    :language: python
    :linenos:
    :caption: An example script that will run concurrently across multiple network devices

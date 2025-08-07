@@ -383,56 +383,46 @@ It will return the thread objects from the function for further processing by th
 
 <section id="example-scripts">
 <h2>Example Scripts<a class="headerlink" href="#example-scripts" title="Link to this heading"></a></h2>
-<p>Below is an example script that will run concurrently across multiple network devices:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.ThreadLib</span> <span class="kn">import</span> <span class="n">SSH</span><span class="p">,</span> <span class="n">start_threads</span>
-
-
-<span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">SSH</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">interfaces_connected</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">def</span> <span class="nf">during_login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
-        <span class="c1"># Code here will run every time no matter what</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ssh</span><span class="o">.</span><span class="n">send_command_get_output</span><span class="p">(</span><span class="s1">&#39;show interface status&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="s1">&#39;connected&#39;</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;notconn&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">interfaces_connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">secondary_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If there is some secondary action needed to be performed, code it here</span>
-<span class="sd">        If there is nothing you need to do you DO NOT need to define this method</span>
-
-<span class="sd">        To execute this, when starting threads via the start_threads method set</span>
-<span class="sd">        perform_secondary_action=True</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="nf">post_secondary_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        If you need to something post the secondary action taking place, code it here.</span>
-<span class="sd">        an example would be re gathering data or saving config</span>
-
-<span class="sd">        If there is nothing you need to do you DO NOT need to define this method</span>
-
-<span class="sd">        To execute this, when starting threads via the start_threads method set</span>
-<span class="sd">        perform_secondary_action=True</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-
-    <span class="n">username</span> <span class="o">=</span> <span class="s1">&#39;myusername&#39;</span>
-    <span class="n">password</span> <span class="o">=</span> <span class="s1">&#39;mypassword&#39;</span>
-
-    <span class="c1"># replace with IP addresses of network devices on your network</span>
-    <span class="n">ips</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;192.168.1.1&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.2.1&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.3.1&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.4.1&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.5.1&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.6.1&#39;</span><span class="p">]</span>
-    <span class="n">threads</span> <span class="o">=</span> <span class="n">start_threads</span><span class="p">(</span><span class="n">MyDevice</span><span class="p">,</span> <span class="n">ips</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">wait_for_threads</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">thread</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">thread</span><span class="o">.</span><span class="n">interfaces_connected</span><span class="p">))</span>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">An example script that will run concurrently across multiple network devices</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.ThreadLib</span> <span class="kn">import</span> <span class="n">SSH</span><span class="p">,</span> <span class="n">start_threads</span>
+<span class="linenos"> 2</span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.util</span> <span class="kn">import</span> <span class="n">column_print</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="k">class</span> <span class="nc">NetworkDevice</span><span class="p">(</span><span class="n">SSH</span><span class="p">):</span>
+<span class="linenos"> 6</span>
+<span class="linenos"> 7</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="linenos"> 8</span>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="linenos"> 9</span>        <span class="bp">self</span><span class="o">.</span><span class="n">raw_clock_time</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span>    <span class="nd">@property</span>
+<span class="linenos">12</span>    <span class="k">def</span> <span class="nf">clock_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos">13</span>        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_clock_time</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="linenos">14</span>
+<span class="linenos">15</span>    <span class="k">def</span> <span class="nf">during_login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
+<span class="linenos">16</span>        <span class="bp">self</span><span class="o">.</span><span class="n">raw_clock_time</span> <span class="o">=</span> <span class="n">ssh</span><span class="o">.</span><span class="n">send_command_get_output</span><span class="p">(</span><span class="s1">&#39;show clock&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span>
+<span class="linenos">19</span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="linenos">20</span>    <span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getpass</span>
+<span class="linenos">21</span>
+<span class="linenos">22</span>    <span class="n">username</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">&#39;Enter Username: &#39;</span><span class="p">)</span>
+<span class="linenos">23</span>    <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Enter Password for </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s1">: &#39;</span><span class="p">)</span>
+<span class="linenos">24</span>    <span class="n">ips</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10.204.10.12&#39;</span><span class="p">,</span> <span class="s1">&#39;10.204.10.13&#39;</span><span class="p">]</span>  <span class="c1"># replace with your IP addresses or get them programmatically</span>
+<span class="linenos">25</span>
+<span class="linenos">26</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Reaching out to network devices!&#39;</span><span class="p">)</span>
+<span class="linenos">27</span>    <span class="n">threads</span> <span class="o">=</span> <span class="n">start_threads</span><span class="p">(</span><span class="n">NetworkDevice</span><span class="p">,</span> <span class="n">ips</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+<span class="linenos">28</span>
+<span class="linenos">29</span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Waiting for threads to complete.&#39;</span><span class="p">)</span>
+<span class="linenos">30</span>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+<span class="linenos">31</span>        <span class="n">t</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="linenos">32</span>
+<span class="linenos">33</span>    <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;Hostname&#39;</span><span class="p">,</span> <span class="s1">&#39;IP&#39;</span><span class="p">,</span> <span class="s1">&#39;Time&#39;</span><span class="p">]]</span>
+<span class="linenos">34</span>    <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">:</span>
+<span class="linenos">35</span>        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">thread</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="n">thread</span><span class="o">.</span><span class="n">ip</span><span class="p">,</span> <span class="n">thread</span><span class="o">.</span><span class="n">clock_time</span><span class="p">])</span>
+<span class="linenos">36</span>    <span class="n">column_print</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">separator_char</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
 </pre></div>
+</div>
 </div>
 </section>
 </section>
