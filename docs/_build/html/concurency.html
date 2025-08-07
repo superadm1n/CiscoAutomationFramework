@@ -1,400 +1,390 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Interacting with Multiple Network Devices at the same time &mdash; CiscoAutomationFramework 1.0.4 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interacting with Multiple Network Devices at the same time &mdash; CiscoAutomationFramework 1.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="CiscoAutomationFramework 1.0.4 documentation" href="index.html"/>
-        <link rel="next" title="Command Output Parsers" href="parsers.html"/>
-        <link rel="prev" title="Interacting with a Network Device" href="interact.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=aec50437"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Command Output Parsers" href="parsers.html" />
+    <link rel="prev" title="Interacting with a Network Device" href="interact.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> CiscoAutomationFramework
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            CiscoAutomationFramework
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="connect.html">How To Connect to A Network Device</a></li>
 <li class="toctree-l1"><a class="reference internal" href="interact.html">Interacting with a Network Device</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Interacting with Multiple Network Devices at the same time</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH"><code class="docutils literal notranslate"><span class="pre">SSH</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH.during_login"><code class="docutils literal notranslate"><span class="pre">SSH.during_login()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action"><code class="docutils literal notranslate"><span class="pre">SSH.post_secondary_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH.run"><code class="docutils literal notranslate"><span class="pre">SSH.run()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH.secondary_action"><code class="docutils literal notranslate"><span class="pre">SSH.secondary_action()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.during_login"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.during_login()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.ios_during_login()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.ios_post_secondary_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.ios_secondary_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.nexus_during_login()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.nexus_post_secondary_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.nexus_secondary_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.post_secondary_action"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.post_secondary_action()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.secondary_action"><code class="docutils literal notranslate"><span class="pre">SSHSplitDeviceType.secondary_action()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.ReadOnlySSH"><code class="docutils literal notranslate"><span class="pre">ReadOnlySSH</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.start_threads"><code class="docutils literal notranslate"><span class="pre">start_threads()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example-scripts">Example Scripts</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parsers.html">Command Output Parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">CiscoAutomationFramework</a>
-        
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Interacting with Multiple Network Devices at the same time</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Interacting with Multiple Network Devices at the same time</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/concurency.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="interacting-with-multiple-network-devices-at-the-same-time">
-<h1>Interacting with Multiple Network Devices at the same time<a class="headerlink" href="#interacting-with-multiple-network-devices-at-the-same-time" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="interacting-with-multiple-network-devices-at-the-same-time">
+<h1>Interacting with Multiple Network Devices at the same time<a class="headerlink" href="#interacting-with-multiple-network-devices-at-the-same-time" title="Link to this heading"></a></h1>
 <p>CiscoAutomationFramework provides a way of running the same code on multiple devices
 concurrently. It takes into account situations where you will have a mix of IOS and Nexus and
 when you dont care, providing object to inherit from and override in both circumstances.</p>
-<dl class="class">
-<dt id="CiscoAutomationFramework.ThreadLib.SSH">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.ThreadLib.</code><code class="descname">SSH</code><span class="sig-paren">(</span><em>ip</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em>, <em>perform_secondary_action=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSH">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.ThreadLib.</span></span><span class="sig-name descname"><span class="pre">SSH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_secondary_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH" title="Link to this definition"></a></dt>
 <dd><p>Base SSH object that you can inherit from when building a threaded script that will run across the network.</p>
 <p>To build a script you must subclass this object and override the methods that are documented.</p>
 <p>Method Execution Order
 The object logs into the device
 during_login is executed
 if perform_secondary_action is set to True secondary_action is executed and then post_secondary_action</p>
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSH.during_login">
-<code class="descname">during_login</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.during_login" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSH.during_login">
+<span class="sig-name descname"><span class="pre">during_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.during_login" title="Link to this definition"></a></dt>
 <dd><p>Every time this object runs against a device this method will be run. Override this method and add logic
 that needs to be run every time your object runs against a device.</p>
 <p>I find I often add logic here that gathers data and does not modify configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action">
-<code class="descname">post_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action">
+<span class="sig-name descname"><span class="pre">post_secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.post_secondary_action" title="Link to this definition"></a></dt>
 <dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed.</p>
 <p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSH.secondary_action">
-<code class="descname">secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.secondary_action" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSH.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.run" title="Link to this definition"></a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSH.secondary_action">
+<span class="sig-name descname"><span class="pre">secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSH.secondary_action" title="Link to this definition"></a></dt>
 <dd><p>This method will run only if perform_secondary_action is set to True.</p>
 <p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
 certain condition is met.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.ThreadLib.</code><code class="descname">SSHSplitDeviceType</code><span class="sig-paren">(</span><em>ip</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em>, <em>perform_secondary_action=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.ThreadLib.</span></span><span class="sig-name descname"><span class="pre">SSHSplitDeviceType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_secondary_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="Link to this definition"></a></dt>
 <dd><p>Create a script by inheriting from this object if you are running the same script against both
 Nexus and IOS devices but the command are different on each platform or the sequence is different.
 Out of the box it will run the functions prepended with ios on ios and iosxe devices and functions
 prepended with nexus on nxos devices. Because it is implied that this script will be run against a mix
 of nexus and ios you must define the functions regardless if they will be used or not when inheriting from
 this object</p>
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login">
-<code class="descname">ios_during_login</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.during_login">
+<span class="sig-name descname"><span class="pre">during_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.during_login" title="Link to this definition"></a></dt>
+<dd><p>Every time this object runs against a device this method will be run. Override this method and add logic
+that needs to be run every time your object runs against a device.</p>
+<p>I find I often add logic here that gathers data and does not modify configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ios_during_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_during_login" title="Link to this definition"></a></dt>
 <dd><p>Every time this object runs against a device that is detected to be NOT Nexus this method
 will be run. Override this method and add logic that needs to be run every time your object runs against a
 device.</p>
 <p>Must be overridden when inheriting from this object regardless if your script will run against this device
 type</p>
 <p>I find I often add logic here that gathers data and does not modify configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action">
-<code class="descname">ios_post_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ios_post_secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_post_secondary_action" title="Link to this definition"></a></dt>
 <dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed
 and the device is detected to be NOT Nexus.</p>
 <p>Must be overridden when inheriting from this object regardless if your script will run against this device
 type.</p>
 <p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action">
-<code class="descname">ios_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ios_secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.ios_secondary_action" title="Link to this definition"></a></dt>
 <dd><p>This method will run only if perform_secondary_action is set to True and the device is detected as not Nexus.</p>
 <p>Must be overridden when inheriting from this object regardless if your script will run against this device
 type</p>
 <p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
 certain condition is met.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login">
-<code class="descname">nexus_during_login</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nexus_during_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_during_login" title="Link to this definition"></a></dt>
 <dd><p>Every time this object runs against a device that is detected to be running Nexus this method
 will be run. Override this method and add logic that needs to be run every time your object runs against a
 device.</p>
 <p>Must be overridden when inheriting from this object regardless if your script will run against this device
 type</p>
 <p>I find I often add logic here that gathers data and does not modify configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action">
-<code class="descname">nexus_post_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nexus_post_secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_post_secondary_action" title="Link to this definition"></a></dt>
 <dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed
 and the device is detected to be Nexus.</p>
 <p>Must be overridden when inheriting from this object regardless if your script will run against this device
 type.</p>
 <p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action">
-<code class="descname">nexus_secondary_action</code><span class="sig-paren">(</span><em>ssh</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nexus_secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.nexus_secondary_action" title="Link to this definition"></a></dt>
 <dd><p>This method will run only if perform_secondary_action is set to True and the device is detected Nexus.</p>
 <p>Must be overridden when inheriting from this object regardless if your script will run against this device
 type.</p>
 <p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
 certain condition is met.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.post_secondary_action">
+<span class="sig-name descname"><span class="pre">post_secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.post_secondary_action" title="Link to this definition"></a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True and AFTER secondary_action has completed.</p>
+<p>I often find this is useful for containing logic that re gathers data or saves configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.secondary_action">
+<span class="sig-name descname"><span class="pre">secondary_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ssh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType.secondary_action" title="Link to this definition"></a></dt>
+<dd><p>This method will run only if perform_secondary_action is set to True.</p>
+<p>I often find this is useful for containing logic that modifies configuration that only needs to be run if a
+certain condition is met.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ssh</strong> (<a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><em>CiscoFirmware</em></a>) – SSH object is provided to this method for interacting with the end device</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nothing</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<span class="target" id="module-CiscoAutomationFramework.ThreadLib"></span><dl class="function">
-<dt id="CiscoAutomationFramework.ThreadLib.start_threads">
-<code class="descclassname">CiscoAutomationFramework.ThreadLib.</code><code class="descname">start_threads</code><span class="sig-paren">(</span><em>object</em>, <em>ips</em>, <em>username</em>, <em>password</em>, <em>enable_password=None</em>, <em>perform_secondary_action=False</em>, <em>wait_for_threads=False</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.start_threads" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.ReadOnlySSH">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.ThreadLib.</span></span><span class="sig-name descname"><span class="pre">ReadOnlySSH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_secondary_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.ReadOnlySSH" title="Link to this definition"></a></dt>
+<dd><p>Use this class to guarantee a script will not be able to change any configuration on a device</p>
+<p>SSH object that inspects all commands sent to the device and if it detects “configuration terminal” or any
+variation such as “conf t” etc. It also wont let you reload the device or write erase the configuration it will
+throw an exception not allowing you to enter config terminal.  This inspection happens in the transport engine
+so even integrated ssh methods such as cli_to_config_mode will throw the exception.</p>
+<p>It is functionally equivalent to the “SSH” class, but wont let you into config mode or do any dangerous commands.</p>
+</dd></dl>
+
+<dl class="py function" id="module-CiscoAutomationFramework.ThreadLib">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.ThreadLib.start_threads">
+<span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.ThreadLib.</span></span><span class="sig-name descname"><span class="pre">start_threads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ips</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perform_secondary_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_for_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.ThreadLib.start_threads" title="Link to this definition"></a></dt>
 <dd><p>This helper function is a quick and easy way to start your threads. Gives you an option for waiting for threads
 to complete also.
 It will return the thread objects from the function for further processing by the main thread.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>object</strong> (<em>[</em><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH" title="CiscoAutomationFramework.ThreadLib.SSH"><em>SSH</em></a><em>, </em><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType"><em>SSHSplitDeviceType</em></a><em>]</em>) – Object you have written to perform your task. Must be inherted from SSH or SSHSplitDeviceType</li>
-<li><strong>ips</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – List of IP addresses or hostnames to run your worker object against</li>
-<li><strong>username</strong> (<em>str</em>) – Username to login with</li>
-<li><strong>password</strong> (<em>str</em>) – Password for user</li>
-<li><strong>enable_password</strong> (<em>str</em>) – Enable password if user does not have rights to privilege exec mode without enable password</li>
-<li><strong>perform_secondary_action</strong> (<em>bool</em>) – True if you want to run the secondary_action method against device</li>
-<li><strong>wait_for_threads</strong> (<em>bool</em>) – Wait for all threads to complete before returning</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>object</strong> (<em>[</em><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH" title="CiscoAutomationFramework.ThreadLib.SSH"><em>SSH</em></a><em>, </em><a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType"><em>SSHSplitDeviceType</em></a><em>]</em>) – Object you have written to perform your task. Must be inherted from SSH or SSHSplitDeviceType</p></li>
+<li><p><strong>ips</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – List of IP addresses or hostnames to run your worker object against</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – Username to login with</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – Password for user</p></li>
+<li><p><strong>enable_password</strong> (<em>str</em>) – Enable password if user does not have rights to privilege exec mode without enable password</p></li>
+<li><p><strong>perform_secondary_action</strong> (<em>bool</em>) – True if you want to run the secondary_action method against device</p></li>
+<li><p><strong>wait_for_threads</strong> (<em>bool</em>) – Wait for all threads to complete before returning</p></li>
+<li><p><strong>kwargs</strong> – Keyword arguments to be passed to your object. If your child class accepts additional arguments, pass them to the object via keyword arguments here.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of threads either running or completed depending on if wait_for_threads is True/False</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list[<a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH" title="CiscoAutomationFramework.ThreadLib.SSH">SSH</a>, <a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType">SSHSplitDeviceType</a>, <a class="reference internal" href="parsers.html#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type" title="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type">type</a>(object)]</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of threads either running or completed depending on if wait_for_threads is True/False</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[<a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSH" title="CiscoAutomationFramework.ThreadLib.SSH">SSH</a>, <a class="reference internal" href="#CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType" title="CiscoAutomationFramework.ThreadLib.SSHSplitDeviceType">SSHSplitDeviceType</a>, type(object)]</p>
+</dd>
+</dl>
 </dd></dl>
 
-<div class="section" id="example-scripts">
-<h2>Example Scripts<a class="headerlink" href="#example-scripts" title="Permalink to this headline">¶</a></h2>
+<section id="example-scripts">
+<h2>Example Scripts<a class="headerlink" href="#example-scripts" title="Link to this heading"></a></h2>
 <p>Below is an example script that will run concurrently across multiple network devices:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.ThreadLib</span> <span class="kn">import</span> <span class="n">SSH</span><span class="p">,</span> <span class="n">start_threads</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.ThreadLib</span> <span class="kn">import</span> <span class="n">SSH</span><span class="p">,</span> <span class="n">start_threads</span>
 
 
 <span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">SSH</span><span class="p">):</span>
@@ -410,7 +400,7 @@ It will return the thread objects from the function for further processing by th
                 <span class="bp">self</span><span class="o">.</span><span class="n">interfaces_connected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">secondary_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If there is some secondary action needed to be performed, code it here</span>
 <span class="sd">        If there is nothing you need to do you DO NOT need to define this method</span>
 
@@ -420,7 +410,7 @@ It will return the thread objects from the function for further processing by th
         <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">post_secondary_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssh</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        If you need to something post the secondary action taking place, code it here.</span>
 <span class="sd">        an example would be re gathering data or saving config</span>
 
@@ -444,79 +434,38 @@ It will return the thread objects from the function for further processing by th
         <span class="nb">print</span><span class="p">(</span><span class="n">thread</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">thread</span><span class="o">.</span><span class="n">interfaces_connected</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
-           </div>
-           <div class="articleComments">
-            
            </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="parsers.html" class="btn btn-neutral float-right" title="Command Output Parsers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="interact.html" class="btn btn-neutral" title="Interacting with a Network Device" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="interact.html" class="btn btn-neutral float-left" title="Interacting with a Network Device" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="parsers.html" class="btn btn-neutral float-right" title="Command Output Parsers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2022, Kyle Kowalczyk.
-
-    </p>
+    <p>&#169; Copyright 2022, Kyle Kowalczyk.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0.4',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

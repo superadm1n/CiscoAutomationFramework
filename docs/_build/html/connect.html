@@ -1,168 +1,93 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>How To Connect to A Network Device &mdash; CiscoAutomationFramework 1.0.4 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How To Connect to A Network Device &mdash; CiscoAutomationFramework 1.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="CiscoAutomationFramework 1.0.4 documentation" href="index.html"/>
-        <link rel="next" title="Interacting with a Network Device" href="interact.html"/>
-        <link rel="prev" title="Welcome to CiscoAutomationFramework’s documentation!" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=aec50437"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Interacting with a Network Device" href="interact.html" />
+    <link rel="prev" title="Welcome to CiscoAutomationFramework’s documentation!" href="index.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> CiscoAutomationFramework
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            CiscoAutomationFramework
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">How To Connect to A Network Device</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How To Connect to A Network Device</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#CiscoAutomationFramework.connect_ssh"><code class="docutils literal notranslate"><span class="pre">connect_ssh()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="interact.html">Interacting with a Network Device</a></li>
 <li class="toctree-l1"><a class="reference internal" href="concurency.html">Interacting with Multiple Network Devices at the same time</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parsers.html">Command Output Parsers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">CiscoAutomationFramework</a>
-        
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>How To Connect to A Network Device</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How To Connect to A Network Device</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/connect.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="how-to-connect-to-a-network-device">
-<h1>How To Connect to A Network Device<a class="headerlink" href="#how-to-connect-to-a-network-device" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="how-to-connect-to-a-network-device">
+<h1>How To Connect to A Network Device<a class="headerlink" href="#how-to-connect-to-a-network-device" title="Link to this heading"></a></h1>
 <p>Calling the CiscoAutomationFramework.connect_ssh function is how you connect to a device.
 it sets up the connection and all of the
 low level library and hands you an instantiated child of the CiscoFirmware object specific to the device
 type you are connected to.</p>
 <p>You can connect by assigning the output directly to a variable:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
 <span class="n">ssh</span> <span class="o">=</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span>
 <span class="c1">#other code here</span>
 <span class="n">ssh</span><span class="o">.</span><span class="n">close_connection</span><span class="p">()</span>
@@ -170,112 +95,70 @@ type you are connected to.</p>
 </div>
 <p>However It is recommended to use a context manager so you dont have to remember to close the connection
 or if an exception if hit in your code it closes for you:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
 <span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
     <span class="c1"># Code here while logged into the device</span>
 <span class="c1"># Code here while logged out of the device</span>
 </pre></div>
 </div>
-<span class="target" id="module-CiscoAutomationFramework"></span><dl class="function">
-<dt id="CiscoAutomationFramework.connect_ssh">
-<code class="descclassname">CiscoAutomationFramework.</code><code class="descname">connect_ssh</code><span class="sig-paren">(</span><em>ip</em>, <em>username</em>, <em>password</em>, <em>port=22</em>, <em>enable_password=None</em>, <em>timeout=10</em><span class="sig-paren">)</span> &#x2192; CiscoAutomationFramework.FirmwareBase.CiscoFirmware<a class="headerlink" href="#CiscoAutomationFramework.connect_ssh" title="Permalink to this definition">¶</a></dt>
+<dl class="py function" id="module-CiscoAutomationFramework">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.connect_ssh">
+<span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.</span></span><span class="sig-name descname"><span class="pre">connect_ssh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port=22</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_password=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine=&lt;class</span> <span class="pre">'CiscoAutomationFramework.TransportEngines.SSHEngine'&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware"><span class="pre">CiscoFirmware</span></a></span></span><a class="headerlink" href="#CiscoAutomationFramework.connect_ssh" title="Link to this definition"></a></dt>
 <dd><p>Connects to your cisco device, returns a firmware specific instance of CiscoFirmware object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ip</strong> (<em>str</em>) – IP address or hostname of Cisco device</li>
-<li><strong>username</strong> (<em>str</em>) – Username used to login</li>
-<li><strong>password</strong> (<em>str</em>) – Password for user</li>
-<li><strong>port</strong> (<em>int</em>) – Port to use (default 22)</li>
-<li><strong>enable_password</strong> (<em>str</em>) – Enable password to use if the user does not have privileges directly to privilege exec</li>
-<li><strong>timeout</strong> (<em>int</em>) – SSH timeout in seconds</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip</strong> (<em>str</em>) – IP address or hostname of Cisco device</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – Username used to login</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – Password for user</p></li>
+<li><p><strong>port</strong> (<em>int</em>) – Port to use (default 22)</p></li>
+<li><p><strong>enable_password</strong> (<em>str</em>) – Enable password to use if the user does not have privileges directly to privilege exec</p></li>
+<li><p><strong>timeout</strong> (<em>int</em>) – SSH timeout in seconds</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CiscoFirmware Object</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware">CiscoFirmware</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+<p>:param</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CiscoFirmware Object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="interact.html#CiscoAutomationFramework.FirmwareBase.CiscoFirmware" title="CiscoAutomationFramework.FirmwareBase.CiscoFirmware">CiscoFirmware</a></p>
+</dd>
+</dl>
 </dd></dl>
 
-</div>
+</section>
 
 
-           </div>
-           <div class="articleComments">
-            
            </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="interact.html" class="btn btn-neutral float-right" title="Interacting with a Network Device" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral" title="Welcome to CiscoAutomationFramework’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to CiscoAutomationFramework’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="interact.html" class="btn btn-neutral float-right" title="Interacting with a Network Device" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2022, Kyle Kowalczyk.
-
-    </p>
+    <p>&#169; Copyright 2022, Kyle Kowalczyk.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0.4',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

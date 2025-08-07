@@ -1,495 +1,447 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Command Output Parsers &mdash; CiscoAutomationFramework 1.0.4 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Output Parsers &mdash; CiscoAutomationFramework 1.0.8 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
   
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="CiscoAutomationFramework 1.0.4 documentation" href="index.html"/>
-        <link rel="prev" title="Interacting with Multiple Network Devices at the same time" href="concurency.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=aec50437"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Utilities" href="utilities.html" />
+    <link rel="prev" title="Interacting with Multiple Network Devices at the same time" href="concurency.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> CiscoAutomationFramework
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            CiscoAutomationFramework
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="connect.html">How To Connect to A Network Device</a></li>
 <li class="toctree-l1"><a class="reference internal" href="interact.html">Interacting with a Network Device</a></li>
 <li class="toctree-l1"><a class="reference internal" href="concurency.html">Interacting with Multiple Network Devices at the same time</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Command Output Parsers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#show-interface-status-parser">Show Interface Status Parser</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#ip-device-tracking-parser">IP Device Tracking Parser</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#mac-address-table-parser">MAC Address Table Parser</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#power-inline-parser">Power Inline Parser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#show-interface-status-parser">Show Interface Status Parser</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser"><code class="docutils literal notranslate"><span class="pre">InterfaceStatusOutputParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces"><code class="docutils literal notranslate"><span class="pre">InterfaceStatusOutputParser.interfaces</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser"><code class="docutils literal notranslate"><span class="pre">LineParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description"><code class="docutils literal notranslate"><span class="pre">LineParser.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex"><code class="docutils literal notranslate"><span class="pre">LineParser.duplex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name"><code class="docutils literal notranslate"><span class="pre">LineParser.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present"><code class="docutils literal notranslate"><span class="pre">LineParser.not_present</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed"><code class="docutils literal notranslate"><span class="pre">LineParser.speed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status"><code class="docutils literal notranslate"><span class="pre">LineParser.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type"><code class="docutils literal notranslate"><span class="pre">LineParser.type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan"><code class="docutils literal notranslate"><span class="pre">LineParser.vlan</span></code></a></li>
 </ul>
 </li>
 </ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ip-device-tracking-parser">IP Device Tracking Parser</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser"><code class="docutils literal notranslate"><span class="pre">DeviceTrackingOutputParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries"><code class="docutils literal notranslate"><span class="pre">DeviceTrackingOutputParser.entries</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser"><code class="docutils literal notranslate"><span class="pre">EntryParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface"><code class="docutils literal notranslate"><span class="pre">EntryParser.interface</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address"><code class="docutils literal notranslate"><span class="pre">EntryParser.ip_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa"><code class="docutils literal notranslate"><span class="pre">EntryParser.is_apipa</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address"><code class="docutils literal notranslate"><span class="pre">EntryParser.mac_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout"><code class="docutils literal notranslate"><span class="pre">EntryParser.probe_timeout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source"><code class="docutils literal notranslate"><span class="pre">EntryParser.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state"><code class="docutils literal notranslate"><span class="pre">EntryParser.state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan"><code class="docutils literal notranslate"><span class="pre">EntryParser.vlan</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mac-address-table-parser">MAC Address Table Parser</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser"><code class="docutils literal notranslate"><span class="pre">MacAddressTableParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus"><code class="docutils literal notranslate"><span class="pre">MacAddressTableParser.is_nexus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries"><code class="docutils literal notranslate"><span class="pre">MacAddressTableParser.table_entries</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser"><code class="docutils literal notranslate"><span class="pre">MacEntryParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface"><code class="docutils literal notranslate"><span class="pre">MacEntryParser.interface</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus"><code class="docutils literal notranslate"><span class="pre">MacEntryParser.is_nexus</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address"><code class="docutils literal notranslate"><span class="pre">MacEntryParser.mac_address</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type"><code class="docutils literal notranslate"><span class="pre">MacEntryParser.type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan"><code class="docutils literal notranslate"><span class="pre">MacEntryParser.vlan</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#power-inline-parser">Power Inline Parser</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser"><code class="docutils literal notranslate"><span class="pre">PowerInlineParser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces"><code class="docutils literal notranslate"><span class="pre">PowerInlineParser.interfaces</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.admin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.detected_device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.max_watts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.oper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.poe_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts"><code class="docutils literal notranslate"><span class="pre">PowerInlineInterface.watts</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">Utilities</a></li>
+</ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">CiscoAutomationFramework</a>
-        
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Command Output Parsers</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Command Output Parsers</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/parsers.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="command-output-parsers">
-<h1>Command Output Parsers<a class="headerlink" href="#command-output-parsers" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="command-output-parsers">
+<h1>Command Output Parsers<a class="headerlink" href="#command-output-parsers" title="Link to this heading"></a></h1>
 <p>CiscoAutomationFramework provides integrated parsers for various command outputs. These parsers allow
 you to pass in the output from the network device and be able to iterate over output and/or extract
 data from the output in a programatic way versus needing to build your own parsers</p>
-<div class="section" id="show-interface-status-parser">
-<h2>Show Interface Status Parser<a class="headerlink" href="#show-interface-status-parser" title="Permalink to this headline">¶</a></h2>
+<section id="show-interface-status-parser">
+<h2>Show Interface Status Parser<a class="headerlink" href="#show-interface-status-parser" title="Link to this heading"></a></h2>
 <p>Pass in the raw output from “show interface status” command to this parser and you will be
 able to iterate over the table and interact with the entries individually</p>
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.InterfaceStatusParser.</code><code class="descname">InterfaceStatusOutputParser</code><span class="sig-paren">(</span><em>raw_table</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.InterfaceStatusParser.</span></span><span class="sig-name descname"><span class="pre">InterfaceStatusOutputParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser" title="Link to this definition"></a></dt>
 <dd><p>Provide the output directly from the device after issuing the command ‘show interface status’ to
 this object to parse it</p>
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces">
-<code class="descname">interfaces</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interfaces</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.InterfaceStatusOutputParser.interfaces" title="Link to this definition"></a></dt>
 <dd><p>Parses the raw output from the command and provides a list of all entries from the table</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">LineParser</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser" title="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser">LineParser</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>LineParser</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser" title="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser">LineParser</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.InterfaceStatusParser.</code><code class="descname">LineParser</code><span class="sig-paren">(</span><em>raw_line</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description">
-<code class="descname">description</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.InterfaceStatusParser.</span></span><span class="sig-name descname"><span class="pre">LineParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_line</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.description" title="Link to this definition"></a></dt>
 <dd><p>Description set on interface</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Confiured Description</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Confiured Description</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex">
-<code class="descname">duplex</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">duplex</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.duplex" title="Link to this definition"></a></dt>
 <dd><p>Interface duplex settings ex. auto, a-full a-half</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Duplex Setting</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Duplex Setting</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name">
-<code class="descname">name</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.name" title="Link to this definition"></a></dt>
 <dd><p>Name of the interface ex. Gi1/0/1</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Name abbriviated</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Interface Name abbriviated</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present">
-<code class="descname">not_present</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">not_present</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.not_present" title="Link to this definition"></a></dt>
 <dd><p>Returns True/False if the text “not present” in the lowercase line</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True/False</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed">
-<code class="descname">speed</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">speed</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.speed" title="Link to this definition"></a></dt>
 <dd><p>Interface Operating Speed ex. auto, a-100, a-1000</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Speed</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Interface Speed</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status">
-<code class="descname">status</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.status" title="Link to this definition"></a></dt>
 <dd><p>Status of interface ex. connected, notconnected, disabled, err-disable, etc</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">interface status</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>interface status</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type">
-<code class="descname">type</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.type" title="Link to this definition"></a></dt>
 <dd><p>Interface Type ex. 10/100/1000BaseTX, Not Present</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Type</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Interface Type</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan">
-<code class="descname">vlan</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vlan</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.InterfaceStatusParser.LineParser.vlan" title="Link to this definition"></a></dt>
 <dd><p>Vlan configuration of interface ex. 1, 100, trunk, routed</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">vlan configuration</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>vlan configuration</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="ip-device-tracking-parser">
-<h2>IP Device Tracking Parser<a class="headerlink" href="#ip-device-tracking-parser" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="ip-device-tracking-parser">
+<h2>IP Device Tracking Parser<a class="headerlink" href="#ip-device-tracking-parser" title="Link to this heading"></a></h2>
 <p>Pass in the raw output from “show ip device tracking all” and this parser allows you to iterate
 over the contents of the table one at a time.</p>
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.</code><code class="descname">DeviceTrackingOutputParser</code><span class="sig-paren">(</span><em>output_from_device</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries">
-<code class="descname">entries</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.</span></span><span class="sig-name descname"><span class="pre">DeviceTrackingOutputParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_from_device</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entries</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.DeviceTrackingOutputParser.entries" title="Link to this definition"></a></dt>
 <dd><p>Extracts the entires from the table and returns them as a list</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of table entries as EntryParser instances</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser" title="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser">EntryParser</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of table entries as EntryParser instances</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser" title="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser">EntryParser</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.</code><code class="descname">EntryParser</code><span class="sig-paren">(</span><em>entry_data</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface">
-<code class="descname">interface</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.</span></span><span class="sig-name descname"><span class="pre">EntryParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interface</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.interface" title="Link to this definition"></a></dt>
 <dd><p>Extracts interface of the ip device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Switch Interface</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Switch Interface</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address">
-<code class="descname">ip_address</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ip_address</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.ip_address" title="Link to this definition"></a></dt>
 <dd><p>IP address of the IP device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">IP address</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>IP address</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa">
-<code class="descname">is_apipa</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_apipa</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.is_apipa" title="Link to this definition"></a></dt>
 <dd><p>True/False if the IP address in the entry is an APIPA address.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True/False</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address">
-<code class="descname">mac_address</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mac_address</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.mac_address" title="Link to this definition"></a></dt>
 <dd><p>MAC address of the ip device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">MAC Address</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>MAC Address</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout">
-<code class="descname">probe_timeout</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">probe_timeout</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.probe_timeout" title="Link to this definition"></a></dt>
 <dd><p>Extracts probe timeout of the ip device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Probe Timeout</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Probe Timeout</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source">
-<code class="descname">source</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.source" title="Link to this definition"></a></dt>
 <dd><p>Extracts source of the ip device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Source</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Source</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state">
-<code class="descname">state</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.state" title="Link to this definition"></a></dt>
 <dd><p>Extracts state of the ip device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">State</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>State</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan">
-<code class="descname">vlan</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vlan</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.IpDeviceTrackingParser.EntryParser.vlan" title="Link to this definition"></a></dt>
 <dd><p>Extracts vlan of the ip device tracking entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vlan</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vlan</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="mac-address-table-parser">
-<h2>MAC Address Table Parser<a class="headerlink" href="#mac-address-table-parser" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="mac-address-table-parser">
+<h2>MAC Address Table Parser<a class="headerlink" href="#mac-address-table-parser" title="Link to this heading"></a></h2>
 <p>Pass in the raw output from “show mac address-table” and this parser allows you to iterate
 over the contents of the table one at a time and also analyze the table in other ways.:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
 <span class="kn">from</span> <span class="nn">CiscoAutomationFramework.Parsers.MacAddressTableParser</span> <span class="kn">import</span> <span class="n">MacAddressTableParser</span>
 
 <span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
@@ -499,126 +451,114 @@ over the contents of the table one at a time and also analyze the table in other
    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">interface</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">vlan</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">mac_address</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.MacAddressTableParser.</code><code class="descname">MacAddressTableParser</code><span class="sig-paren">(</span><em>raw_table</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus">
-<code class="descname">is_nexus</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.MacAddressTableParser.</span></span><span class="sig-name descname"><span class="pre">MacAddressTableParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_nexus</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.is_nexus" title="Link to this definition"></a></dt>
 <dd><p>Checks the raw table for specific key words to determine if it is a Nexus platform or not returning
 True if it is False if it is not</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True/False</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True/False</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries">
-<code class="descname">table_entries</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">table_entries</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacAddressTableParser.table_entries" title="Link to this definition"></a></dt>
 <dd><p>Parses the mac address table and returns a list of the entries</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of entries from the MAC address table</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser" title="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser">MacEntryParser</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of entries from the MAC address table</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser" title="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser">MacEntryParser</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.MacAddressTableParser.</code><code class="descname">MacEntryParser</code><span class="sig-paren">(</span><em>raw_entry</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface">
-<code class="descname">interface</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.MacAddressTableParser.</span></span><span class="sig-name descname"><span class="pre">MacEntryParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_entry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interface</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.interface" title="Link to this definition"></a></dt>
 <dd><p>Interface on device that the MAC address is on ex. Gi1/0/8</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface on Device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Interface on Device</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus">
-<code class="descname">is_nexus</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_nexus</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.is_nexus" title="Link to this definition"></a></dt>
 <dd><p>Searches the entire mac address table, checking if any of a set of keywords
 are in it</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address">
-<code class="descname">mac_address</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mac_address</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.mac_address" title="Link to this definition"></a></dt>
 <dd><p>MAC address from the row</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">MAC Address</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>MAC Address</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type">
-<code class="descname">type</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.type" title="Link to this definition"></a></dt>
 <dd><p>Address type from the row ex. dynamic, static</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Address Type</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Address Type</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan">
-<code class="descname">vlan</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vlan</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.MacAddressTableParser.MacEntryParser.vlan" title="Link to this definition"></a></dt>
 <dd><p>Vlan from the row</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vlan</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Vlan</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="power-inline-parser">
-<h2>Power Inline Parser<a class="headerlink" href="#power-inline-parser" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="power-inline-parser">
+<h2>Power Inline Parser<a class="headerlink" href="#power-inline-parser" title="Link to this heading"></a></h2>
 <p>Pass the raw output from ‘show power inline’ to this parser and you will
 be able to iterate over the entries in the power inline table:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework</span> <span class="kn">import</span> <span class="n">connect_ssh</span>
 <span class="kn">from</span> <span class="nn">CiscoAutomationFramework.Parsers.PowerInlineParser</span> <span class="kn">import</span> <span class="n">PowerInlineParser</span>
 
 <span class="k">with</span> <span class="n">connect_ssh</span><span class="p">(</span><span class="s1">&#39;ip&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ssh</span><span class="p">:</span>
@@ -628,215 +568,160 @@ be able to iterate over the entries in the power inline table:</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">watts</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">detected_device</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.PowerInlineParser.</code><code class="descname">PowerInlineParser</code><span class="sig-paren">(</span><em>sh_power_inline</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces">
-<code class="descname">interfaces</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.PowerInlineParser.</span></span><span class="sig-name descname"><span class="pre">PowerInlineParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sh_power_inline</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">interfaces</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineParser.interfaces" title="Link to this definition"></a></dt>
 <dd><p>Returns list of interfaces in the power inline table to extract the values from the entry</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of entries in the power inline table</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface" title="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface">PowerInlineInterface</a>]</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of entries in the power inline table</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="reference internal" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface" title="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface">PowerInlineInterface</a>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface">
-<em class="property">class </em><code class="descclassname">CiscoAutomationFramework.Parsers.PowerInlineParser.</code><code class="descname">PowerInlineInterface</code><span class="sig-paren">(</span><em>interface_data</em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin">
-<code class="descname">admin</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">CiscoAutomationFramework.Parsers.PowerInlineParser.</span></span><span class="sig-name descname"><span class="pre">PowerInlineInterface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interface_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">admin</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.admin" title="Link to this definition"></a></dt>
 <dd><p>Admin column of the entry ex. auto</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Admin column</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Admin column</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device">
-<code class="descname">detected_device</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detected_device</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.detected_device" title="Link to this definition"></a></dt>
 <dd><p>Detected device type of connected device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Detected device</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Detected device</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts">
-<code class="descname">max_watts</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_watts</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.max_watts" title="Link to this definition"></a></dt>
 <dd><p>Max watts capable of being drawn on port</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Max watts supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Max watts supported</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name">
-<code class="descname">name</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.name" title="Link to this definition"></a></dt>
 <dd><p>Interface name ex. Gi1/0/5</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Interface Name</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Interface Name</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper">
-<code class="descname">oper</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">oper</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.oper" title="Link to this definition"></a></dt>
 <dd><p>Oper column of the entry, off/on weather it is providing power or not</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Operation status</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Operation status</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class">
-<code class="descname">poe_class</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">poe_class</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.poe_class" title="Link to this definition"></a></dt>
 <dd><p>POE class of connected device ex. 0, 1, 2, 3, n/a</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">POE Class</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>POE Class</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts">
-<code class="descname">watts</code><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">watts</span></span><a class="headerlink" href="#CiscoAutomationFramework.Parsers.PowerInlineParser.PowerInlineInterface.watts" title="Link to this definition"></a></dt>
 <dd><p>Watts currently being drawn on port by connected device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Watts currently drawn</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">float</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Watts currently drawn</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
-           </div>
-           <div class="articleComments">
-            
            </div>
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="concurency.html" class="btn btn-neutral" title="Interacting with Multiple Network Devices at the same time" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="concurency.html" class="btn btn-neutral float-left" title="Interacting with Multiple Network Devices at the same time" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utilities.html" class="btn btn-neutral float-right" title="Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2022, Kyle Kowalczyk.
-
-    </p>
+    <p>&#169; Copyright 2022, Kyle Kowalczyk.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.0.4',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
