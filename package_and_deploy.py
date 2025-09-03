@@ -2,6 +2,7 @@ import subprocess
 from os import listdir
 from os.path import isfile, isdir, join
 from shutil import rmtree
+from getpass import getpass
 
 
 def files_in_dir(dir):
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     print('Building!')
     subprocess.run('python setup.py sdist'.split())
     if input('Deploy to Pypi? [y/N]').lower().startswith('y'):
-        p = subprocess.run('twine upload dist/*'.split())
+        key = getpass('Enter Pypi API key: ')
+        p = subprocess.run(f'twine upload --username __token__ --password {key} dist/*'.split())
     else:
         print('To deploy run: twine upload dist/*')
