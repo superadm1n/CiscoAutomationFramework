@@ -365,7 +365,7 @@ class ConfigParser:
         for name in all_route_maps.keys():
             results = self.search_config_tree(name, full_match=False, case_sensitive=True)
             syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
-            all_route_maps[name] = search_config_tree(results.config_tree, syntactic_usages, min_search_depth=1)
+            all_route_maps[name] = results.search_config_tree(syntactic_usages, min_search_depth=1)
 
         return [self.get_route_map(name) for name, config in all_route_maps.items() if not config]
 
@@ -388,7 +388,7 @@ class ConfigParser:
         for name in all_prefix_lists.keys():
             all_usages = self.search_config_tree(name, full_match=False, case_sensitive=True)
             syntactic_usages = [f'prefix-list {name}', f'match ip address {name}']
-            all_prefix_lists[name] = search_config_tree(all_usages, syntactic_usages, min_search_depth=1)
+            all_prefix_lists[name] = all_usages.search_config_tree(syntactic_usages, min_search_depth=1)
 
         return [self.get_prefix_list(name) for name, config in all_prefix_lists.items() if not config]
 
