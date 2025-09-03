@@ -186,7 +186,7 @@ class ConfigParser:
         :rtype: list
         """
 
-        if not tree:
+        if tree is None:
             tree = self.config_tree
 
         return convert_config_tree_to_list(tree=tree, indent=indent, indent_step=indent_step)
