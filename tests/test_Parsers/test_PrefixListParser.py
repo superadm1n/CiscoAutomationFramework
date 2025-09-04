@@ -40,6 +40,15 @@ class PrefixListParserTests(TestCase):
             'first_prefix_list', {'ip prefix-list first_prefix_list seq 10 permit 10.0.0.0/8 le 32': {}, 'ip prefix-list first_prefix_list seq 20 permit 192.168.0.0/24': {}}
         )
 
+        self.parser_equal = PrefixList(
+            'first_prefix_list', {'ip prefix-list first_prefix_list seq 10 permit 10.0.0.0/8 le 32': {},
+                                  'ip prefix-list first_prefix_list seq 20 permit 192.168.0.0/24': {}}
+        )
+        self.parser_not_equal = PrefixList(
+            'first_prefix_list', {'ip prefix-list first_prefix_list seq 10 permit 10.0.0.0/8 le 32': {},
+                                  'ip prefix-list first_prefix_list seq 20 permit 192.168.10.0/24': {}}
+        )
+
     def test_detects_name(self):
         self.assertEqual(self.parser.name, 'first_prefix_list')
 
@@ -48,6 +57,12 @@ class PrefixListParserTests(TestCase):
 
     def test_detects_seq_numbers(self):
         self.assertEqual(self.parser.sequence_numbers, ['10', '20'])
+
+    def test_able_to_compare_equality(self):
+        self.assertEqual(self.parser, self.parser_equal)
+
+    def test_able_to_compare_non_equality(self):
+        self.assertNotEqual(self.parser, self.parser_not_equal)
 
 
 class PrefixListEntryParserTests(TestCase):
