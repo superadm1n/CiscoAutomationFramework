@@ -41,6 +41,11 @@ class RouteMapParserTests(TestCase):
         self.parser1 = RouteMap(
             'MULTI-SET',  {'route-map MULTI-SET permit 10': {'description abcdefg': {}, 'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {}, 'set local-preference 800': {}, 'set community 12345': {}}}
         )
+        self.parser1_equality = RouteMap(
+            'MULTI-SET', {'route-map MULTI-SET permit 10': {'description abcdefg': {},
+                                                            'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {},
+                                                            'set local-preference 800': {}, 'set community 12345': {}}}
+        )
         self.parser2 = RouteMap(
             'MULTI-RULES', {'route-map MULTI-RULES deny 10': {'description abcdefg': {}, 'match ip address prefix-list PREFIX-LIST-1 PREFIX-LIST-2': {}}, 'route-map MULTI-RULES permit 1000': {'description Allow Everything Else': {}}}
         )
@@ -58,6 +63,12 @@ class RouteMapParserTests(TestCase):
 
     def test_extracts_detects_second_rule(self):
         self.assertEqual(len(self.parser_blank_rule.rules), 2)
+
+    def test_able_to_determine_equality(self):
+        self.assertTrue(self.parser1 == self.parser1_equality)
+
+    def test_able_to_determine_non_equality(self):
+        self.assertFalse(self.parser1 == self.parser2)
 
 
 class RouteMapRuleParserTests(TestCase):

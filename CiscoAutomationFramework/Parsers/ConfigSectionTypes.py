@@ -1,5 +1,5 @@
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects import ConfigSection, TreeConfigSection
-from CiscoAutomationFramework.util import search_config_tree
+from CiscoAutomationFramework.util import search_config_tree, trees_are_equal
 
 
 class InterfaceConfig(TreeConfigSection):
@@ -272,3 +272,8 @@ class RouteMap:
 
     def __str__(self):
         return self.name
+
+    def __eq__(self, other):
+        if not isinstance(other, RouteMap):
+            return False
+        return trees_are_equal(other.config_tree, self.config_tree)
