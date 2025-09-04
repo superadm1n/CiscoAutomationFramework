@@ -84,6 +84,11 @@ such as a configuration backup text file.
    :linenos:
    :caption: An example script that will take live configuration and generate the removal config that needs to be entered into the device.
 
+.. literalinclude:: ../ExampleScripts/find_used_but_not_configured_route_maps.py
+   :language: python
+   :linenos:
+   :caption: Example script that finds all referenced route maps in BGP and lists any that are not configured.
+
 
 .. autoclass:: CiscoAutomationFramework.Parsers.ConfigParser.ConfigParser
    :members:

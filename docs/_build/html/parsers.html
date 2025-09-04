@@ -709,6 +709,8 @@ be able to iterate over the entries in the power inline table:</p>
 <h1>Running Config Parser<a class="headerlink" href="#running-config-parser" title="Link to this heading"></a></h1>
 <p>The config parser is one of the most useful features of the CiscoAutomationFramework. It allows integrated
 functions to recursively search configuration, compare configuration, and modify configuration in line.</p>
+<p>you can access this object by ssh.config_parser or you can access the object directly and load in config from anywhere
+such as a configuration backup text file.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">An example script that will take live configuration and generate the removal config that needs to be entered into the device.</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="sd">&#39;&#39;&#39;</span>
@@ -824,10 +826,58 @@ functions to recursively search configuration, compare configuration, and modify
 <span class="linenos">111</span>
 <span class="linenos">112</span><span class="n">parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">example_config</span><span class="p">)</span>
 <span class="linenos">113</span><span class="n">modified_config_tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">search_and_modify_config_tree</span><span class="p">(</span><span class="n">search_terms</span><span class="o">=</span><span class="n">neighbors_to_remove</span><span class="p">,</span> <span class="n">full_match</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prepend_text</span><span class="o">=</span><span class="s1">&#39;no &#39;</span><span class="p">)</span>
-<span class="linenos">114</span><span class="n">formatted_config</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">config_tree_to_list</span><span class="p">(</span><span class="n">modified_config_tree</span><span class="p">,</span> <span class="n">indent_step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="linenos">114</span><span class="n">formatted_config</span> <span class="o">=</span> <span class="n">modified_config_tree</span><span class="o">.</span><span class="n">config_tree_to_list</span><span class="p">(</span><span class="n">indent_step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="linenos">115</span>
 <span class="linenos">116</span><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">formatted_config</span><span class="p">:</span>
 <span class="linenos">117</span>    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Example script that finds all referenced route maps in BGP and lists any that are not configured.</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 2</span><span class="sd">This is an example script that will check your BGP config, get all of the referenced route maps, then check</span>
+<span class="linenos"> 3</span><span class="sd">if there is a route map with that name configured on the device.</span>
+<span class="linenos"> 4</span>
+<span class="linenos"> 5</span><span class="sd">This script is intended to show the power of the ConfigParser and the level of insights you can gain</span>
+<span class="linenos"> 6</span><span class="sd">through integrated search utilities.</span>
+<span class="linenos"> 7</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="linenos"> 8</span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.Parsers.ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="linenos"> 9</span><span class="kn">from</span> <span class="nn">CiscoAutomationFramework.util</span> <span class="kn">import</span> <span class="n">extract_line_from_tree</span>
+<span class="linenos">10</span>
+<span class="linenos">11</span><span class="c1"># Update path to the path of your config file</span>
+<span class="linenos">12</span><span class="n">config_file_path</span> <span class="o">=</span> <span class="s1">&#39;/path/to/config_file.txt&#39;</span>
+<span class="linenos">13</span>
+<span class="linenos">14</span><span class="c1"># read in config file</span>
+<span class="linenos">15</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="linenos">16</span>    <span class="n">conf</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="linenos">17</span>
+<span class="linenos">18</span>
+<span class="linenos">19</span><span class="k">def</span> <span class="nf">extract_route_map_names</span><span class="p">(</span><span class="n">rm_definition_lines</span><span class="p">):</span>
+<span class="linenos">20</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to extract the route map name from the route map definition</span>
+<span class="linenos">21</span><span class="sd">    ex. neighbor 192.168.10.5 route-map TEST in || will extract &quot;TEST&quot;</span>
+<span class="linenos">22</span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="linenos">23</span>    <span class="n">map_names</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="linenos">24</span>    <span class="k">for</span> <span class="n">map_statement</span> <span class="ow">in</span> <span class="n">rm_definition_lines</span><span class="p">:</span>
+<span class="linenos">25</span>        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">map_statement</span><span class="o">.</span><span class="n">split</span><span class="p">()):</span>
+<span class="linenos">26</span>            <span class="k">if</span> <span class="n">word</span> <span class="o">==</span> <span class="s1">&#39;route-map&#39;</span><span class="p">:</span>
+<span class="linenos">27</span>                <span class="n">map_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">map_statement</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+<span class="linenos">28</span>    <span class="k">return</span> <span class="n">map_names</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span>
+<span class="linenos">31</span><span class="n">parser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+<span class="linenos">32</span><span class="c1"># extract only BGP config</span>
+<span class="linenos">33</span><span class="n">bgp_config</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">search_config_tree</span><span class="p">(</span><span class="s1">&#39;router bgp&#39;</span><span class="p">)</span>
+<span class="linenos">34</span><span class="c1"># From BGP config extract all lines that contain the text &quot;route-map&quot;</span>
+<span class="linenos">35</span><span class="n">maps</span> <span class="o">=</span> <span class="n">extract_line_from_tree</span><span class="p">(</span><span class="n">bgp_config</span><span class="o">.</span><span class="n">config_tree</span><span class="p">,</span> <span class="s1">&#39;route-map&#39;</span><span class="p">,</span> <span class="n">find_all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="linenos">36</span><span class="c1"># use helper function to extract the name of the route map from all references</span>
+<span class="linenos">37</span><span class="n">configured_route_maps</span> <span class="o">=</span> <span class="n">extract_route_map_names</span><span class="p">(</span><span class="n">maps</span><span class="p">)</span>
+<span class="linenos">38</span>
+<span class="linenos">39</span><span class="c1"># Iterate over each route map name, try and get the route map definition from the config, printing out the name</span>
+<span class="linenos">40</span><span class="c1"># if not found</span>
+<span class="linenos">41</span><span class="k">for</span> <span class="nb">map</span> <span class="ow">in</span> <span class="n">configured_route_maps</span><span class="p">:</span>
+<span class="linenos">42</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_route_map</span><span class="p">(</span><span class="nb">map</span><span class="p">):</span>
+<span class="linenos">43</span>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Route map </span><span class="si">{</span><span class="nb">map</span><span class="si">}</span><span class="s1"> is referenced but not configured!&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
