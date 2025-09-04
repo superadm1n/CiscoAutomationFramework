@@ -365,7 +365,7 @@ class ConfigParser:
         for name in all_route_maps.keys():
             results = self.search_config_tree(name, full_match=False, case_sensitive=True)
             syntactic_usages = [f'{name} in', f'{name} out', f'{name} export', f'{name} import', f'map {name}']
-            all_route_maps[name] = results.search_config_tree(syntactic_usages, min_search_depth=1)
+            all_route_maps[name] = results.search_config_tree(syntactic_usages, min_search_depth=1).config_tree
 
         return [self.get_route_map(name) for name, config in all_route_maps.items() if not config]
 

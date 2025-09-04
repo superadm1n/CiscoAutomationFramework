@@ -139,7 +139,7 @@ class ConfigParserTreeTests(TestCase):
         self.assertEqual(output, expected)
 
     def test_finds_ununsed_route_maps(self):
-        self.assertEqual([x.name for x in self.parser.unused_route_maps], ['unused_route_map'])
+        self.assertEqual(['unused_route_map'], [x.name for x in self.parser.unused_route_maps])
 
 
 class RootParserSearchTests(TestCase):
