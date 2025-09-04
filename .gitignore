@@ -8,5 +8,6 @@ __pycache__/
 htmlcov/
 build/
 dist/
+docs/_build
 CiscoAutomationFramework.egg-info/
 t.py
