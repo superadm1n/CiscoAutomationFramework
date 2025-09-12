@@ -254,6 +254,77 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
                 data[key] = path
     return data
 
+def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
+                                  max_search_depth=0, prepend_text='', append_text='',
+                                  replace_tuple=('', ''), _depth=0):
+    """
+    Searches the config tree for a set of search terms, and any match will be eligible for modification.
+    Any line that DOES not match the search terms will still be returned, but not eligible to be modified by
+    the modification arguments that are passed in. THis allows you to modify only certain config but return the
+    entire config tree that was passed in.
+
+    This function is very similar to search_and_modify_config_tree but instead of only returning the matches
+    and the outdened path to the root, it will return everything that was passed in, but still only allowing
+    modification of lines that contain the search_terms matches
+
+    Modification will ONLY occur to lines that CONTAIN a match! if you search for "description example" it will
+    also return in the tree the interface name ex. interface GigabitEthernet1/0/1, however that line will NOT
+    be eligible for the string modification because it does not contain "description example".
+
+    Additionally using that same interface example, the interface will likely have other config besides the
+    description, but if you search for the description, all other commands in that layer of the tree will
+    not be returned, just the path up to the root which in this case is the interface name.
+
+    You may also specify if you want your search to be case sensitive, and you may also specify if you want
+    a full or partial match. For example if I do a full match for "description" but the line of configuration
+    is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+    "descrip", and the line is "description example" it WILL match.
+
+    :param search_terms: List of search terms to search for.
+    :type search_terms: list
+    :param case_sensitive: Whether the search is case-sensitive.
+    :type case_sensitive: bool
+    :default case_sensitive: True
+    :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+    :type full_match: bool
+    :default full_match: False
+    :param prepend_text: Text to prepend to matches.
+    :type prepend_text: str
+    :default prepend_text: ""
+    :param append_text: Text to append to matches.
+    :type append_text: str
+    :default append_text: ""
+    :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
+    :type replace_tuple: tuple or None
+    :default replace_tuple: None
+    :param tree: The configuration tree to search. Do not specify this, its only used for recursion
+    :type tree: dict or None
+    :default tree: None
+
+    :return: A dictionary containing matched and modified results.
+    :rtype: dict
+    """
+
+    if not any([isinstance(search_terms, x) for x in (list, tuple)]):
+        search_terms = [search_terms]
+        # raise TypeError('search_terms MUST be a list or tuple')
+
+    data = {}
+    for key, sub_tree in tree.items():
+        if matches_search_terms(key, search_terms, case_sensitive, full_match):
+            # only capture results that are between the min/max search depth variables, 0 max is infinite
+            if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+                data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
+        else:
+            data[key] = sub_tree
+
+            if isinstance(sub_tree, dict) and sub_tree:
+                path = modify_config_tree_inline(sub_tree, search_terms, case_sensitive, full_match, min_search_depth,
+                                                     max_search_depth, prepend_text, append_text, replace_tuple, _depth+1)
+                if path:
+                    data[key] = path
+    return data
+
 
 def extract_line_from_tree(tree, search_term, case_sensitive=True, full_match=False, find_all=False):
     """

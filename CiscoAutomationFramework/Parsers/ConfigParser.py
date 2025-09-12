@@ -2,7 +2,8 @@ from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig,
     PrefixList
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
 from CiscoAutomationFramework.util import (convert_config_tree_to_list, search_config_tree,
-                                           search_and_modify_config_tree, tree_is_subset, trees_are_equal)
+                                           search_and_modify_config_tree, tree_is_subset, trees_are_equal,
+                                           modify_config_tree_inline)
 from collections import OrderedDict
 
 
@@ -167,6 +168,57 @@ class ConfigParser:
         if not tree:
             tree = self.config_tree
         result_dict = search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth,
+                                             max_search_depth, prepend_text, append_text, replace_tuple)
+
+        return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
+
+    def modify_config_tree_inline(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
+                                      max_search_depth=0, prepend_text='', append_text='', replace_tuple=('',''),
+                                      tree=None):
+        """
+        Searches the config tree for a set of search terms, and if specified will run each line that matches
+        a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
+
+        Modification will ONLY occur to lines that CONTAIN a match! if you search for "description example" it will
+        also return in the tree the interface name ex. interface GigabitEthernet1/0/1, however that line will NOT
+        be eligible for the string modification because it does not contain "description example".
+
+        Additionally using that same interface example, the interface will likely have other config besides the
+        description, but if you search for the description, all other commands in that layer of the tree will
+        not be returned, just the path up to the root which in this case is the interface name.
+
+        You may also specify if you want your search to be case sensitive, and you may also specify if you want
+        a full or partial match. For example if I do a full match for "description" but the line of configuration
+        is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
+        "descrip", and the line is "description example" it WILL match.
+
+        :param search_terms: List of search terms to search for.
+        :type search_terms: list
+        :param case_sensitive: Whether the search is case-sensitive.
+        :type case_sensitive: bool
+        :default case_sensitive: True
+        :param full_match: If True, matches the whole word exactly; else, allows partial matches.
+        :type full_match: bool
+        :default full_match: False
+        :param prepend_text: Text to prepend to matches.
+        :type prepend_text: str
+        :default prepend_text: ""
+        :param append_text: Text to append to matches.
+        :type append_text: str
+        :default append_text: ""
+        :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
+        :type replace_tuple: tuple or None
+        :default replace_tuple: None
+        :param tree: The configuration tree to search. Do not specify this, its only used for recursion
+        :type tree: dict or None
+        :default tree: None
+
+        :return: A dictionary containing matched and modified results.
+        :rtype: ConfigParser
+        """
+        if not tree:
+            tree = self.config_tree
+        result_dict = modify_config_tree_inline(tree, search_terms, case_sensitive, full_match, min_search_depth,
                                              max_search_depth, prepend_text, append_text, replace_tuple)
 
         return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
