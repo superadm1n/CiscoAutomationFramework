@@ -135,7 +135,7 @@ def convert_config_tree_to_list(tree, indent=0, indent_step=0):
 
 def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                   max_search_depth=0, prepend_text='', append_text='',
-                                  replace_tuple=('', ''), _depth=0):
+                                  replace_tuple=('', ''), modifier_callback=None, _depth=0):
     """
     Searches the config tree for a set of search terms, and if specified will run each line that matches
     a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
@@ -152,6 +152,14 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
     a full or partial match. For example if I do a full match for "description" but the line of configuration
     is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
     "descrip", and the line is "description example" it WILL match.
+
+    Lastly if the integrated prepend, append, or replace functionality does not provide enough flexibility
+    in terms of modification, you can pass in a modifier_callback function and implement your own modification
+    algorthm. One thing to note is the function you pass in MUST accept a single argument as the line which
+    matches your search term will be passed in. Keep in mind the prepend, append, and modify will still run after
+    your modifier_callback runs. Your modifier callback will overwrite all lines that are passed into it so make
+    sure that you take into account that every match will be run through your modifier_callback and will be
+    overwritten with whatever your modifier_callback returns
 
     :param search_terms: List of search terms to search for.
     :type search_terms: list
@@ -170,6 +178,9 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
     :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
     :type replace_tuple: tuple or None
     :default replace_tuple: None
+    :param modifier_callback: User defined function to call whenever a line matches search terms, MUST accept a single argument as the matching line of config will be passed in.
+    :type modifier_callback: function
+    :default modifier_callback: None
     :param tree: The configuration tree to search. Do not specify this, its only used for recursion
     :type tree: dict or None
     :default tree: None
@@ -187,10 +198,13 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
         if matches_search_terms(key, search_terms, case_sensitive, full_match):
             # only capture results that are between the min/max search depth variables, 0 max is infinite
             if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+                if modifier_callback:
+                    key = modifier_callback(key)
                 data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
         elif isinstance(sub_tree, dict) and sub_tree:
             path = search_and_modify_config_tree(sub_tree, search_terms, case_sensitive, full_match, min_search_depth,
-                                                 max_search_depth, prepend_text, append_text, replace_tuple, _depth+1)
+                                                 max_search_depth, prepend_text, append_text, replace_tuple,
+                                                 modifier_callback, _depth+1)
             if path:
                 data[key] = path
     return data
@@ -256,7 +270,7 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
 
 def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                   max_search_depth=0, prepend_text='', append_text='',
-                                  replace_tuple=('', ''), _depth=0):
+                                  replace_tuple=('', ''), modifier_callback=None, _depth=0):
     """
     Searches the config tree for a set of search terms, and any match will be eligible for modification.
     Any line that DOES not match the search terms will still be returned, but not eligible to be modified by
@@ -280,6 +294,14 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
     is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
     "descrip", and the line is "description example" it WILL match.
 
+    Lastly if the integrated prepend, append, or replace functionality does not provide enough flexibility
+    in terms of modification, you can pass in a modifier_callback function and implement your own modification
+    algorthm. One thing to note is the function you pass in MUST accept a single argument as the line which
+    matches your search term will be passed in. Keep in mind the prepend, append, and modify will still run after
+    your modifier_callback runs. Your modifier callback will overwrite all lines that are passed into it so make
+    sure that you take into account that every match will be run through your modifier_callback and will be
+    overwritten with whatever your modifier_callback returns
+
     :param search_terms: List of search terms to search for.
     :type search_terms: list
     :param case_sensitive: Whether the search is case-sensitive.
@@ -297,6 +319,9 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
     :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
     :type replace_tuple: tuple or None
     :default replace_tuple: None
+    :param modifier_callback: User defined function to call whenever a line matches search terms, MUST accept a single argument as the matching line of config will be passed in.
+    :type modifier_callback: function
+    :default modifier_callback: None
     :param tree: The configuration tree to search. Do not specify this, its only used for recursion
     :type tree: dict or None
     :default tree: None
@@ -314,19 +339,22 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
         if matches_search_terms(key, search_terms, case_sensitive, full_match):
             # only capture results that are between the min/max search depth variables, 0 max is infinite
             if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+                if modifier_callback:
+                    key = modifier_callback(key)
                 data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
         else:
             data[key] = sub_tree
 
             if isinstance(sub_tree, dict) and sub_tree:
                 path = modify_config_tree_inline(sub_tree, search_terms, case_sensitive, full_match, min_search_depth,
-                                                     max_search_depth, prepend_text, append_text, replace_tuple, _depth+1)
+                                                     max_search_depth, prepend_text, append_text, replace_tuple,
+                                                 modifier_callback, _depth+1)
                 if path:
                     data[key] = path
     return data
 
 
-def extract_line_from_tree(tree, search_term, case_sensitive=True, full_match=False, find_all=False):
+def extract_line_from_tree(tree, search_term, case_sensitive=True, full_match=False, find_all=True):
     """
     Extracts the first (or all) occurances of "search_term" from "tree". Can specify case sensitive, and full
     match in the search

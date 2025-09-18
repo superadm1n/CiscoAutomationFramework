@@ -3,7 +3,7 @@ from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig,
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
 from CiscoAutomationFramework.util import (convert_config_tree_to_list, search_config_tree,
                                            search_and_modify_config_tree, tree_is_subset, trees_are_equal,
-                                           modify_config_tree_inline)
+                                           modify_config_tree_inline, extract_line_from_tree)
 from collections import OrderedDict
 
 
@@ -123,7 +123,7 @@ class ConfigParser:
 
     def search_and_modify_config_tree(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                       max_search_depth=0, prepend_text='', append_text='', replace_tuple=('',''),
-                                      tree=None):
+                                      modifier_callback=None,tree=None):
         """
         Searches the config tree for a set of search terms, and if specified will run each line that matches
         a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
@@ -140,6 +140,14 @@ class ConfigParser:
         a full or partial match. For example if I do a full match for "description" but the line of configuration
         is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
         "descrip", and the line is "description example" it WILL match.
+
+        Lastly if the integrated prepend, append, or replace functionality does not provide enough flexibility
+        in terms of modification, you can pass in a modifier_callback function and implement your own modification
+        algorthm. One thing to note is the function you pass in MUST accept a single argument as the line which
+        matches your search term will be passed in. Keep in mind the prepend, append, and modify will still run after
+        your modifier_callback runs. Your modifier callback will overwrite all lines that are passed into it so make
+        sure that you take into account that every match will be run through your modifier_callback and will be
+        overwritten with whatever your modifier_callback returns
 
         :param search_terms: List of search terms to search for.
         :type search_terms: list
@@ -158,6 +166,9 @@ class ConfigParser:
         :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
         :type replace_tuple: tuple or None
         :default replace_tuple: None
+        :param modifier_callback: User defined function to call whenever a line matches search terms, MUST accept a single argument as the matching line of config will be passed in.
+        :type modifier_callback: function
+        :default modifier_callback: None
         :param tree: The configuration tree to search. Do not specify this, its only used for recursion
         :type tree: dict or None
         :default tree: None
@@ -168,13 +179,13 @@ class ConfigParser:
         if not tree:
             tree = self.config_tree
         result_dict = search_and_modify_config_tree(tree, search_terms, case_sensitive, full_match, min_search_depth,
-                                             max_search_depth, prepend_text, append_text, replace_tuple)
+                                             max_search_depth, prepend_text, append_text, replace_tuple, modifier_callback)
 
         return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
 
     def modify_config_tree_inline(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                       max_search_depth=0, prepend_text='', append_text='', replace_tuple=('',''),
-                                      tree=None):
+                                      modifier_callback=None, tree=None):
         """
         Searches the config tree for a set of search terms, and if specified will run each line that matches
         a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
@@ -191,6 +202,14 @@ class ConfigParser:
         a full or partial match. For example if I do a full match for "description" but the line of configuration
         is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
         "descrip", and the line is "description example" it WILL match.
+
+        Lastly if the integrated prepend, append, or replace functionality does not provide enough flexibility
+        in terms of modification, you can pass in a modifier_callback function and implement your own modification
+        algorthm. One thing to note is the function you pass in MUST accept a single argument as the line which
+        matches your search term will be passed in. Keep in mind the prepend, append, and modify will still run after
+        your modifier_callback runs. Your modifier callback will overwrite all lines that are passed into it so make
+        sure that you take into account that every match will be run through your modifier_callback and will be
+        overwritten with whatever your modifier_callback returns
 
         :param search_terms: List of search terms to search for.
         :type search_terms: list
@@ -209,6 +228,9 @@ class ConfigParser:
         :param replace_tuple: A tuple (old_text, new_text) for replacing matches.
         :type replace_tuple: tuple or None
         :default replace_tuple: None
+        :param modifier_callback: User defined function to call whenever a line matches search terms, MUST accept a single argument as the matching line of config will be passed in.
+        :type modifier_callback: function
+        :default modifier_callback: None
         :param tree: The configuration tree to search. Do not specify this, its only used for recursion
         :type tree: dict or None
         :default tree: None
@@ -219,9 +241,17 @@ class ConfigParser:
         if not tree:
             tree = self.config_tree
         result_dict = modify_config_tree_inline(tree, search_terms, case_sensitive, full_match, min_search_depth,
-                                             max_search_depth, prepend_text, append_text, replace_tuple)
+                                             max_search_depth, prepend_text, append_text, replace_tuple, modifier_callback)
 
         return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
+
+    def extract_line_from_tree(self, search_term, case_sensitive=True, full_match=False, find_all=True):
+        """
+        Extracts the first (or all) occurances of "search_term" from "tree". Can specify case sensitive, and full
+        match in the search
+        """
+        return extract_line_from_tree(tree=self.config_tree, search_term=search_term, case_sensitive=case_sensitive,
+                                      full_match=full_match, find_all=find_all)
 
     def config_tree_to_list(self, tree=None, indent=0, indent_step=0):
         """
