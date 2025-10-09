@@ -1,4 +1,5 @@
 from ipaddress import ip_address, IPv4Network, AddressValueError
+from collections import OrderedDict
 
 
 def abbreviate_interface(interface_string, max_chars=2):
@@ -109,6 +110,54 @@ def matches_search_terms(key, search_terms, case_sensitive, full_match):
             if term in key:  # Partial match
                 return True
     return False
+
+
+def indented_text_to_tree(config):
+    """
+    Takes in a string/list that is formatted in a heiarchy by indents similar to below
+    line one
+     line two
+     line three
+      line four
+    line five
+
+    And parses it based on the indents, Can be arbitrary
+
+    This is used to parse the running/startup config. Also useful for parsing things like "show interfaces" output.
+    """
+    if type(config) == str:
+        config = config.splitlines()
+
+    tree = OrderedDict()
+    stack = [(0, tree)]  # (indent_level, node)
+
+    for line in config:
+        if not line.strip():
+            continue  # skip empty lines
+
+        text = line.lstrip()
+        indent = len(line) - len(text)
+
+        current_node = OrderedDict()
+
+        # If indent is 0, reset to root
+        if indent == 0:
+            parent = tree
+            stack = [(0, tree)]
+        else:
+            # Walk back up until we find a parent with less indent
+            while stack and stack[-1][0] >= indent:
+                stack.pop()
+
+            if not stack:
+                raise ValueError(f"Invalid indentation or format at line: {line}")
+
+            parent = stack[-1][1]
+
+        parent[text] = current_node
+        stack.append((indent, current_node))
+
+    return tree
 
 
 def convert_config_tree_to_list(tree, indent=0, indent_step=0):
@@ -352,6 +401,64 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
                 if path:
                     data[key] = path
     return data
+
+def get_config_sections(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0, max_search_depth=0, _depth=0):
+    """
+    Searches the configuration tree for section headers that match the given
+    search terms and returns the full path to root and the complete nested
+    section(s) under those matches. This works very similar to search_config_tree with the
+    exception that it will not only return the full path to root for any matches, but the
+    full nested path.
+
+
+    :param tree: Configuration tree to search
+    :type tree: dict
+    :param search_terms: Search term(s) (string, list, or tuple)
+    :type search_terms: str | list | tuple
+    :param case_sensitive: Whether the search is case-sensitive
+    :type case_sensitive: bool
+    :param full_match: If True, requires exact match; if False, allows partial matches
+    :type full_match: bool
+    :param min_search_depth: Minimum nesting level to include matches (0 = no restriction)
+    :type min_search_depth: int
+    :param max_search_depth: Maximum nesting level to include matches (0 = infinite)
+    :type max_search_depth: int
+    :param _depth: Internal recursion tracker (do not pass manually)
+    :type _depth: int
+
+    :return: Dictionary containing the full path to root and complete matched sections
+    :rtype: dict
+    """
+    if not isinstance(search_terms, (list, tuple)):
+        search_terms = [search_terms]
+
+    results = {}
+
+    for key, sub_tree in tree.items():
+        # If the key matches our search term(s)
+        if matches_search_terms(key, search_terms, case_sensitive, full_match):
+            if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+                # Return this full subtree
+                results[key] = sub_tree
+                # Skip recursion — entire subtree is already captured
+                continue
+
+        # Recurse into children if this is a nested dict
+        if isinstance(sub_tree, dict) and sub_tree:
+            nested = get_config_sections(
+                sub_tree,
+                search_terms,
+                case_sensitive=case_sensitive,
+                full_match=full_match,
+                min_search_depth=min_search_depth,
+                max_search_depth=max_search_depth,
+                _depth=_depth + 1
+            )
+            if nested:
+                # Preserve full path to root
+                results[key] = nested
+
+    return results
 
 
 def extract_line_from_tree(tree, search_term, case_sensitive=True, full_match=False, find_all=True):

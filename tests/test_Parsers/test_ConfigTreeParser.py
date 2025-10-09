@@ -196,7 +196,7 @@ class ConversionTests(TestCase):
     def test_converting_to_list_doesnt_return_full_config(self):
         '''Makes sure that the config parser will not return the full config when a match is not found'''
         new_parser = self.parser.search_config_tree('noexist')
-        self.assertNotEquals(self.parser.config_tree, new_parser.config_tree)
+        self.assertNotEqual(self.parser.config_tree, new_parser.config_tree)
 
 
 class EqualityParserTests(TestCase):

@@ -3,7 +3,8 @@ from CiscoAutomationFramework.Parsers.ConfigSectionTypes import InterfaceConfig,
 from CiscoAutomationFramework.Parsers.ConfigSectionObjects.StaticRoute import StaticRoute
 from CiscoAutomationFramework.util import (convert_config_tree_to_list, search_config_tree,
                                            search_and_modify_config_tree, tree_is_subset, trees_are_equal,
-                                           modify_config_tree_inline, extract_line_from_tree)
+                                           modify_config_tree_inline, extract_line_from_tree, get_config_sections,
+                                           indented_text_to_tree)
 from collections import OrderedDict
 
 
@@ -62,32 +63,7 @@ class ConfigParser:
         if self._config_tree:
             return self._config_tree
         else:
-            tree = OrderedDict()
-            stack = [(0, tree)]
-
-            for line in self.running_config:
-                if not line.strip():
-                    continue
-
-                text = line.lstrip()
-                indent = len(line) - len(text)
-
-                current_node = {}
-                # If we're at the top level (no indentation), always attach to root
-                if indent == 0:
-                    parent = tree
-                    stack = [(0, tree)]  # Reset stack to this level
-                else:
-                    while stack and stack[-1][0] >= indent:
-                        stack.pop()
-
-                    if not stack:
-                        raise ValueError(f"Invalid indentation or format at line: {line}")
-
-                    parent = stack[-1][1]
-
-                parent[text] = current_node
-                stack.append((indent, current_node))
+            tree = indented_text_to_tree(self.running_config)
             self._config_tree = tree
             return tree
 
@@ -243,6 +219,34 @@ class ConfigParser:
         result_dict = modify_config_tree_inline(tree, search_terms, case_sensitive, full_match, min_search_depth,
                                              max_search_depth, prepend_text, append_text, replace_tuple, modifier_callback)
 
+        return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
+
+    def get_config_sections(self, search_terms, case_sensitive=True, full_match=False, min_search_depth=0, max_search_depth=0, tree=None):
+        """
+           Searches the configuration tree for section headers that match the given
+           search terms and returns the full path to root and the complete nested
+           section(s) under those matches. This works very similar to search_config_tree with the
+           exception that it will not only return the full path to root for any matches, but the
+           full nested path.
+
+
+           :param search_terms: Search term(s) (string, list, or tuple)
+           :type search_terms: str | list | tuple
+           :param case_sensitive: Whether the search is case-sensitive
+           :type case_sensitive: bool
+           :param full_match: If True, requires exact match; if False, allows partial matches
+           :type full_match: bool
+           :param min_search_depth: Minimum nesting level to include matches (0 = no restriction)
+           :type min_search_depth: int
+           :param max_search_depth: Maximum nesting level to include matches (0 = infinite)
+           :type max_search_depth: int
+
+           :return: Config Parser with results of search
+           :rtype: ConfigParser
+           """
+        if not tree:
+            tree = self.config_tree
+        result_dict = get_config_sections(tree, search_terms, case_sensitive, full_match, min_search_depth, max_search_depth)
         return ConfigParser(self.config_tree_to_list(result_dict, indent_step=1))
 
     def extract_line_from_tree(self, search_term, case_sensitive=True, full_match=False, find_all=True):
