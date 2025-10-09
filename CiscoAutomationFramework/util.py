@@ -154,7 +154,7 @@ def indented_text_to_tree(config):
 
             parent = stack[-1][1]
 
-        parent[text] = current_node
+        parent[text.strip()] = current_node
         stack.append((indent, current_node))
 
     return tree
