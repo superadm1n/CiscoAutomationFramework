@@ -46,6 +46,9 @@ class ConfigParser:
             return False
         return trees_are_equal(other.config_tree, self.config_tree)
 
+    def __bool__(self):
+        return bool(self.config_tree)
+
     def __repr__(self):
         return '\n'.join(self.running_config)
 
