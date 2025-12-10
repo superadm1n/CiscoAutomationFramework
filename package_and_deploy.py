@@ -1,6 +1,6 @@
 import subprocess
-from os import listdir
-from os.path import isfile, isdir, join
+from os import listdir, rename
+from os.path import isfile, isdir, join, basename
 from shutil import rmtree
 from getpass import getpass
 
@@ -32,6 +32,11 @@ if __name__ == '__main__':
 
     print('Building!')
     subprocess.run('python setup.py sdist'.split())
+    print('Renaming tar.gz output file to all lowercase')
+    for file_path in files_in_dir(join(args.dir, 'dist')):
+        lowercase = file_path.replace(basename(file_path), basename(file_path).lower())
+        rename(file_path, lowercase)
+
     if input('Deploy to Pypi? [y/N]').lower().startswith('y'):
         key = getpass('Enter Pypi API key: ')
         p = subprocess.run(f'twine upload --username __token__ --password {key} dist/*'.split())
