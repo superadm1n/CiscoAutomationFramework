@@ -181,10 +181,10 @@ def convert_config_tree_to_list(tree, indent=0, indent_step=0):
             data.extend(convert_config_tree_to_list(subtree, indent + 1, indent_step))
     return data
 
-
 def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
                                   max_search_depth=0, prepend_text='', append_text='',
-                                  replace_tuple=('', ''), modifier_callback=None, _depth=0):
+                                  replace_tuple=('', ''), modifier_callback=None, prematch_extend_callback=None,
+                                  postmatch_extend_callback=None, _depth=0):
     """
     Searches the config tree for a set of search terms, and if specified will run each line that matches
     a search term through a modification algorithm to prepend, append, and find/replace specified text on that line.
@@ -202,13 +202,39 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
     is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
     "descrip", and the line is "description example" it WILL match.
 
-    Lastly if the integrated prepend, append, or replace functionality does not provide enough flexibility
+    If the integrated prepend, append, or replace functionality does not provide enough flexibility
     in terms of modification, you can pass in a modifier_callback function and implement your own modification
     algorthm. One thing to note is the function you pass in MUST accept a single argument as the line which
     matches your search term will be passed in. Keep in mind the prepend, append, and modify will still run after
     your modifier_callback runs. Your modifier callback will overwrite all lines that are passed into it so make
     sure that you take into account that every match will be run through your modifier_callback and will be
     overwritten with whatever your modifier_callback returns
+
+    If you need to add additional lines to the configuration before and/or after the match line you also have
+    the ability to pass in a "pre_extend_callback" to extend a single or multiple lines before the match line
+    and a "post_extend_callback" function to extend a single or multiple lines after the match line.
+    Both of these user defined functions MUST accept a single argument which will be the matched line, and
+    you may return a single string, list of strings, and tuple of strings to extend the config.
+    Unlike the modifier_callback, the integrated prepend, append, and find/replace features of this function
+    will NOT be applied to what is returned by the pre/post_extend_callback functions.
+
+    These functions are especially useful when generating change configuration where you need to "no" the
+    command and re apply it with different paramaters
+
+    Keep in mind when using the postmatch_extend_callback, if your match line has nested configuration under
+    it such as the following example matching "router bgp":
+    router bgp 65000
+     nested config1
+     nested config2
+      nested config3
+    and your post match callback returns "Post Match Line" it would come after the last line of nested config
+    on the same level as your match line such as below:
+
+    router bgp 65000
+     nested config1
+     nested config2
+      nested config3
+    Post Match Line
 
     :param search_terms: List of search terms to search for.
     :type search_terms: list
@@ -230,6 +256,10 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
     :param modifier_callback: User defined function to call whenever a line matches search terms, MUST accept a single argument as the matching line of config will be passed in.
     :type modifier_callback: function
     :default modifier_callback: None
+    :param prematch_extend_callback: User defined function to insert a line or multiple lines before the match line. User defined function may return string, list, or tuple.
+    :type prematch_extend_callback: function
+    :param postmatch_extend_callback: User defined function to insert a line or multiple lines after the match line. User defined function may return string, list, or tuple.
+    :type postmatch_extend_callback: function
     :param tree: The configuration tree to search. Do not specify this, its only used for recursion
     :type tree: dict or None
     :default tree: None
@@ -242,18 +272,71 @@ def search_and_modify_config_tree(tree, search_terms, case_sensitive=True, full_
         search_terms = [search_terms]
         # raise TypeError('search_terms MUST be a list or tuple')
 
-    data = {}
+    data = OrderedDict()
     for key, sub_tree in tree.items():
         if matches_search_terms(key, search_terms, case_sensitive, full_match):
-            # only capture results that are between the min/max search depth variables, 0 max is infinite
             if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
+
+                # Handle pre extend callback
+                before_lines = []
+                if prematch_extend_callback:
+                    result = prematch_extend_callback(key)
+
+                    if isinstance(result, str):
+                        before_lines.append(result)
+
+                    elif isinstance(result, list):
+                        before_lines.extend(result)
+
+                    elif isinstance(result, tuple):
+                        before_lines.extend(result)
+
+                    elif result is not None:
+                        raise TypeError("pre_extend_callback must return a string, list, or None")
+
+                # Handle modifier callback if defined
+                modified_line = key
                 if modifier_callback:
-                    key = modifier_callback(key)
-                data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
+                    result = modifier_callback(key)
+
+                    if not isinstance(result, str):
+                        raise TypeError("modifier_callback MUST return a single string")
+
+                    modified_line = result
+
+                # Handle post extend callback if defined
+                after_lines = []
+                if postmatch_extend_callback:
+                    result = postmatch_extend_callback(key)
+
+                    if isinstance(result, str):
+                        after_lines.append(result)
+
+                    elif isinstance(result, list):
+                        after_lines.extend(result)
+
+                    elif isinstance(result, tuple):
+                        after_lines.extend(result)
+
+                    elif result is not None:
+                        raise TypeError("post_extend_callback must return a string, list, or None")
+
+                # Construct config
+                for entry in before_lines:
+                    data[entry] = OrderedDict()
+
+                # Apply built-in modifications ONLY to the modified line
+                main_entry = f"{prepend_text}{modified_line.replace(*replace_tuple)}{append_text}"
+                data[main_entry] = sub_tree
+
+                for entry in after_lines:
+                    data[entry] = OrderedDict()
+
         elif isinstance(sub_tree, dict) and sub_tree:
             path = search_and_modify_config_tree(sub_tree, search_terms, case_sensitive, full_match, min_search_depth,
                                                  max_search_depth, prepend_text, append_text, replace_tuple,
-                                                 modifier_callback, _depth+1)
+                                                 modifier_callback, prematch_extend_callback, postmatch_extend_callback,
+                                                 _depth + 1)
             if path:
                 data[key] = path
     return data
@@ -318,8 +401,10 @@ def search_config_tree(tree, search_terms, case_sensitive=True, full_match=False
     return data
 
 def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0,
-                                  max_search_depth=0, prepend_text='', append_text='',
-                                  replace_tuple=('', ''), modifier_callback=None, _depth=0):
+                              max_search_depth=0, prepend_text='', append_text='',
+                              replace_tuple=('', ''), modifier_callback=None,
+                              prematch_extend_callback=None, postmatch_extend_callback=None,
+                              _depth=0):
     """
     Searches the config tree for a set of search terms, and any match will be eligible for modification.
     Any line that DOES not match the search terms will still be returned, but not eligible to be modified by
@@ -343,13 +428,40 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
     is "description example" it will NOT match. Also if I do a partial match (by setting full match to false) for
     "descrip", and the line is "description example" it WILL match.
 
-    Lastly if the integrated prepend, append, or replace functionality does not provide enough flexibility
+    If the integrated prepend, append, or replace functionality does not provide enough flexibility
     in terms of modification, you can pass in a modifier_callback function and implement your own modification
     algorthm. One thing to note is the function you pass in MUST accept a single argument as the line which
     matches your search term will be passed in. Keep in mind the prepend, append, and modify will still run after
     your modifier_callback runs. Your modifier callback will overwrite all lines that are passed into it so make
     sure that you take into account that every match will be run through your modifier_callback and will be
     overwritten with whatever your modifier_callback returns
+
+    If you need to add additional lines to the configuration before and/or after the match line you also have
+    the ability to pass in a "pre_extend_callback" to extend a single or multiple lines before the match line
+    and a "post_extend_callback" function to extend a single or multiple lines after the match line.
+    Both of these user defined functions MUST accept a single argument which will be the matched line, and
+    you may return a single string, list of strings, and tuple of strings to extend the config.
+    Unlike the modifier_callback, the integrated prepend, append, and find/replace features of this function
+    will NOT be applied to what is returned by the pre/post_extend_callback functions.
+
+    These functions are especially useful when generating change configuration where you need to "no" the
+    command and re apply it with different paramaters
+
+    Keep in mind when using the postmatch_extend_callback, if your match line has nested configuration under
+    it such as the following example matching "router bgp":
+    router bgp 65000
+     nested config1
+     nested config2
+      nested config3
+    and your post match callback returns "Post Match Line" it would come after the last line of nested config
+    on the same level as your match line such as below:
+
+    router bgp 65000
+     nested config1
+     nested config2
+      nested config3
+    Post Match Line
+
 
     :param search_terms: List of search terms to search for.
     :type search_terms: list
@@ -370,6 +482,10 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
     :default replace_tuple: None
     :param modifier_callback: User defined function to call whenever a line matches search terms, MUST accept a single argument as the matching line of config will be passed in.
     :type modifier_callback: function
+    :param prematch_extend_callback: User defined function to insert a line or multiple lines before the match line. User defined function may return string, list, or tuple.
+    :type prematch_extend_callback: function
+    :param postmatch_extend_callback: User defined function to insert a line or multiple lines after the match line. User defined function may return string, list, or tuple.
+    :type postmatch_extend_callback: function
     :default modifier_callback: None
     :param tree: The configuration tree to search. Do not specify this, its only used for recursion
     :type tree: dict or None
@@ -381,25 +497,69 @@ def modify_config_tree_inline(tree, search_terms, case_sensitive=True, full_matc
 
     if not any([isinstance(search_terms, x) for x in (list, tuple)]):
         search_terms = [search_terms]
-        # raise TypeError('search_terms MUST be a list or tuple')
 
-    data = {}
+    data = OrderedDict()
     for key, sub_tree in tree.items():
-        if matches_search_terms(key, search_terms, case_sensitive, full_match):
-            # only capture results that are between the min/max search depth variables, 0 max is infinite
-            if _depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth):
-                if modifier_callback:
-                    key = modifier_callback(key)
-                data[f'{prepend_text}{key.replace(*replace_tuple)}{append_text}'] = sub_tree
+
+        if matches_search_terms(key, search_terms, case_sensitive, full_match) \
+           and (_depth >= min_search_depth and (max_search_depth == 0 or _depth < max_search_depth)):
+
+            #handle pre extend if it is passed in
+            before_lines = []
+            if prematch_extend_callback:
+                result = prematch_extend_callback(key)
+                if isinstance(result, str):
+                    before_lines.append(result)
+                elif isinstance(result, (list, tuple)):
+                    before_lines.extend(result)
+                elif result is not None:
+                    raise TypeError("prematch_extend_callback must return string, list, tuple, or None")
+
+            # handle modifier if passed in
+            modified_line = key
+            if modifier_callback:
+                new_val = modifier_callback(key)
+                if not isinstance(new_val, str):
+                    raise TypeError("modifier_callback MUST return a string")
+                modified_line = new_val
+
+            # Apply built-in modifications ONLY to main modified line
+            main_entry = f"{prepend_text}{modified_line.replace(*replace_tuple)}{append_text}"
+
+            # handle post extend if it is passed in
+            after_lines = []
+            if postmatch_extend_callback:
+                result = postmatch_extend_callback(key)
+                if isinstance(result, str):
+                    after_lines.append(result)
+                elif isinstance(result, (list, tuple)):
+                    after_lines.extend(result)
+                elif result is not None:
+                    raise TypeError("postmatch_extend_callback must return string, list, tuple, or None")
+
+            # Order the lines correctly
+            for entry in before_lines:
+                data[entry] = OrderedDict()
+
+            data[main_entry] = sub_tree
+
+            for entry in after_lines:
+                data[entry] = OrderedDict()
+
         else:
+            # Non-matching line — return as-is
             data[key] = sub_tree
 
+            # Recurse downward if needed
             if isinstance(sub_tree, dict) and sub_tree:
-                path = modify_config_tree_inline(sub_tree, search_terms, case_sensitive, full_match, min_search_depth,
-                                                     max_search_depth, prepend_text, append_text, replace_tuple,
-                                                 modifier_callback, _depth+1)
-                if path:
-                    data[key] = path
+                data[key] = modify_config_tree_inline(
+                    sub_tree, search_terms, case_sensitive, full_match,
+                    min_search_depth, max_search_depth,
+                    prepend_text, append_text, replace_tuple,
+                    modifier_callback, prematch_extend_callback,
+                    postmatch_extend_callback, _depth + 1
+                )
+
     return data
 
 def get_config_sections(tree, search_terms, case_sensitive=True, full_match=False, min_search_depth=0, max_search_depth=0, _depth=0):

@@ -226,3 +226,165 @@ class EqualityParserTests(TestCase):
         t2['newkey'] = {}
         result = trees_are_equal(self.t1, t2)
         self.assertEqual(False, result)
+
+class SearchTests(TestCase):
+
+    def setUp(self):
+        self.parser = ConfigParser(canned_output)
+
+    def test_finds_nested(self):
+        expected = ConfigParser('template peer-session TEST\n remote-as 65100')
+        result = self.parser.search_config_tree('remote-as 65100')
+        self.assertEqual(result, expected)
+
+class SearchModifyTests(TestCase):
+
+    def setUp(self):
+        self.parser = ConfigParser(canned_output)
+
+    def test_prematch_extends_single(self):
+        def prematch(line):
+            return 'before'
+
+        expected = ConfigParser('template peer-session TEST\n before\n remote-as 65100')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', prematch_extend_callback=prematch)
+        self.assertEqual(result, expected)
+
+    def test_prematch_extends_multipe(self):
+        def prematch(line):
+            return 'before1', 'before2'
+
+        expected = ConfigParser('template peer-session TEST\n before1\n before2\n remote-as 65100')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', prematch_extend_callback=prematch)
+        self.assertEqual(result, expected)
+
+    def test_prematch_doesnt_have_builtins_run_on_it(self):
+        def prematch(line):
+            return 'before'
+
+        expected = ConfigParser('template peer-session TEST\n before\n no remote-as 65100')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', prematch_extend_callback=prematch, prepend_text='no ')
+        self.assertEqual(result, expected)
+
+    def test_postmatch_extends_single(self):
+        def postmatch(line):
+            return 'before'
+
+        expected = ConfigParser('template peer-session TEST\n before\n remote-as 65100')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', postmatch_extend_callback=postmatch)
+        self.assertEqual(result, expected)
+
+    def test_postmatch_extends_multipe(self):
+        def postmatch(line):
+            return 'before1', 'before2'
+
+        expected = ConfigParser('template peer-session TEST\n before1\n before2\n remote-as 65100')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', postmatch_extend_callback=postmatch)
+        self.assertEqual(result, expected)
+
+    def test_postmatch_doesnt_have_builtins_run_on_it(self):
+        def postmatch(line):
+            return 'before'
+
+        expected = ConfigParser('template peer-session TEST\n before\n no remote-as 65100')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', postmatch_extend_callback=postmatch, prepend_text='no ')
+        self.assertEqual(result, expected)
+
+    def test_modifier_does_change(self):
+        def mod(line):
+            return line.replace('65100', 'CHANGED')
+
+        expected = ConfigParser('template peer-session TEST\n remote-as CHANGED')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', modifier_callback=mod)
+        self.assertEqual(expected, result)
+
+    def test_modifier_has_builtins_run_on_it(self):
+        def mod(line):
+            return line.replace('65100', 'CHANGED')
+
+        expected = ConfigParser('template peer-session TEST\n Builtin remote-as CHANGED')
+        result = self.parser.search_and_modify_config_tree('remote-as 65100', modifier_callback=mod, prepend_text='Builtin ')
+        self.assertEqual(expected, result)
+
+
+
+class InlineModifyTests(TestCase):
+    def setUp(self):
+        cfg = '''router bgp 65000
+ template peer-policy TEST
+  route-map INBOUND_RM in
+  route-map OUTBOUND_RM out
+ exit-peer-policy
+ !'''
+
+        self.parser = ConfigParser(cfg)
+
+    def test_prematch_extends_single(self):
+        def pre(line):
+            return f'no {line}'
+        result = self.parser.modify_config_tree_inline('router bgp 65000', prematch_extend_callback=pre)
+        expected = ConfigParser('no router bgp 65000\nrouter bgp 65000\n template peer-policy TEST\n  route-map INBOUND_RM in\n  route-map OUTBOUND_RM out\n exit-peer-policy\n !')
+        self.assertEqual(result, expected)
+
+    def test_prematch_extends_multiple(self):
+        def pre(line):
+            return f'no {line}', f'I said no {line}'
+
+        result = self.parser.modify_config_tree_inline('router bgp 65000', prematch_extend_callback=pre)
+        expected = ConfigParser(
+            'no router bgp 65000\nI said no router bgp 65000\nrouter bgp 65000\n template peer-policy TEST\n  route-map INBOUND_RM in\n  route-map OUTBOUND_RM out\n exit-peer-policy\n !')
+        self.assertEqual(result, expected)
+
+    def test_postmatch_extends_single(self):
+        """
+        It is expected that postmatch function will be added AFTER all nested config that
+        is related to the match line
+        for example:
+        router bgp 65000
+         line1
+         line2
+
+         if you match router bgp and do a postmatch, it will be after line2 assuming that lin2 is the last line
+         of config that is nested. So if your postmatch returns 'postmatch line', you would get the fillowing
+         router bgp 65000
+          line1
+          line2
+         postmatch line
+
+        """
+        def post(line):
+            return '!line1'
+
+        result = self.parser.modify_config_tree_inline('router bgp 65000', postmatch_extend_callback=post)
+        expected = ConfigParser(
+            'router bgp 65000\n template peer-policy TEST\n  route-map INBOUND_RM in\n  route-map OUTBOUND_RM out\n exit-peer-policy\n !\n!line1')
+        self.assertEqual(result, expected)
+
+    def test_postmatch_extends_multiple(self):
+        def post(line):
+            return '!line1', '!line2'
+
+        result = self.parser.modify_config_tree_inline('router bgp 65000', postmatch_extend_callback=post)
+        expected = ConfigParser(
+            'router bgp 65000\n template peer-policy TEST\n  route-map INBOUND_RM in\n  route-map OUTBOUND_RM out\n exit-peer-policy\n !\n!line1\n!line2')
+        self.assertEqual(result, expected)
+
+    def test_modifier_does_change(self):
+        def mod(line):
+            return f'{line} modified'
+
+        result = self.parser.modify_config_tree_inline('router bgp 65000', modifier_callback=mod)
+        expected = ConfigParser(
+            'router bgp 65000 modified\n template peer-policy TEST\n  route-map INBOUND_RM in\n  route-map OUTBOUND_RM out\n exit-peer-policy\n !')
+        self.assertEqual(result, expected)
+
+    def test_builtins_run_on_modifier_output(self):
+        def mod(line):
+            return f'{line} callback'
+
+        result = self.parser.modify_config_tree_inline('router bgp 65000', modifier_callback=mod,
+                                                       replace_tuple=('65000', 'REPLACE'),
+                                                       prepend_text='prepend ', append_text=' append')
+        expected = ConfigParser(
+            'prepend router bgp REPLACE callback append\n template peer-policy TEST\n  route-map INBOUND_RM in\n  route-map OUTBOUND_RM out\n exit-peer-policy\n !')
+        self.assertEqual(result, expected)
