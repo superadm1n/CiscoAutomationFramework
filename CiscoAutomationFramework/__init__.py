@@ -13,6 +13,8 @@ from CiscoAutomationFramework.Exceptions import (
     ParserError,
 )
 
+__version__ = '1.2.0'
+
 
 def connect_ssh(ip, username, password, port=22, enable_password=None, timeout=10, engine=SSHEngine, jumphost=None) -> CiscoFirmware:
     """
