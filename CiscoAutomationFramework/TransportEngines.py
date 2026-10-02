@@ -1,5 +1,14 @@
-from CiscoAutomationFramework.Exceptions import AuthenticationException, ForbiddenError
+from CiscoAutomationFramework.Exceptions import (
+    AuthenticationException,
+    ForbiddenError,
+    JumpHostAuthenticationException,
+    DeviceAuthenticationException,
+    JumpHostConnectionException,
+    JumpHostTunnelException,
+)
+import paramiko
 from paramiko import SSHClient, AutoAddPolicy
+import socket
 from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 from time import sleep
@@ -162,7 +171,10 @@ class BaseEngine(ABC):
             data = self._get_output(100)
             output += data
             if '% Authorization failed.' in output:
-                raise AuthenticationException('% Authorization failed.')
+                raise DeviceAuthenticationException(
+                    "% Authorization failed on network device.",
+                    ip=getattr(self, 'hostname', None) or ''
+                )
         prompt = self._prompt_lookup(output)
 
         # prompt = data.splitlines()[-1].strip()
@@ -188,7 +200,7 @@ class BaseEngine(ABC):
         return False
 
     @abstractmethod
-    def connect_to_server(self, ip, username, password, port) -> bool:
+    def connect_to_server(self, ip, username, password, port, jumphost=None) -> bool:
         pass
 
     @abstractmethod
@@ -204,6 +216,131 @@ class BaseEngine(ABC):
         pass
 
 
+class JumpHost:
+    """
+    Represents an SSH jump host (bastion server) used to transparently tunnel
+    SSH connections to remote network devices via a direct-tcpip channel.
+
+    Supports password authentication, SSH private keys (file path or PKey object),
+    passphrases, and custom SSH ports/timeouts.
+    """
+
+    def __init__(self, ip, username, password=None, port=22,
+                 key_filename=None, pkey=None, passphrase=None,
+                 timeout=10, look_for_keys=None, allow_agent=None, **kwargs):
+        self.ip = ip
+        self.username = username
+        self.password = password
+        self.port = port
+        self.key_filename = key_filename
+        self.pkey = pkey
+        self.passphrase = passphrase
+        self.timeout = timeout
+
+        if look_for_keys is None:
+            self.look_for_keys = False if (password and not (key_filename or pkey)) else True
+        else:
+            self.look_for_keys = look_for_keys
+
+        if allow_agent is None:
+            self.allow_agent = False if (password and not (key_filename or pkey)) else True
+        else:
+            self.allow_agent = allow_agent
+
+        self.kwargs = kwargs
+
+    def __repr__(self):
+        return f"JumpHost({self.username}@{self.ip}:{self.port})"
+
+    def connect(self) -> SSHClient:
+        """
+        Establishes an SSH connection to the jump host and returns an active SSHClient.
+
+        :return: Connected Paramiko SSHClient
+        :rtype: paramiko.SSHClient
+        :raises CiscoAutomationFramework.Exceptions.JumpHostAuthenticationException:
+            If credentials (password or SSH key) are rejected by the jump host.
+        :raises CiscoAutomationFramework.Exceptions.JumpHostConnectionException:
+            If connecting to the jump host fails (e.g. timeout, connection refused, or network unreachable).
+        """
+        client = SSHClient()
+        client.set_missing_host_key_policy(AutoAddPolicy())
+        connect_kwargs = {
+            'hostname': self.ip,
+            'port': self.port,
+            'username': self.username,
+            'password': self.password,
+            'key_filename': self.key_filename,
+            'pkey': self.pkey,
+            'passphrase': self.passphrase,
+            'timeout': self.timeout,
+            'look_for_keys': self.look_for_keys,
+            'allow_agent': self.allow_agent,
+        }
+        connect_kwargs.update(self.kwargs)
+        try:
+            client.connect(**connect_kwargs)
+            return client
+        except paramiko.AuthenticationException as err:
+            raise JumpHostAuthenticationException(
+                f"Authentication failed on jump host '{self.username}@{self.ip}:{self.port}'.",
+                jumphost=self
+            ) from err
+        except (socket.error, paramiko.SSHException, TimeoutError) as err:
+            raise JumpHostConnectionException(
+                f"Failed to connect to jump host '{self.ip}:{self.port}': {err}",
+                jumphost=self
+            ) from err
+
+    def open_channel(self, client, dest_ip, dest_port=22):
+        """
+        Opens a direct-tcpip forwarding channel through the jump host to the destination.
+
+        :param client: Connected SSHClient for the jump host
+        :type client: paramiko.SSHClient
+        :param dest_ip: Target destination IP address or hostname
+        :type dest_ip: str
+        :param dest_port: Target destination TCP port (default 22)
+        :type dest_port: int
+        :return: Forwarding channel
+        :rtype: paramiko.Channel
+        :raises CiscoAutomationFramework.Exceptions.JumpHostConnectionException:
+            If the jump host transport is missing or inactive.
+        :raises CiscoAutomationFramework.Exceptions.JumpHostTunnelException:
+            If opening the direct-tcpip channel fails.
+        """
+        transport = client.get_transport()
+        if transport is None or not transport.is_active():
+            raise JumpHostConnectionException(
+                f"No active transport on jump host '{self.ip}:{self.port}'.",
+                jumphost=self
+            )
+        try:
+            channel = transport.open_channel(
+                kind='direct-tcpip',
+                dest_addr=(dest_ip, dest_port),
+                src_addr=('127.0.0.1', 0),
+                timeout=self.timeout
+            )
+        except paramiko.SSHException as err:
+            raise JumpHostTunnelException(
+                f"Failed to open forwarding channel through jump host '{self.ip}' to '{dest_ip}:{dest_port}': {err}",
+                jumphost=self,
+                dest_ip=dest_ip,
+                dest_port=dest_port
+            ) from err
+
+        if channel is None:
+            raise JumpHostTunnelException(
+                f"Failed to open direct-tcpip channel through jump host '{self.ip}' to '{dest_ip}:{dest_port}'. "
+                f"Check network reachability and sshd 'AllowTcpForwarding' on the jump host.",
+                jumphost=self,
+                dest_ip=dest_ip,
+                dest_port=dest_port
+            )
+        return channel
+
+
 class SSHEngine(BaseEngine):
 
     def __init__(self):
@@ -213,16 +350,68 @@ class SSHEngine(BaseEngine):
         self.shell = None
         self.timeout = 10
         self._pre_jumphost_hostname = ''
+        self.jump_client = None
+        self.jump_channel = None
+        self.tunnel_jumphost = None
 
     @property
     def _in_jumphost(self):
         return self._pre_jumphost_hostname != self.hostname
 
-    def connect_to_server(self, ip, username, password, port):
-        self.client.connect(hostname=ip, port=port, username=username, password=password, timeout=self.timeout)
-        self.shell = self.client.invoke_shell()
-        self.prompt, self.hostname = self._get_prompt_and_hostname()
-        self._pre_jumphost_hostname = self.hostname
+    def connect_to_server(self, ip, username, password, port=22, jumphost=None):
+        """
+        Establishes SSH connection to the remote server, optionally tunneled via a JumpHost.
+
+        :param ip: Target device IP or hostname
+        :type ip: str
+        :param username: Target device username
+        :type username: str
+        :param password: Target device password
+        :type password: str
+        :param port: Target device port (default 22)
+        :type port: int
+        :param jumphost: Optional JumpHost or dict for bastion tunneling
+        :type jumphost: JumpHost or dict
+        :raises CiscoAutomationFramework.Exceptions.JumpHostAuthenticationException:
+            If authentication to the jump host fails.
+        :raises CiscoAutomationFramework.Exceptions.JumpHostConnectionException:
+            If connecting to the jump host fails.
+        :raises CiscoAutomationFramework.Exceptions.JumpHostTunnelException:
+            If opening the forwarding channel through the jump host fails.
+        :raises CiscoAutomationFramework.Exceptions.DeviceAuthenticationException:
+            If authentication to the destination device fails.
+        """
+        sock = None
+        if jumphost is not None:
+            if isinstance(jumphost, dict):
+                jumphost = JumpHost(**jumphost)
+            elif not isinstance(jumphost, JumpHost):
+                raise TypeError(f'jumphost must be an instance of JumpHost or dict, got {type(jumphost)}')
+
+            self.tunnel_jumphost = jumphost
+            try:
+                self.jump_client = jumphost.connect()
+                self.jump_channel = jumphost.open_channel(self.jump_client, ip, port)
+                sock = self.jump_channel
+            except Exception:
+                self._cleanup_jumphost()
+                raise
+
+        try:
+            self.client.connect(hostname=ip, port=port, username=username, password=password, timeout=self.timeout, sock=sock)
+            self.shell = self.client.invoke_shell()
+            self.prompt, self.hostname = self._get_prompt_and_hostname()
+            self._pre_jumphost_hostname = self.hostname
+        except paramiko.AuthenticationException as err:
+            self.close_connection()
+            raise DeviceAuthenticationException(
+                f"Authentication failed on network device '{ip}' for user '{username}'.",
+                ip=ip,
+                username=username
+            ) from err
+        except Exception:
+            self.close_connection()
+            raise
 
     def jumphost(self, ip, password, username=None, port=None, ssh_ver=None, vrf=None):
         command_string = 'ssh '
@@ -248,16 +437,41 @@ class SSHEngine(BaseEngine):
             self.prompt, self.hostname = self._get_prompt_and_hostname()
 
     def _get_output(self, buffer_size):
-        if self.shell.recv_ready():
+        if self.shell and self.shell.recv_ready():
             return bytes.decode(self.shell.recv(buffer_size))
         return ''
 
     def _send_command(self, command, end='\n'):
-        self.shell.send(f'{command}{end}')
+        if self.shell:
+            self.shell.send(f'{command}{end}')
+
+    def _cleanup_jumphost(self):
+        if self.jump_channel:
+            try:
+                self.jump_channel.close()
+            except Exception:
+                pass
+            self.jump_channel = None
+        if self.jump_client:
+            try:
+                self.jump_client.close()
+            except Exception:
+                pass
+            self.jump_client = None
 
     def close_connection(self):
         self.exit_jumphost()
-        self.client.close()
+        if self.shell:
+            try:
+                self.shell.close()
+            except Exception:
+                pass
+        if self.client:
+            try:
+                self.client.close()
+            except Exception:
+                pass
+        self._cleanup_jumphost()
 
 
 class ReadOnlySSHEngine(SSHEngine):

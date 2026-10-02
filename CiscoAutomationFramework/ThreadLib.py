@@ -5,7 +5,7 @@ from CiscoAutomationFramework.TransportEngines import SSHEngine, ReadOnlySSHEngi
 from abc import ABC, abstractmethod
 
 
-__all__ = ['SSH', 'ReadOnlySSH', 'SSHSplitDeviceType']
+__all__ = ['SSH', 'ReadOnlySSH', 'SSHSplitDeviceType', 'start_threads']
 
 
 class SSH(Thread, ABC):
@@ -23,7 +23,7 @@ class SSH(Thread, ABC):
 
     """
 
-    def __init__(self, ip, username, password, enable_password=None, perform_secondary_action=False, **kwargs):
+    def __init__(self, ip, username, password, enable_password=None, perform_secondary_action=False, jumphost=None, **kwargs):
         """
 
         :param ip: IP address of device
@@ -36,6 +36,8 @@ class SSH(Thread, ABC):
         :type enable_password: str
         :param perform_secondary_action: True/False to execute secondary_action method when logged in
         :type perform_secondary_action: bool
+        :param jumphost: Optional JumpHost object or dict to tunnel connection through
+        :type jumphost: JumpHost or dict
         """
         super().__init__()
         self.ip = ip
@@ -43,9 +45,11 @@ class SSH(Thread, ABC):
         self.password = password
         self.enable_password = enable_password
         self.perform_secondary_action = perform_secondary_action
+        self.jumphost = jumphost
         self.hostname = ''
         self.commands_sent = []
         self.is_nexus = False
+        self.error = None
 
     def during_login(self, ssh):
         """
@@ -90,15 +94,18 @@ class SSH(Thread, ABC):
         return SSHEngine
 
     def run(self) -> None:
-
-        with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password, engine=self._ssh_engine) as ssh:
-            self.is_nexus = ssh.is_nexus
-            self.hostname = ssh.hostname
-            self.during_login(ssh)
-            if self.perform_secondary_action:
-                self.secondary_action(ssh)
-                self.post_secondary_action(ssh)
-            self.commands_sent = ssh.commands_sent
+        try:
+            with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password, engine=self._ssh_engine, jumphost=self.jumphost) as ssh:
+                self.is_nexus = ssh.is_nexus
+                self.hostname = ssh.hostname
+                self.during_login(ssh)
+                if self.perform_secondary_action:
+                    self.secondary_action(ssh)
+                    self.post_secondary_action(ssh)
+                self.commands_sent = ssh.commands_sent
+        except Exception as exc:
+            self.error = exc
+            raise
 
 
 class ReadOnlySSH(SSH):
@@ -254,18 +261,38 @@ class SSHSplitDeviceType(SSH):
             self.ios_post_secondary_action(ssh)
 
 
+def _is_jumphost_config_dict(d):
+    return isinstance(d, dict) and ('ip' in d or 'hostname' in d) and 'username' in d
+
+
+def _resolve_jumphost(jumphost, ip, index):
+    if jumphost is None:
+        return None
+    if callable(jumphost):
+        return jumphost(ip)
+    if _is_jumphost_config_dict(jumphost):
+        return jumphost
+    if isinstance(jumphost, dict):
+        return jumphost.get(ip)
+    if isinstance(jumphost, (list, tuple)):
+        if index < len(jumphost):
+            return jumphost[index]
+        return None
+    return jumphost
+
+
 def start_threads(object, ips, username, password, enable_password=None,
-                  perform_secondary_action=False, wait_for_threads=False, **kwargs):
+                  perform_secondary_action=False, wait_for_threads=False, jumphost=None, **kwargs):
 
     """
     This helper function is a quick and easy way to start your threads. Gives you an option for waiting for threads
     to complete also.
     It will return the thread objects from the function for further processing by the main thread.
 
-    :param object: Object you have written to perform your task. Must be inherted from SSH or SSHSplitDeviceType
+    :param object: Object you have written to perform your task. Must be inherited from SSH or SSHSplitDeviceType
     :type object: [SSH, SSHSplitDeviceType]
-    :param ips: List of IP addresses or hostnames to run your worker object against
-    :type ips: list[str]
+    :param ips: List of IP addresses, hostnames, or (ip, jumphost) tuples to run your worker object against
+    :type ips: list[str] or list[tuple[str, JumpHost]]
     :param username: Username to login with
     :type username: str
     :param password: Password for user
@@ -276,17 +303,40 @@ def start_threads(object, ips, username, password, enable_password=None,
     :type perform_secondary_action: bool
     :param wait_for_threads: Wait for all threads to complete before returning
     :type wait_for_threads: bool
+    :param jumphost: Optional JumpHost, dict, dict mapping {ip: JumpHost}, list matching ips, or callable(ip)
+    :type jumphost: JumpHost, dict, list, or callable
     :param kwargs: Keyword arguments to be passed to your object. If your child class accepts additional arguments, pass them to the object via keyword arguments here.
     :return: List of threads either running or completed depending on if wait_for_threads is True/False
     :rtype: list[SSH, SSHSplitDeviceType, type(object)]
     """
 
     if not issubclass(object, SSH):
-        raise TypeError('object MUST be a subclass of ThreadedSSH!')
+        raise TypeError('object MUST be a subclass of SSH!')
+
+    if jumphost is None and 'jumphost' in kwargs:
+        jumphost = kwargs.pop('jumphost')
 
     # Instantiate thread objects and start them
-    threads = [object(ip=ip, username=username, password=password, enable_password=enable_password,
-                      perform_secondary_action=perform_secondary_action, **kwargs) for ip in ips]
+    threads = []
+    for idx, item in enumerate(ips):
+        if isinstance(item, (tuple, list)) and len(item) == 2 and not isinstance(item, str):
+            ip, thread_jumphost = item
+        else:
+            ip = item
+            thread_jumphost = _resolve_jumphost(jumphost, ip, idx)
+
+        threads.append(
+            object(
+                ip=ip,
+                username=username,
+                password=password,
+                enable_password=enable_password,
+                perform_secondary_action=perform_secondary_action,
+                jumphost=thread_jumphost,
+                **kwargs
+            )
+        )
+
     for thread in threads:
         thread.start()
 
