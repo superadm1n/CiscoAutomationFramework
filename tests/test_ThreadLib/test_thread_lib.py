@@ -116,6 +116,28 @@ class TestSSHClass(TestCase):
         )
 
     @patch('CiscoAutomationFramework.ThreadLib.connect_ssh')
+    def test_ssh_run_passes_key_auth(self, mock_connect_ssh):
+        mock_ctx = MagicMock()
+        mock_device = MagicMock()
+        mock_device.is_nexus = False
+        mock_device.hostname = 'switch1'
+        mock_device.commands_sent = []
+        mock_ctx.__enter__.return_value = mock_device
+        mock_connect_ssh.return_value = mock_ctx
+
+        worker = DummySSH('10.1.1.1', 'admin', key_filename='/path/to/key.pem', passphrase='secret')
+        worker.run()
+
+        mock_connect_ssh.assert_called_once_with(
+            '10.1.1.1', 'admin', None,
+            enable_password=None,
+            engine=SSHEngine,
+            jumphost=None,
+            key_filename='/path/to/key.pem',
+            passphrase='secret'
+        )
+
+    @patch('CiscoAutomationFramework.ThreadLib.connect_ssh')
     def test_ssh_run_captures_error(self, mock_connect_ssh):
         from CiscoAutomationFramework.Exceptions import DeviceAuthenticationException
         auth_err = DeviceAuthenticationException("Login failed", ip='10.1.1.1', username='admin')
@@ -129,6 +151,19 @@ class TestSSHClass(TestCase):
 
 
 class TestStartThreads(TestCase):
+
+    @patch.object(DummySSH, 'start')
+    def test_start_threads_with_key_filename(self, mock_start):
+        threads = start_threads(
+            DummySSH, ['10.1.1.1'], 'admin',
+            key_filename='/path/to/key.pem', passphrase='pass'
+        )
+        self.assertEqual(len(threads), 1)
+        self.assertIsNone(threads[0].password)
+        self.assertEqual(threads[0].key_filename, '/path/to/key.pem')
+        self.assertEqual(threads[0].passphrase, 'pass')
+        self.assertFalse(threads[0].look_for_keys)
+        self.assertFalse(threads[0].allow_agent)
 
     @patch.object(DummySSH, 'start')
     def test_start_threads_no_jumphost(self, mock_start):
@@ -211,3 +246,78 @@ class TestConnectSSH(TestCase):
             created_instances[0].recorded_call,
             ('10.1.1.1', 'admin', 'pass', 22, jh)
         )
+
+    @patch('CiscoAutomationFramework.detect_firmware')
+    def test_connect_ssh_passes_key_auth_params(self, mock_detect_firmware):
+        mock_firmware_class = MagicMock()
+        mock_detect_firmware.return_value = mock_firmware_class
+
+        class KeyRecordingEngine(SSHEngine):
+            def __init__(self):
+                self.enable_password = None
+                self.timeout = 10
+                self.recorded_kwargs = None
+
+            def connect_to_server(self, ip, username, password=None, **kwargs):
+                self.recorded_kwargs = (ip, username, password, kwargs)
+
+        created_instances = []
+        original_init = KeyRecordingEngine.__init__
+
+        def tracked_init(self, *args, **kwargs):
+            original_init(self, *args, **kwargs)
+            created_instances.append(self)
+
+        KeyRecordingEngine.__init__ = tracked_init
+
+        connect_ssh(
+            '10.1.1.1', 'admin',
+            key_filename='/path/to/key.pem',
+            passphrase='secret',
+            engine=KeyRecordingEngine
+        )
+
+        self.assertEqual(len(created_instances), 1)
+        ip, user, pw, kwargs = created_instances[0].recorded_kwargs
+        self.assertEqual(ip, '10.1.1.1')
+        self.assertEqual(user, 'admin')
+        self.assertIsNone(pw)
+        self.assertEqual(kwargs['key_filename'], '/path/to/key.pem')
+        self.assertEqual(kwargs['passphrase'], 'secret')
+        self.assertFalse(kwargs['look_for_keys'])
+        self.assertFalse(kwargs['allow_agent'])
+
+    @patch('CiscoAutomationFramework.detect_firmware')
+    def test_connect_ssh_passes_explicit_look_for_keys(self, mock_detect_firmware):
+        mock_firmware_class = MagicMock()
+        mock_detect_firmware.return_value = mock_firmware_class
+
+        class FlagRecordingEngine(SSHEngine):
+            def __init__(self):
+                self.enable_password = None
+                self.timeout = 10
+                self.recorded_kwargs = None
+
+            def connect_to_server(self, ip, username, password=None, **kwargs):
+                self.recorded_kwargs = kwargs
+
+        created_instances = []
+        original_init = FlagRecordingEngine.__init__
+
+        def tracked_init(self, *args, **kwargs):
+            original_init(self, *args, **kwargs)
+            created_instances.append(self)
+
+        FlagRecordingEngine.__init__ = tracked_init
+
+        connect_ssh(
+            '10.1.1.1', 'admin', 'pw',
+            look_for_keys=True,
+            allow_agent=True,
+            engine=FlagRecordingEngine
+        )
+
+        self.assertEqual(len(created_instances), 1)
+        kwargs = created_instances[0].recorded_kwargs
+        self.assertTrue(kwargs['look_for_keys'])
+        self.assertTrue(kwargs['allow_agent'])

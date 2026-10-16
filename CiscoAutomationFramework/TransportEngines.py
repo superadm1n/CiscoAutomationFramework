@@ -200,7 +200,9 @@ class BaseEngine(ABC):
         return False
 
     @abstractmethod
-    def connect_to_server(self, ip, username, password, port, jumphost=None) -> bool:
+    def connect_to_server(self, ip, username, password=None, port=22, jumphost=None,
+                          key_filename=None, pkey=None, passphrase=None,
+                          look_for_keys=False, allow_agent=False, **kwargs) -> bool:
         pass
 
     @abstractmethod
@@ -238,12 +240,12 @@ class JumpHost:
         self.timeout = timeout
 
         if look_for_keys is None:
-            self.look_for_keys = False if (password and not (key_filename or pkey)) else True
+            self.look_for_keys = False
         else:
             self.look_for_keys = look_for_keys
 
         if allow_agent is None:
-            self.allow_agent = False if (password and not (key_filename or pkey)) else True
+            self.allow_agent = False
         else:
             self.allow_agent = allow_agent
 
@@ -353,12 +355,16 @@ class SSHEngine(BaseEngine):
         self.jump_client = None
         self.jump_channel = None
         self.tunnel_jumphost = None
+        self.look_for_keys = False
+        self.allow_agent = False
 
     @property
     def _in_jumphost(self):
         return self._pre_jumphost_hostname != self.hostname
 
-    def connect_to_server(self, ip, username, password, port=22, jumphost=None):
+    def connect_to_server(self, ip, username, password=None, port=22, jumphost=None,
+                          key_filename=None, pkey=None, passphrase=None,
+                          look_for_keys=None, allow_agent=None, **kwargs):
         """
         Establishes SSH connection to the remote server, optionally tunneled via a JumpHost.
 
@@ -366,12 +372,22 @@ class SSHEngine(BaseEngine):
         :type ip: str
         :param username: Target device username
         :type username: str
-        :param password: Target device password
-        :type password: str
+        :param password: Target device password (optional if key_filename or pkey is provided)
+        :type password: str or None
         :param port: Target device port (default 22)
         :type port: int
         :param jumphost: Optional JumpHost or dict for bastion tunneling
         :type jumphost: JumpHost or dict
+        :param key_filename: Path to private key file for SSH key authentication
+        :type key_filename: str or None
+        :param pkey: Paramiko PKey object for SSH key authentication
+        :type pkey: paramiko.PKey or None
+        :param passphrase: Passphrase for decrypting the private key
+        :type passphrase: str or None
+        :param look_for_keys: Whether to search ~/.ssh/ for keys (default False)
+        :type look_for_keys: bool
+        :param allow_agent: Whether to query SSH agent for keys (default False)
+        :type allow_agent: bool
         :raises CiscoAutomationFramework.Exceptions.JumpHostAuthenticationException:
             If authentication to the jump host fails.
         :raises CiscoAutomationFramework.Exceptions.JumpHostConnectionException:
@@ -381,6 +397,11 @@ class SSHEngine(BaseEngine):
         :raises CiscoAutomationFramework.Exceptions.DeviceAuthenticationException:
             If authentication to the destination device fails.
         """
+        if look_for_keys is None:
+            look_for_keys = self.look_for_keys
+        if allow_agent is None:
+            allow_agent = self.allow_agent
+
         sock = None
         if jumphost is not None:
             if isinstance(jumphost, dict):
@@ -397,8 +418,23 @@ class SSHEngine(BaseEngine):
                 self._cleanup_jumphost()
                 raise
 
+        connect_kwargs = {
+            'hostname': ip,
+            'port': port,
+            'username': username,
+            'password': password,
+            'key_filename': key_filename,
+            'pkey': pkey,
+            'passphrase': passphrase,
+            'timeout': self.timeout,
+            'look_for_keys': look_for_keys,
+            'allow_agent': allow_agent,
+            'sock': sock,
+        }
+        connect_kwargs.update(kwargs)
+
         try:
-            self.client.connect(hostname=ip, port=port, username=username, password=password, timeout=self.timeout, sock=sock)
+            self.client.connect(**connect_kwargs)
             self.shell = self.client.invoke_shell()
             self.prompt, self.hostname = self._get_prompt_and_hostname()
             self._pre_jumphost_hostname = self.hostname

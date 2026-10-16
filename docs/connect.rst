@@ -22,6 +22,24 @@ or if an exception if hit in your code it closes for you::
     # Code here while logged out of the device
 
 
+SSH Key Authentication
+======================
+
+By default, CiscoAutomationFramework disables automatic SSH key discovery (``look_for_keys=False`` and ``allow_agent=False``). This ensures Paramiko will never automatically probe discoverable keys in your user's ``~/.ssh/`` directory or query a running SSH agent, avoiding unexpected authentication rejects on network devices.
+
+To authenticate using an SSH private key, specify the key file explicitly via ``key_filename`` (and optional ``passphrase``)::
+
+    from CiscoAutomationFramework import connect_ssh
+
+    with connect_ssh('10.1.1.1', 'admin', key_filename='/path/to/private_key.pem') as ssh:
+        print(ssh.hostname)
+
+If your private key requires a passphrase::
+
+    with connect_ssh('10.1.1.1', 'admin', key_filename='/path/to/private_key.pem', passphrase='secret') as ssh:
+        print(ssh.hostname)
+
+
 Connecting Through a Linux Jump Host (Bastion)
 ==============================================
 

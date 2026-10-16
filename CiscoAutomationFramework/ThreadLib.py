@@ -23,21 +23,32 @@ class SSH(Thread, ABC):
 
     """
 
-    def __init__(self, ip, username, password, enable_password=None, perform_secondary_action=False, jumphost=None, **kwargs):
+    def __init__(self, ip, username, password=None, enable_password=None, perform_secondary_action=False, jumphost=None,
+                 key_filename=None, pkey=None, passphrase=None, look_for_keys=False, allow_agent=False, **kwargs):
         """
 
         :param ip: IP address of device
         :type ip: str
         :param username: Username to login with
         :type username: str
-        :param password: Password for user
-        :type password: str
+        :param password: Password for user (optional if key_filename or pkey is provided)
+        :type password: str or None
         :param enable_password: Enable password if login user does not have direct access to privilege exec mode
         :type enable_password: str
         :param perform_secondary_action: True/False to execute secondary_action method when logged in
         :type perform_secondary_action: bool
         :param jumphost: Optional JumpHost object or dict to tunnel connection through
         :type jumphost: JumpHost or dict
+        :param key_filename: Path to private key file for SSH key authentication
+        :type key_filename: str or None
+        :param pkey: Paramiko PKey object for SSH key authentication
+        :type pkey: paramiko.PKey or None
+        :param passphrase: Password/passphrase for decrypting the private key
+        :type passphrase: str or None
+        :param look_for_keys: Search ~/.ssh/ for discoverable keys (default False)
+        :type look_for_keys: bool
+        :param allow_agent: Query SSH agent for keys (default False)
+        :type allow_agent: bool
         """
         super().__init__()
         self.ip = ip
@@ -46,6 +57,12 @@ class SSH(Thread, ABC):
         self.enable_password = enable_password
         self.perform_secondary_action = perform_secondary_action
         self.jumphost = jumphost
+        self.key_filename = key_filename
+        self.pkey = pkey
+        self.passphrase = passphrase
+        self.look_for_keys = look_for_keys
+        self.allow_agent = allow_agent
+        self.extra_kwargs = kwargs
         self.hostname = ''
         self.commands_sent = []
         self.is_nexus = False
@@ -95,7 +112,23 @@ class SSH(Thread, ABC):
 
     def run(self) -> None:
         try:
-            with connect_ssh(self.ip, self.username, self.password, enable_password=self.enable_password, engine=self._ssh_engine, jumphost=self.jumphost) as ssh:
+            connect_kwargs = {
+                'enable_password': self.enable_password,
+                'engine': self._ssh_engine,
+                'jumphost': self.jumphost,
+            }
+            if self.key_filename is not None:
+                connect_kwargs['key_filename'] = self.key_filename
+            if self.pkey is not None:
+                connect_kwargs['pkey'] = self.pkey
+            if self.passphrase is not None:
+                connect_kwargs['passphrase'] = self.passphrase
+            if self.look_for_keys:
+                connect_kwargs['look_for_keys'] = self.look_for_keys
+            if self.allow_agent:
+                connect_kwargs['allow_agent'] = self.allow_agent
+            connect_kwargs.update(self.extra_kwargs)
+            with connect_ssh(self.ip, self.username, self.password, **connect_kwargs) as ssh:
                 self.is_nexus = ssh.is_nexus
                 self.hostname = ssh.hostname
                 self.during_login(ssh)
@@ -281,8 +314,9 @@ def _resolve_jumphost(jumphost, ip, index):
     return jumphost
 
 
-def start_threads(object, ips, username, password, enable_password=None,
-                  perform_secondary_action=False, wait_for_threads=False, jumphost=None, **kwargs):
+def start_threads(object, ips, username, password=None, enable_password=None,
+                  perform_secondary_action=False, wait_for_threads=False, jumphost=None,
+                  key_filename=None, pkey=None, passphrase=None, look_for_keys=False, allow_agent=False, **kwargs):
 
     """
     This helper function is a quick and easy way to start your threads. Gives you an option for waiting for threads
@@ -295,8 +329,8 @@ def start_threads(object, ips, username, password, enable_password=None,
     :type ips: list[str] or list[tuple[str, JumpHost]]
     :param username: Username to login with
     :type username: str
-    :param password: Password for user
-    :type password: str
+    :param password: Password for user (optional if key_filename or pkey is provided)
+    :type password: str or None
     :param enable_password: Enable password if user does not have rights to privilege exec mode without enable password
     :type enable_password: str
     :param perform_secondary_action: True if you want to run the secondary_action method against device
@@ -305,6 +339,16 @@ def start_threads(object, ips, username, password, enable_password=None,
     :type wait_for_threads: bool
     :param jumphost: Optional JumpHost, dict, dict mapping {ip: JumpHost}, list matching ips, or callable(ip)
     :type jumphost: JumpHost, dict, list, or callable
+    :param key_filename: Path to private key file for SSH key authentication
+    :type key_filename: str or None
+    :param pkey: Paramiko PKey object for SSH key authentication
+    :type pkey: paramiko.PKey or None
+    :param passphrase: Password/passphrase for decrypting the private key
+    :type passphrase: str or None
+    :param look_for_keys: Search ~/.ssh/ for discoverable keys (default False)
+    :type look_for_keys: bool
+    :param allow_agent: Query SSH agent for keys (default False)
+    :type allow_agent: bool
     :param kwargs: Keyword arguments to be passed to your object. If your child class accepts additional arguments, pass them to the object via keyword arguments here.
     :return: List of threads either running or completed depending on if wait_for_threads is True/False
     :rtype: list[SSH, SSHSplitDeviceType, type(object)]
@@ -325,15 +369,24 @@ def start_threads(object, ips, username, password, enable_password=None,
             ip = item
             thread_jumphost = _resolve_jumphost(jumphost, ip, idx)
 
+        worker_kwargs = {
+            'enable_password': enable_password,
+            'perform_secondary_action': perform_secondary_action,
+            'jumphost': thread_jumphost,
+            'key_filename': key_filename,
+            'pkey': pkey,
+            'passphrase': passphrase,
+            'look_for_keys': look_for_keys,
+            'allow_agent': allow_agent,
+        }
+        worker_kwargs.update(kwargs)
+
         threads.append(
             object(
                 ip=ip,
                 username=username,
                 password=password,
-                enable_password=enable_password,
-                perform_secondary_action=perform_secondary_action,
-                jumphost=thread_jumphost,
-                **kwargs
+                **worker_kwargs
             )
         )
 

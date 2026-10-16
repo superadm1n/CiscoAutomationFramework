@@ -31,8 +31,8 @@ class TestJumpHost(TestCase):
         self.assertEqual(jh.port, 2222)
         self.assertEqual(jh.key_filename, '/path/to/key.pem')
         self.assertIsNone(jh.password)
-        self.assertTrue(jh.look_for_keys)
-        self.assertTrue(jh.allow_agent)
+        self.assertFalse(jh.look_for_keys)
+        self.assertFalse(jh.allow_agent)
 
     def test_init_explicit_key_flags(self):
         jh = JumpHost(ip='10.0.0.1', username='user', password='pw', look_for_keys=True, allow_agent=True)
@@ -144,6 +144,10 @@ class TestSSHEngineTunneling(TestCase):
     def setUp(self):
         self.engine = SSHEngine()
 
+    def test_engine_defaults_disable_key_search(self):
+        self.assertFalse(self.engine.look_for_keys)
+        self.assertFalse(self.engine.allow_agent)
+
     @patch.object(SSHEngine, '_get_prompt_and_hostname', return_value=('router#', 'router'))
     def test_connect_to_server_direct(self, mock_prompt):
         mock_client = MagicMock()
@@ -152,10 +156,89 @@ class TestSSHEngineTunneling(TestCase):
         self.engine.connect_to_server('10.1.1.1', 'admin', 'pw', port=22, jumphost=None)
 
         mock_client.connect.assert_called_once_with(
-            hostname='10.1.1.1', port=22, username='admin', password='pw', timeout=10, sock=None
+            hostname='10.1.1.1',
+            port=22,
+            username='admin',
+            password='pw',
+            key_filename=None,
+            pkey=None,
+            passphrase=None,
+            timeout=10,
+            look_for_keys=False,
+            allow_agent=False,
+            sock=None
         )
         self.assertIsNone(self.engine.jump_client)
         self.assertIsNone(self.engine.jump_channel)
+
+    @patch.object(SSHEngine, '_get_prompt_and_hostname', return_value=('router#', 'router'))
+    def test_connect_to_server_with_key_filename(self, mock_prompt):
+        mock_client = MagicMock()
+        self.engine.client = mock_client
+
+        self.engine.connect_to_server(
+            '10.1.1.1', 'admin',
+            key_filename='/path/to/key.pem',
+            passphrase='secret',
+            port=22
+        )
+
+        mock_client.connect.assert_called_once_with(
+            hostname='10.1.1.1',
+            port=22,
+            username='admin',
+            password=None,
+            key_filename='/path/to/key.pem',
+            pkey=None,
+            passphrase='secret',
+            timeout=10,
+            look_for_keys=False,
+            allow_agent=False,
+            sock=None
+        )
+
+    @patch.object(SSHEngine, '_get_prompt_and_hostname', return_value=('router#', 'router'))
+    def test_connect_to_server_with_pkey(self, mock_prompt):
+        mock_client = MagicMock()
+        self.engine.client = mock_client
+        mock_pkey = MagicMock()
+
+        self.engine.connect_to_server('10.1.1.1', 'admin', pkey=mock_pkey, port=22)
+
+        mock_client.connect.assert_called_once_with(
+            hostname='10.1.1.1',
+            port=22,
+            username='admin',
+            password=None,
+            key_filename=None,
+            pkey=mock_pkey,
+            passphrase=None,
+            timeout=10,
+            look_for_keys=False,
+            allow_agent=False,
+            sock=None
+        )
+
+    @patch.object(SSHEngine, '_get_prompt_and_hostname', return_value=('router#', 'router'))
+    def test_connect_to_server_override_look_for_keys(self, mock_prompt):
+        mock_client = MagicMock()
+        self.engine.client = mock_client
+
+        self.engine.connect_to_server('10.1.1.1', 'admin', 'pw', look_for_keys=True, allow_agent=True)
+
+        mock_client.connect.assert_called_once_with(
+            hostname='10.1.1.1',
+            port=22,
+            username='admin',
+            password='pw',
+            key_filename=None,
+            pkey=None,
+            passphrase=None,
+            timeout=10,
+            look_for_keys=True,
+            allow_agent=True,
+            sock=None
+        )
 
     @patch.object(SSHEngine, '_get_prompt_and_hostname', return_value=('router#', 'router'))
     def test_connect_to_server_with_jumphost_instance(self, mock_prompt):
@@ -174,7 +257,17 @@ class TestSSHEngineTunneling(TestCase):
         jh.connect.assert_called_once()
         jh.open_channel.assert_called_once_with(mock_jump_client, '10.1.1.1', 22)
         mock_client.connect.assert_called_once_with(
-            hostname='10.1.1.1', port=22, username='admin', password='pw', timeout=10, sock=mock_jump_channel
+            hostname='10.1.1.1',
+            port=22,
+            username='admin',
+            password='pw',
+            key_filename=None,
+            pkey=None,
+            passphrase=None,
+            timeout=10,
+            look_for_keys=False,
+            allow_agent=False,
+            sock=mock_jump_channel
         )
         self.assertEqual(self.engine.jump_client, mock_jump_client)
         self.assertEqual(self.engine.jump_channel, mock_jump_channel)
@@ -196,7 +289,17 @@ class TestSSHEngineTunneling(TestCase):
 
         mock_connect.assert_called_once()
         mock_client.connect.assert_called_once_with(
-            hostname='10.1.1.1', port=22, username='admin', password='pw', timeout=10, sock=mock_jump_channel
+            hostname='10.1.1.1',
+            port=22,
+            username='admin',
+            password='pw',
+            key_filename=None,
+            pkey=None,
+            passphrase=None,
+            timeout=10,
+            look_for_keys=False,
+            allow_agent=False,
+            sock=mock_jump_channel
         )
 
     def test_connect_to_server_raises_device_auth_exception(self):
