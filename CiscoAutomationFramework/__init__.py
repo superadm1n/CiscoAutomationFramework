@@ -14,7 +14,7 @@ from CiscoAutomationFramework.Exceptions import (
 )
 import inspect
 
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 
 
 def connect_ssh(ip, username, password=None, port=22, enable_password=None, timeout=10,
